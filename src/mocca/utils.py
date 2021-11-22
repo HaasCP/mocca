@@ -8,7 +8,8 @@ Created on Fri Aug  6 14:58:54 2021
 
 import math
 
-def is_unimodal(L, high_val_threshold = math.inf):
+
+def is_unimodal(L, high_val_threshold=math.inf):
     """
     Checks if a list is unimodal (for use in peak purity).
 

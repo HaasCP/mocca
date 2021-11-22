@@ -10,7 +10,7 @@ class Peak():
     left : int
     right : int
     maximum : int
-    dataset : typing.Any #DADData parent of peak
+    dataset : typing.Any  # DADData parent of peak
     saturation : bool = None
     pure : bool = None
     istd : bool = None
@@ -231,13 +231,20 @@ class Peak():
         
 
         agilent_test = np.sum(np.greater(correls, agilent_thresholds)) / peak_data.shape[1] #check if > 90% of the points are greater than the modified agilent threshold.
-        correls_test_1 = np.min(correls) #if peak is pure, overall correlation across all relevant peaks should be high
-        correls_test_2 = np.mean(correls) #if peak is pure, average correlation across all peaks should also be high
-        unimodality_test = is_unimodal(np.convolve(correls, np.ones(3), 'valid') / 3, 0.99) #averaging filter of length 3 https://stackoverflow.com/questions/14313510/how-to-calculate-rolling-moving-average-using-numpy-scipy
+        #if peak is pure, overall correlation across all relevant peaks should be high
+        correls_test_1 = np.min(correls) 
+        # if peak is pure, average correlation across all peaks should be high
+        correls_test_2 = np.mean(correls)
+        # averaging filter of length 3 
+        # https://stackoverflow.com/questions/14313510/how-to-calculate- \
+            # rolling-moving-average-using-numpy-scipy
+        unimodality_test = is_unimodal(np.convolve(correls, np.ones(3), 
+                                                   'valid') / 3, 0.99)
 
         pca = PCA(n_components=1)
         pca.fit(peak_data)
-        pca_test = pca.explained_variance_ratio_[0] #if peak is pure, % explained with just one component should be high
+        # if peak is pure, % explained with just one component should be high
+        pca_test = pca.explained_variance_ratio_[0]
 
         if show_analytics:
             plt.plot(correls)
@@ -246,33 +253,43 @@ class Peak():
             for i in range(peak_data.shape[1]):
                 plt.plot(peak_data[:, i])
             plt.show()
-            print(f"Agilent Threshold (True for >0.9): {agilent_test} \n" \
-                  f"Unimodality Test (False for False): {unimodality_test} \n" \
-                  f"PCA Variance Explained (True for >0.995): {pca_test} \n" \
-                  f"Minimum Correlation (False for <0.9): {correls_test_1} \n" \
-                  f"Minimum Correlation (True for >0.95): {correls_test_1} \n" \
+            print(f"Agilent Threshold (True for >0.9): {agilent_test} \n"
+                  f"Unimodality Test (False for False): {unimodality_test} \n"
+                  f"PCA Variance Explained (True for >0.995): {pca_test} \n"
+                  f"Minimum Correlation (False for <0.9): {correls_test_1} \n"
+                  f"Minimum Correlation (True for >0.95): {correls_test_1} \n"
                   f"Average Correlation (True for >0.98): {correls_test_2} \n")
 
-        if agilent_test > 0.9: #if agilent threshold reached, then probably pure, so don't do other checks
+        # if agilent threshold reached, then probably pure
+        if agilent_test > 0.9:
             return True
+        # for pure peak, correlation array emperically expected to be unimodal
         if not unimodality_test:
-            return False #for a pure peak, correlation array is emperically expected to be unimodal
-        if pca_test > 0.995: #if pca big enough, then probably pure
-            return True
-        if correls_test_1 < 0.9: #if any correlation is < 0.9, then probably impure somewhere
             return False
-        if correls_test_1 > 0.95: # otherwise, check if correlation shows that it is reasonably pure
+        # if pca big enough, then probably pure
+        if pca_test > 0.995:
+            return True
+        # if any correlation is < 0.9, then probably impure somewhere
+        if correls_test_1 < 0.9:
+            return False
+        # otherwise, check if correlation shows that it is reasonably pure
+        if correls_test_1 > 0.95:
             return True
         if correls_test_2 > 0.98:
             return True
-        return False  
+        return False
 
-    def _check_peak_purity(self, detector_limit, wavelength_filter, 
-                            data_filter, show_analytics):
-
-        peak_data = self._filter_peak_data(data_filter = data_filter, wavelength_filter = wavelength_filter, detector_limit = detector_limit)
-        noise_data = self.dataset.data[:,np.max(self.dataset.data, axis=0) < 0.01 * np.max(self.dataset.data)] #filtered dataset with only timepoints whose max absorbance at any wavelength is 0.01 * max absorbance
-        noise_variance = np.mean(np.var(noise_data, axis=0)) #take the average of the variance over all wavelengths
-        return self._check_peak_thresholds(peak_data = peak_data, noise_variance = noise_variance, show_analytics = show_analytics)
-
-
+    def _check_peak_purity(self, detector_limit, wavelength_filter,
+                           data_filter, show_analytics):
+        peak_data = self._filter_peak_data(data_filter=data_filter,
+                                           wavelength_filter=wavelength_filter,
+                                           detector_limit=detector_limit)
+        # filtered dataset with only timepoints whose max absorbance at
+        # any wavelength is 0.01 * max absorbance
+        noise_data = self.dataset.data[:, np.max(self.dataset.data, axis=0) <
+                                       0.01 * np.max(self.dataset.data)]
+        # take the average of the variance over all wavelengths
+        noise_variance = np.mean(np.var(noise_data, axis=0))
+        return self._check_peak_thresholds(peak_data=peak_data,
+                                           noise_variance=noise_variance,
+                                           show_analytics=show_analytics)
