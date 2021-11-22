@@ -8,7 +8,7 @@ Created on Fri Aug  6 14:58:54 2021
 
 import math
 
-def is_unimodal(L, high_val_threshold = math.inf): 
+def is_unimodal(L, high_val_threshold = math.inf):
     """
     Checks if a list is unimodal (for use in peak purity).
 
@@ -27,7 +27,7 @@ def is_unimodal(L, high_val_threshold = math.inf):
         True if the list is unimodal ignoring high values; False otherwise.
     """
 
-    passed_turning_point = False 
+    passed_turning_point = False
     for idx in range(len(L) - 1):
         if not passed_turning_point:
             if L[idx] <= L[idx + 1] or L[idx] > high_val_threshold:

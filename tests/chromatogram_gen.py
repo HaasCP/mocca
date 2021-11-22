@@ -61,9 +61,9 @@ class Chromatogram():
         df['Timepoint'] = timepoints
         df['Absorbance'] = absorbances
         plot = plot_1D_data(df = df, xlabel = 'Timepoint', ylabel = 'Absorbance', title = 'Summed Data Plot')
-        display(plot) #for display in jupyter notebook
+        display(plot)  # for display in jupyter notebook
 
-    def write_csv(self, csv_path, time_interval = 0.001):
+    def write_csv(self, csv_path, time_interval=0.001):
         df = pd.DataFrame(self.data.T, columns=np.array(wavelength), index=np.array(self.time) * time_interval)
         df.to_csv(csv_path)
 
