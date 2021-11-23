@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import logging
 from sklearn.decomposition import PCA
 from mocca.utils import is_unimodal
 from dataclasses import dataclass
@@ -157,18 +158,18 @@ class Peak():
             distance_to_max = abs(component.maximum - self.maximum)
             if distance_to_max < abs_threshold + rel_threshold * component.maximum and \
                     similarity > similarity_threshold:
-                matches.append({'name': component.name, 'similarity': similarity})
+                matches.append({'compound_id': component.compound_id, 'similarity': similarity})
             # sort in decreasing order, based on similarity of spectra
             matches.sort(key=lambda x: -x['similarity'])
 
         if len(matches) == 0:
-            print("Warning: check_database() found no matches for peak {}, setting compound_id as Unknown".format(self.idx))
+            logging.warning("Warning: check_database() found no matches for peak {}, setting compound_id as Unknown".format(self.idx))
             return "Unknown"
 
         if len(matches) > 1:
-            print("Warning: check_database() found multiple matches for peak {}, the full list is {}".format(self.idx, matches))
+            logging.warning("Warning: check_database() found multiple matches for peak {}, the full list is {}".format(self.idx, matches))
 
-        return matches[0]['name']
+        return matches[0]['compound_id']
 
     def set_compound_id(self, component_database, abs_threshold=100,
                         rel_threshold=0.01, similarity_threshold=0.9):
@@ -183,7 +184,7 @@ class Peak():
         """
 
         if self.pure is None or not self.pure:
-            print("Warning: Running set_compound_id() on impure peak {}.".format(self.idx))
+            logging.warning("Warning: Running set_compound_id() on impure peak {}.".format(self.idx))
 
         self.compound_id = self.check_database(component_database=component_database,
                                                abs_threshold=abs_threshold,
@@ -200,23 +201,23 @@ class Peak():
 
         Parameters
         ----------
-        component_database : micdrop.component_database
-            A component database containing all seen components.
-
-        abs_threshold : numeric
-            The absolute number of timepoints that the retention time is allowed to
-            be off by. Default is 100.
-
-        rel_threshold : numeric
-            The relative fraction of timepoints that the retention time is allowed to
-            be off by. Default is 0.01.
+        quantification_database : micdrop.QuantificationDatabase
+            A quantification database containing all seen components.
 
         Raises Exception if the attributes self.integral or self.compound_id are
         not set. Prints a text warning if self.pure is not set.
+
+        Modifies
+        --------
+        self.concentration : sets concentration to that predicted by integral
         """
         if self.integral is None or self.compound_id is None:
             raise Exception("Must set peak integral and compound_id before attempting to quantify!")
-        raise NotImplementedError("TODO")
+
+        if self.pure is None or not self.pure:
+            logging.warning("Warning: Running quantify_peak() on impure peak {}.".format(self.idx))
+
+        self.concentration = quantification_database.quantify_peak(self.integral, self.compound_id)
 
     def _check_peak_saturation(self, detector_limit):
         return self.dataset.data[:, self.maximum].max() > detector_limit

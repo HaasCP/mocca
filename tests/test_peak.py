@@ -67,7 +67,7 @@ plot_test_data(test_data_5)
 
 def test_peak_overlap_1():
     # check that non-overlapping peaks are detected as non-overlapping
-    peak_1 = Peak(left=100, right=200, maximum=150, dataset=test_data_1)
+    peak_1 = Peak(left=100, right=200, maximum=100, dataset=test_data_1)
     peak_2 = Peak(left=250, right=350, maximum=300, dataset=test_data_1)
     assert not peak_1.peak_overlap(peak_2)
     assert not peak_2.peak_overlap(peak_1)
@@ -76,7 +76,7 @@ def test_peak_overlap_1():
 def test_peak_overlap_2():
     # check that overlapping peaks are detected as overlapping
     peak_1 = Peak(left=100, right=200, maximum=150, dataset=test_data_1)
-    peak_2 = Peak(left=150, right=250, maximum=200, dataset=test_data_1)
+    peak_2 = Peak(left=100, right=200, maximum=150, dataset=test_data_1)
     assert peak_1.peak_overlap(peak_2)
     assert peak_2.peak_overlap(peak_1)
 
@@ -85,7 +85,7 @@ def test_peak_overlap_3():
     # check that different dataset peaks do throw an exception
     with pytest.raises(Exception):
         peak_1 = Peak(left=100, right=200, maximum=150, dataset=test_data_1)
-        peak_2 = Peak(left=150, right=250, maximum=200, dataset=test_data_2)
+        peak_2 = Peak(left=100, right=200, maximum=150, dataset=test_data_2)
         peak_1.peak_overlap(peak_2)
 
 
@@ -115,7 +115,7 @@ def test_peak_integral_1():
 
 def test_peak_integral_2():
     # check that peak integral is large over actual peak
-    peak = Peak(left=90, right=100, maximum=110, dataset=test_data_1)
+    peak = Peak(left=90, right=110, maximum=100, dataset=test_data_1)
     peak.integrate_peak()
     assert peak.integral is not None
     assert peak.integral > 0.9
@@ -124,7 +124,7 @@ def test_peak_integral_2():
 
 
 def test_peak_purity_saturation_1():
-    peak = Peak(left=50, right=100, maximum=150, dataset=test_data_1)
+    peak = Peak(left=80, right=120, maximum=100, dataset=test_data_1)
     peak.check_peak(detector_limit=10, show_analytics=show_peak_purity_analytics,
                     wavelength_filter=False, data_filter=False)
     assert peak.pure
@@ -132,7 +132,7 @@ def test_peak_purity_saturation_1():
 
 
 def test_peak_purity_saturation_2():
-    peak = Peak(left=50, right=100, maximum=150, dataset=test_data_1)
+    peak = Peak(left=80, right=120, maximum=100, dataset=test_data_1)
     peak.check_peak(detector_limit=10, show_analytics=show_peak_purity_analytics,
                     wavelength_filter=True, data_filter=False)
     assert peak.pure
@@ -140,7 +140,7 @@ def test_peak_purity_saturation_2():
 
 
 def test_peak_purity_saturation_3():
-    peak = Peak(left=50, right=100, maximum=150, dataset=test_data_1)
+    peak = Peak(left=80, right=120, maximum=100, dataset=test_data_1)
     peak.check_peak(detector_limit=10, show_analytics=show_peak_purity_analytics,
                     wavelength_filter=False, data_filter=True)
     assert peak.pure
@@ -148,7 +148,7 @@ def test_peak_purity_saturation_3():
 
 
 def test_peak_purity_saturation_4():
-    peak = Peak(left=50, right=100, maximum=150, dataset=test_data_1)
+    peak = Peak(left=80, right=120, maximum=100, dataset=test_data_1)
     peak.check_peak(detector_limit=10, show_analytics=show_peak_purity_analytics,
                     wavelength_filter=True, data_filter=True)
     assert peak.pure
@@ -246,7 +246,7 @@ def test_component_database_1():
 def test_component_database_2():
     # component database add peak with same name
     with pytest.raises(Exception):
-        peak_1 = Peak(left=130, right=170, maximum=150, dataset=test_data_1)
+        peak_1 = Peak(left=130, right=150, maximum=100, dataset=test_data_1)
         peak_2 = Peak(left=280, right=330, maximum=300, dataset=test_data_1)
         component_database = ComponentDatabase()
         component_database.add_peak(peak_1, 'Component 1')
@@ -256,7 +256,7 @@ def test_component_database_2():
 def test_component_database_3():
     # component database get unadded item
     with pytest.raises(Exception):
-        peak_1 = Peak(left=130, right=170, maximum=150, dataset=test_data_1)
+        peak_1 = Peak(left=130, right=150, maximum=100, dataset=test_data_1)
         peak_2 = Peak(left=280, right=330, maximum=300, dataset=test_data_1)
         component_database = ComponentDatabase()
         component_database.add_peak(peak_1, 'Component 1')
@@ -314,17 +314,78 @@ def test_check_database_2():
 
 
 def test_peak_quantification_1():
-    peak_1 = Peak(left=130, right=170, maximum=150, dataset=test_data_1)
+    peak_1 = Peak(left=90, right=110, maximum=100, dataset=test_data_1)
     component_database = ComponentDatabase()
     component_database.add_peak(peak_1, 'Component 1')
 
-    quantification_database = QuantificationDatabase()
+    qd = QuantificationDatabase()
 
     # error because self.integral and self.compound_id is None
     with pytest.raises(Exception):
-        peak_1.quantify_peak(quantification_database)
+        peak_1.quantify_peak(qd)
+
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(1, 0.9))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(2, 2.1))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(3, 3))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(4, 4))
 
     peak_1.integrate_peak()
+    print(peak_1.integral)
+    peak_1.check_peak(detector_limit=10)
     peak_1.set_compound_id(component_database)
+    peak_1.quantify_peak(qd)
+    # quant database formula should be roughly y = x
+    assert abs(peak_1.concentration - peak_1.integral) < 0.1
 
-    peak_1.quantify_peak(quantification_database)
+
+def test_peak_quantification_2():
+    peak_1 = Peak(left=90, right=110, maximum=100, dataset=test_data_1)
+    component_database = ComponentDatabase()
+    component_database.add_peak(peak_1, 'Component 1')
+
+    qd = QuantificationDatabase()
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(1, 2))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(2, 5))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(3, 8))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(4, 10))
+
+    peak_1.integrate_peak()
+    peak_1.check_peak(detector_limit=10)
+    peak_1.set_compound_id(component_database)
+    peak_1.quantify_peak(qd)
+    # quant database formula should be roughly y = 2.5x
+    assert abs(peak_1.concentration - 2.5 * peak_1.integral) < 0.1
+
+
+def test_peak_quantification_3():
+    peak_1 = Peak(left=90, right=110, maximum=100, dataset=test_data_1)
+    component_database = ComponentDatabase()
+    component_database.add_peak(peak_1, 'Component 1')
+
+    qd = QuantificationDatabase()
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(1, 5))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(2, 5))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(3, 5))
+    qd.add_compound_concentration(compound_id=('Component 1'), conc_info=(4, 5))
+
+    peak_1.integrate_peak()
+    peak_1.check_peak(detector_limit=10)
+    peak_1.set_compound_id(component_database)
+    peak_1.quantify_peak(qd)
+    # make sure regression line passes through 0 still
+    assert abs(peak_1.concentration - 5) > 0.1
+
+
+def test_peak_quantification_4():
+    peak_1 = Peak(left=90, right=110, maximum=100, dataset=test_data_1)
+    component_database = ComponentDatabase()
+    component_database.add_peak(peak_1, 'Component 1')
+
+    qd = QuantificationDatabase()
+    qd.add_compound_concentration(compound_id=('Nonexistent 1'), conc_info=(1, 5))
+
+    peak_1.integrate_peak()
+    peak_1.check_peak(detector_limit=10)
+    peak_1.set_compound_id(component_database)
+    with pytest.raises(Exception):  # test nonexistent compound error
+        peak_1.quantify_peak(qd)
