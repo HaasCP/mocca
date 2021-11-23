@@ -62,6 +62,13 @@ plot_test_data(test_data_5)
 
 # ACTUAL TESTS
 
+def test_get_attribute_1():
+    peak_1 = Peak(left=100, right=200, maximum=100, dataset=test_data_1)
+    assert peak_1.get_attribute('left') == 100
+    assert peak_1.get_attribute('right') == 200
+    assert peak_1.get_attribute('maximum') == 100
+    assert peak_1.get_attribute('dataset') == test_data_1
+
 # PEAK CLASS TESTS
 
 
