@@ -6,7 +6,7 @@ Created on Tue Nov 23 15:55:25 2021
 @author: haascp
 """
 
-from mocca.peak import Peak
+import mocca.peak
 from mocca.utils import is_unimodal
 
 import numpy as np
@@ -15,17 +15,22 @@ from sklearn.decomposition import PCA
 
 
 class PeakPurityPredictor:
-    def __init__(self, peak):
+    def __init__(self, passed_peak):
         """
         Parameters
         ----------
         peak : mocca Peak object
         """
-        if type(peak) == Peak:
-            self.peak = peak
+        if type(passed_peak) == mocca.peak.Peak:
+            self.peak = passed_peak
         else:
             raise Exception("The given peaks is not an object of the mocca Peak class")
-        self.peak_data = self.peak.dataset.data[:, self.peak.left:self.peak.right]
+        peak_data = self.peak.dataset.data[:, self.peak.left:self.peak.right]
+        # cutting edges of the peak to 5% of max absorbance to avoid noise artifacts
+        self.peak_data = peak_data[:, np.sum(peak_data, axis=0) > 0.05 *
+                                   np.max(np.sum(peak_data, axis=0))]
+
+        self.max_loc = np.argmax(np.sum(self.peak_data, axis=0))
 
         # Filteres dataset with only timepoints whose max absorbance at
         # any wavelength is below 1% of max absorbance
@@ -36,15 +41,18 @@ class PeakPurityPredictor:
 
         # Get a list with correlation coefficients of UV-Vis spectra at every
         # timepoint with reference to the UV-Vis spectrum at maximum absorbance
-        self.correls = [(np.corrcoef(self.peak_data[:, i],
-                                     self.peak_data[:, self.peak.maximum])[0, 1])**2
-                        for i in range(self.peak_data.shape[1])]
-
+        correls_to_max = [(np.corrcoef(self.peak_data[:, i],
+                                       self.peak_data[:, self.max_loc])[0, 1])**2
+                          for i in range(self.peak_data.shape[1])]
+        correls_to_left = [(np.corrcoef(self.peak_data[:, i],
+                                        self.peak_data[:, 0])[0, 1])**2
+                           for i in range(self.peak_data.shape[1])]
+        self.correls = [correls_to_max, correls_to_left]
         self.test_agilent = self.calc_purity_agilent()
         # averaging filter of length 3
         # https://stackoverflow.com/questions/14313510/how-to-calculate-
         # rolling-moving-average-using-numpy-scipy
-        self.test_unimodality = is_unimodal(np.convolve(self.correls, np.ones(3),
+        self.test_unimodality = is_unimodal(np.convolve(self.correls[0], np.ones(3),
                                                         'valid') / 3, 0.99)
         self.test_pca = self.calc_pca_explained_variance()
         # if peak is pure, overall correlation across all relevant peaks should be high
@@ -59,12 +67,12 @@ class PeakPurityPredictor:
         """
         agilent_thresholds = [(max(0, 1 - param *
                                    (self.noise_variance / np.var(self.peak_data[:, i]) +
-                                    self.noise_variance / np.var(self.peak_data[:, self.peak.maximum]))))**2  # noqa: E501
+                                    self.noise_variance / np.var(self.peak_data[:, self.max_loc]))))**2  # noqa: E501
                               for i in range(self.peak_data.shape[1])]
         self.agilent_thresholds = agilent_thresholds
 
         # check if > 90% of the points are greater than the modified agilent threshold.
-        agilent_test = np.sum(np.greater(self.correls, agilent_thresholds)) / \
+        agilent_test = np.sum(np.greater(self.correls[0], agilent_thresholds)) / \
             self.peak_data.shape[1]
         return agilent_test
 
@@ -104,8 +112,11 @@ class PeakPurityPredictor:
         """
         Plots and prints infromation about the peak purity prediction.
         """
-        plt.plot(self.correls)
+        plt.plot(self.correls[0])
         plt.plot(self.agilent_thresholds)
+        plt.show()
+        plt.plot(self.correls[0])
+        plt.plot(self.correls[1])
         plt.show()
         for i in range(self.peak_data.shape[1]):
             plt.plot(self.peak_data[:, i])
