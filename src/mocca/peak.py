@@ -1,7 +1,9 @@
 import numpy as np
 
 from dataclasses import dataclass
-import typing
+from typing import Optional, Any
+# TODO: Replace Any by DadData
+
 
 from mocca.peak_purity import PeakPurityPredictor
 
@@ -11,14 +13,14 @@ class Peak():
     left : int
     right : int
     maximum : int
-    dataset : typing.Any  # DADData parent of peak
-    saturation : bool = None
-    pure : bool = None
-    istd : bool = None
-    integral : float = None
-    compound_id : str = None
-    idx : int = None
-    concentration : float = None
+    dataset : Any  # DADData parent of peak
+    saturation : Optional[bool] = None
+    pure : Optional[bool] = None
+    istd : Optional[bool] = None
+    integral : Optional[float] = None
+    compound_id : Optional[str] = None
+    idx : Optional[int] = None
+    concentration : Optional[float] = None
 
     # Peak processing functions
     def expand_peak(self, absorbance_threshold):
@@ -100,10 +102,10 @@ class Peak():
         --------
         self.peak.pure : bool based on purity prediction.
         """
-        purity_predictor = PeakPurityPredictor(self)
+        purity_predictor = PeakPurityPredictor()
+        self.pure = purity_predictor.predict_peak_purity(self)
         if print_purity_check:
             purity_predictor.show_analytics()
-        self.pure = purity_predictor.predict_peak_purity()
 
     def process_peak(self, absorbance_threshold, detector_limit,
                      print_purity_check=False):
@@ -116,6 +118,15 @@ class Peak():
         self.check_peak_purity(print_purity_check)
 
     # Functions including second peak
+    def __eq__(self, other):
+        if not isinstance(other, Peak):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+        return (self.left == other.left and
+                self.right == other.right and
+                self.maximum == other.maximum and
+                self.dataset == other.dataset)
+
     def check_same_type(self, other):
         """
         Raises exception if given peak is not an mocca peak object
@@ -123,7 +134,6 @@ class Peak():
         if type(other) != type(self):
             raise Exception("Given peak is not an \
                             object of the mocca Peak class")
-        # TODO: handle exception and write test
 
     def check_same_dataset(self, other):
         """
@@ -134,7 +144,6 @@ class Peak():
             raise Exception("Peaks are not from the same dataset, \
                             when comparing peak {} and {}!".format(self.idx,
                             other.idx))
-        # TODO: handle exception and write test
 
     def check_overlap(self, other):
         """
@@ -152,3 +161,7 @@ class Peak():
         """
         self.check_same_dataset(other)
         return abs(self.maximum - other.maximum)
+
+    # Functions including databases
+    def set_compound_id(self, component_db, len_time_vec):
+        pass

@@ -15,7 +15,20 @@ from sklearn.decomposition import PCA
 
 
 class PeakPurityPredictor:
-    def __init__(self, passed_peak):
+    def __init__(self):
+        self.peak = None
+        self.peak_data = None
+        self.max_loc = None
+        self.noise_variance = None
+        self.correls = None
+        self.test_agilent = None
+        self.test_unimodality = None
+        self.test_pca = None
+        self.test_correls_1 = None
+        self.test_correls_2 = None
+        self.agilent_thresholds = None
+
+    def _add_peak(self, passed_peak):
         """
         Parameters
         ----------
@@ -48,19 +61,19 @@ class PeakPurityPredictor:
                                         self.peak_data[:, 0])[0, 1])**2
                            for i in range(self.peak_data.shape[1])]
         self.correls = [correls_to_max, correls_to_left]
-        self.test_agilent = self.calc_purity_agilent()
+        self.test_agilent = self._calc_purity_agilent()
         # averaging filter of length 3
         # https://stackoverflow.com/questions/14313510/how-to-calculate-
         # rolling-moving-average-using-numpy-scipy
         self.test_unimodality = is_unimodal(np.convolve(self.correls[0], np.ones(3),
                                                         'valid') / 3, 0.99)
-        self.test_pca = self.calc_pca_explained_variance()
+        self.test_pca = self._calc_pca_explained_variance()
         # if peak is pure, overall correlation across all relevant peaks should be high
         self.test_correls_1 = np.min(self.correls)
         # if peak is pure, average correlation across all peaks should be high
         self.test_correls_2 = np.mean(self.correls)
 
-    def calc_purity_agilent(self, param=2.5):
+    def _calc_purity_agilent(self, param=2.5):
         """
         Uses Agilent's peak purity algorithm to predict purity of peak. Param
         gives strictness of test (original was 0.5, which is more strict)
@@ -76,7 +89,7 @@ class PeakPurityPredictor:
             self.peak_data.shape[1]
         return agilent_test
 
-    def calc_pca_explained_variance(self):
+    def _calc_pca_explained_variance(self):
         """
         Calculates the ration of explained variance by the first principal
         component of the devonvoluted peak data.
@@ -85,10 +98,11 @@ class PeakPurityPredictor:
         pca.fit(self.peak_data)
         return pca.explained_variance_ratio_[0]
 
-    def predict_peak_purity(self):
+    def predict_peak_purity(self, passed_peak):
         """
         Returns peak purity prediction by performing the described test sequence.
         """
+        self._add_peak(passed_peak)
         #  if agilent threshold reached, then probably pure
         if self.test_agilent > 0.9:
             return True
