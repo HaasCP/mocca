@@ -23,6 +23,7 @@ class CompoundIdPredictor():
         for component in component_db:
             similarity = np.corrcoef(component.spectrum,
                                      peak_spectrum)[1, 0]
+    
         
         
         

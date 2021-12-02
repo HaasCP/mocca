@@ -100,7 +100,25 @@ def quantify_peak(self, quantification_database):
 
     self.concentration = quantification_database.quantify_peak(self.integral,
                                                                self.compound_id)
-    
+
+
+def test_peak_integral_1():
+    # check that peak integral is approximately 0 over empty peak area
+    peak = Peak(left=550, right=650, maximum=600, dataset=test_data[0])
+    peak.integrate_peak()
+    assert peak.integral is not None
+    assert peak.integral < 0.005  # approximate noise level
+
+
+def test_peak_integral_2():
+    # check that peak integral is large over actual peak
+    peak = Peak(left=90, right=110, maximum=100, dataset=test_data[0])
+    peak.integrate_peak()
+    assert peak.integral is not None
+    assert peak.integral > 0.9
+    # each peak should integrate to roughly its concentration in the chromatogram_gen
+    # as spectra are normalized to area 1
+
 # PEAK CHECK DATABASE TESTS
 
 def test_check_database_1():

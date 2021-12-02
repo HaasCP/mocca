@@ -1,36 +1,15 @@
-from dataclasses import dataclass
-import logging
-import numpy as np
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Dec  2 16:32:36 2021
 
+@author: haascp
+"""
+from mocca.databases.base import BaseDatabase
 
-@dataclass
-class Component():
-    compound_id: str
-    left: int
-    right: int
-    maximum: int
-    spectrum: list
-    created_from: list
-    
-    def __post_init__(self):
-        try:
-            self.right > self.maximum
-        except:
-            raise NotImplemented
-
-class ComponentDatabase():
+class ComponentDatabase(BaseDatabase):
     def __init__(self):
         self.components = []
-
-    def _delete_all_components(self):
-        """
-        Clears all components out of database.
-        """
-        if self.components:
-            self.components = []
-            logging.debug("Components deleted from database.")
-        else:
-            logging.debug("Components alread empty in database.")
 
     def _average_peak_spectrum(self, peak):
         """

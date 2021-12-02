@@ -3,7 +3,7 @@ import pandas as pd
 import random
 import math
 import matplotlib.pyplot as plt
-from mocca.visualization import contour_map, plot_1D_data
+from mocca.utils.visualization import contour_map, plot_1D_data
 from sim_test_data import test_spectra, wavelength
 
 

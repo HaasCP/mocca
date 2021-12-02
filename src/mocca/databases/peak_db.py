@@ -28,3 +28,6 @@ class PeakDatabase():
                     self.peaks = [p for p in self.peaks if not p == peak]
             self.peaks.append(new_peak)
             logging.debug("Peak {} added to the database.".format(new_peak))
+
+# parent database class (abc)
+# database composition insert update etc. 
