@@ -6,13 +6,20 @@ Created on Thu Dec  2 10:00:18 2021
 @author: haascp
 """
 import math
+import numpy as np
 
 def get_peak_data(peak):
     """
     Returns absorbance data from the left to the right border of the peak
     for all wavelengths.
     """
-    return peak.dataset.data[:, peak.left:peak.right]
+    return peak.dataset.data[:, peak.left:(peak.right + 1)]
+
+def average_peak_spectrum(peak):
+    """
+    Calculates mean spectrum over peak from left to right border.
+    """
+    return np.average(get_peak_data(peak), axis=0).tolist()
 
 def is_unimodal(L, high_val_threshold=math.inf):
     """

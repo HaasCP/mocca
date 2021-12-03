@@ -26,16 +26,16 @@ class PickedPeak(BasePeak):
                 self.dataset == other.dataset)
 
 @dataclass(frozen = True, eq = False)
-class ProcessedPeak(PickedPeak):
+class CheckedPeak(PickedPeak):
     saturation : bool
     pure : bool
 
 @dataclass(frozen = True, eq = False)
-class AssignedPeak(ProcessedPeak):
-    istd : bool
-    compound_id : str
+class AssignedPeak(CheckedPeak):
+    # istd : bool
+    compound_id : Optional[str]
 
 @dataclass(frozen = True, eq = False)
-class QuantifiedPeak(AssignedPeak):
+class ProcessedPeak(AssignedPeak):
     integral : float
-    concentration : float
+    concentration : Optional[float]

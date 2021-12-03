@@ -6,17 +6,17 @@ Created on Fri Nov 26 08:28:12 2021
 @author: haascp
 """
 
-from mocca.peak import Peak
+from mocca.peak.models import ProcessedPeak
+from mocca.databases.base import BaseDatabase
+
 import logging
 
 
-class PeakDatabase():
-    def __init__(self):
-        self.peaks = []
+class PeakDatabase(BaseDatabase):
 
-    def insert_peak(self, new_peak):
-        if type(new_peak) != Peak:
-            logging.warning("Warning: Data {} is not of the mocca Peak type."
+    def insert_item(self, new_peak):
+        if type(new_peak) != ProcessedPeak:
+            logging.warning("Warning: Data {} is not of the mocca ProcessedPeak type."
                             "Given data not inserted in the database".format(new_peak))
             return
         else:
@@ -28,6 +28,4 @@ class PeakDatabase():
                     self.peaks = [p for p in self.peaks if not p == peak]
             self.peaks.append(new_peak)
             logging.debug("Peak {} added to the database.".format(new_peak))
-
-# parent database class (abc)
-# database composition insert update etc. 
+    

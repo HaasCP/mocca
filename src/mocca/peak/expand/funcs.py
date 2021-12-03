@@ -7,6 +7,8 @@ Created on Thu Dec  2 09:16:47 2021
 """
 import numpy as np
 
+from mocca.peak.models import PickedPeak
+
 # Peak processing functions
 def expand_peak(picked_peak, absorbance_threshold):
     """
@@ -51,20 +53,8 @@ def expand_peak(picked_peak, absorbance_threshold):
     if prev_val != np.inf:  # if peak was expanded, fix boundary, else don't change
         right -= 1
     
-    return left, right
-
-def check_peak_saturation(picked_peak, detector_limit):
-    """
-    Integrates the peak and sets picked_peak.integral to be that value.
-    Parameters
-    ----------
-    detector_limit : int
-        Absorbance values above which detector saturation is expected
-
-    Modifies
-    --------
-    picked_peak.saturation : Sets peak attribute to either True or False
-        based on if the peak absorbance exceeds detector_limit.
-    """
-    max_absorbance = picked_peak.dataset.data[:, picked_peak.maximum].max()
-    return max_absorbance > detector_limit
+    return PickedPeak(left = left,
+                      right = right,
+                      maximum = picked_peak.maximum,
+                      dataset = picked_peak.dataset,
+                      idx = picked_peak.idx)

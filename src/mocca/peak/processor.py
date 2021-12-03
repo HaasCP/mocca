@@ -6,23 +6,26 @@ Created on Thu Dec  2 09:21:06 2021
 @author: haascp
 """
 from mocca.peak.models import PickedPeak, ProcessedPeak
-from mocca.peak.process.funcs import expand_peak, check_peak_saturation
-from mocca.peak.process.purity_predictor import predict_peak_purity
+from mocca.databases.models import ComponentDatabase
 
-def process_peak(picked_peak: PickedPeak, absorbance_threshold: int, 
-                 detector_limit: int, print_purity_check: bool = False) \
-    -> ProcessedPeak:
+from mocca.peak.expand.funcs import expand_peak
+from mocca.peak.check.funcs import check_peak
+from mocca.peak.assign.funcs import assign_peak
+
+def process_peak_init(picked_peak: PickedPeak, component_db: ComponentDatabase, 
+                      absorbance_threshold: int, detector_limit: int,
+                      assign_peak_thresh_1: float = 0.9, # spectrum_correl_coef_thresh
+                      assign_peak_thresh_2: float = 0.01, # relative_distance_thresh
+                      print_purity_check: bool = False, 
+                      print_compound_prediction: bool = False) -> ProcessedPeak:
     """
     Peak processing routine
     """
-    new_left, new_right = expand_peak(picked_peak, absorbance_threshold)
-    new_saturation = check_peak_saturation(picked_peak, detector_limit)
-    new_pure = predict_peak_purity(picked_peak, print_purity_check)
+    expanded_peak = expand_peak(picked_peak, absorbance_threshold)
+    checked_peak = check_peak(expanded_peak, detector_limit, 
+                              show_analytics = print_purity_check)
+    assigned_peak = assign_peak(checked_peak, component_db, assign_peak_thresh_1,
+                        assign_peak_thresh_2, print_compound_prediction)
     
-    return ProcessedPeak(left = new_left,
-                         right = new_right,
-                         maximum = picked_peak.maximum,
-                         dataset = picked_peak.dataset,
-                         idx = picked_peak.idx,
-                         saturation = new_saturation,
-                         pure = new_pure)
+    
+    #return processed_peak

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-import logging
-import numpy as np
+from typing import List
+
+from mocca.peak.models import ProcessedPeak
 
 
 @dataclass
@@ -10,4 +11,4 @@ class Component():
     right: int
     maximum: int
     spectrum: list
-    created_from: list
+    created_from: List[ProcessedPeak]
