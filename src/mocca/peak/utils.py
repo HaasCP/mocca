@@ -19,7 +19,7 @@ def average_peak_spectrum(peak):
     """
     Calculates mean spectrum over peak from left to right border.
     """
-    return np.average(get_peak_data(peak), axis=0).tolist()
+    return np.average(get_peak_data(peak), axis=1).tolist()
 
 def is_unimodal(L, high_val_threshold=math.inf):
     """

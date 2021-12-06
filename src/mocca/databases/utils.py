@@ -50,7 +50,7 @@ def sort_peaks_by_compound(peaks):
 def get_filtered_peaks_by_compound(peak_database, filter_function):
     """
     """
-    filtered_peaks = get_filtered_peaks(peak_database.peaks, filter_function)
+    filtered_peaks = get_filtered_peaks(peak_database, filter_function)
     compound_dict = sort_peaks_by_compound(filtered_peaks)
     return compound_dict
 
@@ -58,18 +58,22 @@ def average_spectra_over_peaks(peaks):
     """
     Calculates mean spectrum of a list of peaks with averaged spectrum.
     """
-    spectra_list = []
-    for peak in peaks:
-        peak_spectrum = average_peak_spectrum(peak)
-        spectra_list.append(peak_spectrum)
-    return np.average(np.array(spectra_list), axis=0)
+    if peaks:
+        spectra_list = []
+        for peak in peaks:
+            peak_spectrum = average_peak_spectrum(peak)
+            spectra_list.append(peak_spectrum)
+        return np.average(np.array(spectra_list), axis=0).tolist()
+    else:
+        return []
 
 def average_ret_times_over_peaks(peaks):
     """
     Calculates mean retention indices of a list of peaks.
     """
-    num_peaks = len(peaks)
-    left = int(round(sum([peak.left for peak in peaks]) / num_peaks)),
-    right = int(round(sum([peak.right for peak in peaks]) / num_peaks)),
-    maximum = int(round(sum([peak.maximum for peak in peaks]) / num_peaks))
-    return left, right, maximum
+    if peaks:
+        num_peaks = len(peaks)
+        left = int(round(sum([peak.left for peak in peaks]) / num_peaks))
+        right = int(round(sum([peak.right for peak in peaks]) / num_peaks))
+        maximum = int(round(sum([peak.maximum for peak in peaks]) / num_peaks))
+        return left, right, maximum

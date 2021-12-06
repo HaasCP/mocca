@@ -1,21 +1,39 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Dec  2 12:16:35 2021
+Created on Thu Dec  2 09:16:47 2021
 
 @author: haascp
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-from mocca.peak.process.purity_funcs import (get_trimmed_peak_data, get_max_loc,
+from mocca.peak.models import CheckedPeak
+from mocca.peak.purity.funcs import (get_trimmed_peak_data, get_max_loc,
                                      get_noise_variance, get_correls,
                                      get_agilent_thresholds,
                                      get_purity_value_agilent,
                                      predict_purity_unimodal,
                                      get_pca_explained_variance)
 
-def predict_peak_purity(peak, param=2.5, show_analytics=False):
+def check_peak_saturation(picked_peak, detector_limit):
+    """
+    Integrates the peak and sets picked_peak.integral to be that value.
+    Parameters
+    ----------
+    detector_limit : int
+        Absorbance values above which detector saturation is expected
+
+    Modifies
+    --------
+    picked_peak.saturation : Sets peak attribute to either True or False
+        based on if the peak absorbance exceeds detector_limit.
+    """
+    max_absorbance = picked_peak.dataset.data[:, picked_peak.maximum].max()
+    return max_absorbance > detector_limit
+
+def check_peak_purity(peak, param=2.5, show_analytics=False):
     """
     Returns peak purity prediction by performing the described test sequence.
     Plots and prints infromation about the peak purity prediction.
@@ -73,3 +91,15 @@ def predict_peak_purity(peak, param=2.5, show_analytics=False):
               f"Minimum Correlation (False for <0.9): {test_correls_1} \n"
               f"Minimum Correlation (True for >0.95): {test_correls_1} \n"
               f"Average Correlation (True for >0.98): {test_correls_2} \n")
+
+def check_peak(expanded_peak, detector_limit, param=2.5, show_analytics=False):
+    new_saturation = check_peak_saturation(expanded_peak, detector_limit)
+    new_pure = check_peak_purity(expanded_peak, show_analytics)
+    
+    return CheckedPeak(left = expanded_peak.left,
+                       right = expanded_peak.right,
+                       maximum = expanded_peak.maximum,
+                       dataset = expanded_peak.dataset,
+                       idx = expanded_peak.idx,
+                       saturation = new_saturation,
+                       pure = new_pure)

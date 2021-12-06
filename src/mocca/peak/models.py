@@ -32,10 +32,31 @@ class CheckedPeak(PickedPeak):
 
 @dataclass(frozen = True, eq = False)
 class AssignedPeak(CheckedPeak):
-    # istd : bool
     compound_id : Optional[str]
 
 @dataclass(frozen = True, eq = False)
-class ProcessedPeak(AssignedPeak):
+class QuantifiedPeak(AssignedPeak):
     integral : float
     concentration : Optional[float]
+
+@dataclass()
+class ProcessedPeak():
+    left : int
+    right : int
+    maximum : int
+    dataset : Any  # DADData parent of peak
+    idx : int
+    saturation : bool
+    pure : bool
+    compound_id : Optional[str]
+    integral : float
+    concentration : Optional[float]
+    
+    def __eq__(self, other):
+        if not isinstance(other, ProcessedPeak):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+        return (self.left == other.left and
+                self.right == other.right and
+                self.maximum == other.maximum and
+                self.dataset == other.dataset)

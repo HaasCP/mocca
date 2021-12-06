@@ -7,25 +7,36 @@ Created on Fri Nov 26 08:28:12 2021
 """
 
 from mocca.peak.models import ProcessedPeak
-from mocca.databases.base import BaseDatabase
 
 import logging
 
 
-class PeakDatabase(BaseDatabase):
+class PeakDatabase():
+    def __init__(self):
+        self.peaks = []
+    
+    def __iter__(self):
+        """Yields all items inside the database.
+           Allows statements such as "for component in component_database:" """
+        for peak in self.peaks:
+            yield peak
 
-    def insert_item(self, new_peak):
+    def __contains__(self, peak):
+        """Allows statements such as "'Component 1' in component_database"
+        to see if that Component is inside the database"""
+        return True in [peak == db_peak for db_peak in self.peaks]
+
+    def insert_peak(self, new_peak):
         if type(new_peak) != ProcessedPeak:
-            logging.warning("Warning: Data {} is not of the mocca ProcessedPeak type."
+            raise TypeError("Warning: Data {} is not of the mocca ProcessedPeak type."
                             "Given data not inserted in the database".format(new_peak))
-            return
+        elif new_peak in self:
+            for i, peak in enumerate(self.peaks):
+                if peak == new_peak:
+                    self.peaks[i] = new_peak
+                logging.warning("Warning: Peak \n {} \n already exists in database. "
+                                "New peak replaces the "
+                                "old one.".format(new_peak))
         else:
-            for peak in self.peaks:
-                if new_peak == peak:
-                    logging.warning("Warning: Peak \n {} \n already exists in database "
-                                    "as Peak \n {} \n New peak replaces the "
-                                    "old one.".format(new_peak, peak))
-                    self.peaks = [p for p in self.peaks if not p == peak]
             self.peaks.append(new_peak)
-            logging.debug("Peak {} added to the database.".format(new_peak))
     
