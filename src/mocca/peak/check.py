@@ -17,21 +17,15 @@ from mocca.peak.purity.funcs import (get_trimmed_peak_data, get_max_loc,
                                      predict_purity_unimodal,
                                      get_pca_explained_variance)
 
+
 def check_peak_saturation(picked_peak, detector_limit):
     """
-    Integrates the peak and sets picked_peak.integral to be that value.
-    Parameters
-    ----------
-    detector_limit : int
-        Absorbance values above which detector saturation is expected
-
-    Modifies
-    --------
-    picked_peak.saturation : Sets peak attribute to either True or False
-        based on if the peak absorbance exceeds detector_limit.
+    Sets peak attribute saturation to either True or False
+    based on if the peak absorbance exceeds detector_limit.
     """
     max_absorbance = picked_peak.dataset.data[:, picked_peak.maximum].max()
     return max_absorbance > detector_limit
+
 
 def check_peak_purity(peak, param=2.5, show_analytics=False):
     """
@@ -41,20 +35,18 @@ def check_peak_purity(peak, param=2.5, show_analytics=False):
     peak_data = get_trimmed_peak_data(peak)
     max_loc = get_max_loc(peak_data)
     noise_variance = get_noise_variance(peak)
-    correls = get_correls(peak_data, max_loc)    
-    agilent_thresholds = get_agilent_thresholds(peak_data, max_loc, 
+    correls = get_correls(peak_data, max_loc)
+    agilent_thresholds = get_agilent_thresholds(peak_data, max_loc,
                                                 noise_variance, param)
-    
-    test_agilent = get_purity_value_agilent(peak_data, correls, 
+
+    test_agilent = get_purity_value_agilent(peak_data, correls,
                                             agilent_thresholds)
     test_unimodality = predict_purity_unimodal(correls)
     test_pca = get_pca_explained_variance(peak_data)
     test_correls_1 = np.min(correls)
     test_correls_2 = np.mean(correls)
-    
-    
+
     # peak purity algorithm
-    
     #  if agilent threshold reached, then probably pure
     if test_agilent > 0.9:
         return True
@@ -92,14 +84,19 @@ def check_peak_purity(peak, param=2.5, show_analytics=False):
               f"Minimum Correlation (True for >0.95): {test_correls_1} \n"
               f"Average Correlation (True for >0.98): {test_correls_2} \n")
 
+
 def check_peak(expanded_peak, detector_limit, param=2.5, show_analytics=False):
+    """
+    Peak checking routine. Returns a checked peak with pure and saturation
+    attributes.
+    """
     new_saturation = check_peak_saturation(expanded_peak, detector_limit)
     new_pure = check_peak_purity(expanded_peak, show_analytics)
-    
-    return CheckedPeak(left = expanded_peak.left,
-                       right = expanded_peak.right,
-                       maximum = expanded_peak.maximum,
-                       dataset = expanded_peak.dataset,
-                       idx = expanded_peak.idx,
-                       saturation = new_saturation,
-                       pure = new_pure)
+
+    return CheckedPeak(left=expanded_peak.left,
+                       right=expanded_peak.right,
+                       maximum=expanded_peak.maximum,
+                       dataset=expanded_peak.dataset,
+                       idx=expanded_peak.idx,
+                       saturation=new_saturation,
+                       pure=new_pure)

@@ -1,7 +1,6 @@
-import pytest
 import numpy as np
-from chromatogram_gen import generate_test_chromatograms, plot_test_data
 import matplotlib.pyplot as plt
+from chromatogram_gen import generate_test_chromatograms, plot_test_data
 # TODO: make dataset actually point to an object of DADData class,
 # rather than Chromatogram class
 
@@ -48,48 +47,3 @@ def test_is_unimodal():
         plt.show()
     assert not is_unimodal(peak_data_1[0, :])
     assert is_unimodal(peak_data_2[0, :])
-
-
-from mocca.peak.utils import check_same_dataset, check_overlap, get_distance_between
-
-def test_check_same_dataset():
-    peak_1 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
-    peak_2 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[1], idx=1)
-    with pytest.raises(Exception):
-        check_same_dataset(peak_1, peak_2)
-
-def test_peak_overlap_1():
-    # check that non-overlapping peaks are detected as non-overlapping
-    peak_1 = PickedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1)
-    peak_2 = PickedPeak(left=250, right=350, maximum=300, dataset=test_data[0], idx=1)
-    assert not check_overlap(peak_1, peak_2)
-    assert not check_overlap(peak_2, peak_1)
-
-def test_peak_overlap_2():
-    # check that overlapping peaks are detected as overlapping
-    peak_1 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
-    peak_2 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
-    assert check_overlap(peak_1, peak_2)
-    assert check_overlap(peak_2, peak_1)
-
-def test_peak_overlap_3():
-    # check that different dataset peaks do throw an exception
-    with pytest.raises(Exception):
-        peak_1 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
-        peak_2 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[1], idx=1)
-        check_overlap(peak_1, peak_2)
-
-def test_peak_distance_1():
-    # check that peak distances are correct
-    peak_1 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
-    peak_2 = PickedPeak(left=250, right=350, maximum=300, dataset=test_data[0], idx=1)
-    assert get_distance_between(peak_1, peak_2) == 150
-    assert get_distance_between(peak_2, peak_1) == 150
-
-def test_peak_distance_2():
-    # check that peak distances are correct
-    with pytest.raises(Exception):
-        peak_1 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
-        peak_2 = PickedPeak(left=250, right=350, maximum=300, dataset=test_data[1], idx=1)
-        get_distance_between(peak_1, peak_2)
-

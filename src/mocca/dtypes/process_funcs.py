@@ -1,3 +1,4 @@
+# flake8: noqa
 from mocca.peak.models import BasePeak
 from scipy.signal import find_peaks, peak_widths
 import numpy as np

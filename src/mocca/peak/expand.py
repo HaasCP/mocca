@@ -9,22 +9,13 @@ import numpy as np
 
 from mocca.peak.models import PickedPeak
 
+
 # Peak processing functions
 def expand_peak(picked_peak, absorbance_threshold):
     """
     Expands peak boundaries to those actually in the data. It keeps expanding
-    them until the absorbance falls below either expand_threshold or
-    rel_threshold times the maximum overall absorbance sum.
-
-    Parameters
-    ----------
-    absorbance_threshold : int
-        Minimum absorbance value when picking peaks
-
-    Modifies
-    --------
-    picked_peak.left, picked_peak.right : The left and right boundaries of the
-    peak are updated
+    them until the absorbance falls below one twentieth of the given absorbance
+    threshold. Returns a picked peak with modified peak boundaries (left, right).
     """
     expand_threshold = absorbance_threshold / 20
     # sum absorbances over all wavelengths
@@ -34,7 +25,7 @@ def expand_peak(picked_peak, absorbance_threshold):
 
     left = picked_peak.left
     right = picked_peak.right
-    
+
     prev_val = np.inf
     while data[left] > expand_threshold and \
             prev_val > data[left] and left >= 0:
@@ -52,9 +43,9 @@ def expand_peak(picked_peak, absorbance_threshold):
 
     if prev_val != np.inf:  # if peak was expanded, fix boundary, else don't change
         right -= 1
-    
-    return PickedPeak(left = left,
-                      right = right,
-                      maximum = picked_peak.maximum,
-                      dataset = picked_peak.dataset,
-                      idx = picked_peak.idx)
+
+    return PickedPeak(left=left,
+                      right=right,
+                      maximum=picked_peak.maximum,
+                      dataset=picked_peak.dataset,
+                      idx=picked_peak.idx)

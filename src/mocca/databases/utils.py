@@ -9,16 +9,23 @@ import numpy as np
 
 from mocca.peak.utils import average_peak_spectrum
 
+
 def get_valid_peaks(peaks):
     """
-    Filters list of peaks for pure and unsaturated peaks with a compound_id.
+    Returns a list of peaks from the database which are pure and unsaturated
+    and have a compound_id.
     """
     return [peak for peak in peaks if (peak.pure is True and
                                        peak.saturation is False and
                                        peak.compound_id is not None)]
 
+
 # TODO: implement different filter options for relevant_peaks (e.g. by date)
 def filter_peaks(peaks, filter_function):
+    """
+    Filters given peaks with regard to the given filter function (which takes
+    a list of peaks and returns a filtered list of peaks).
+    """
     if filter_function is None:
         return peaks
     else:
@@ -28,16 +35,20 @@ def filter_peaks(peaks, filter_function):
             raise ValueError("Given parameter {} not callable/not a "
                              "function".format(filter_function))
 
+
 def get_filtered_peaks(peak_database, filter_function):
     """
+    Returns a filtered (by the given filter function) list of peaks from the
+    database which are pure and unsaturated and have a compound_id.
     """
     valid_peaks = get_valid_peaks(peak_database.peaks)
     filtered_peaks = filter_peaks(valid_peaks, filter_function)
     return filtered_peaks
 
+
 def sort_peaks_by_compound(peaks):
     """
-    Creates dict with unique compound_id as keys and a list of corresponding
+    Returns dict with unique compound_id as keys and a list of corresponding
     peaks as values.
     """
     compound_dict = {}
@@ -47,12 +58,18 @@ def sort_peaks_by_compound(peaks):
         compound_dict[peak.compound_id].append(peak)
     return compound_dict
 
+
 def get_filtered_peaks_by_compound(peak_database, filter_function):
     """
+    Creates a filtered (by the given filter function) list of peaks from the
+    database which are pure and unsaturated and have a compound_id. From this list,
+    it returns a dict with unique compound_id as keys and a list of corresponding
+    peaks as values.
     """
     filtered_peaks = get_filtered_peaks(peak_database, filter_function)
     compound_dict = sort_peaks_by_compound(filtered_peaks)
     return compound_dict
+
 
 def average_spectra_over_peaks(peaks):
     """
@@ -66,6 +83,7 @@ def average_spectra_over_peaks(peaks):
         return np.average(np.array(spectra_list), axis=0).tolist()
     else:
         return []
+
 
 def average_ret_times_over_peaks(peaks):
     """

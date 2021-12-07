@@ -109,21 +109,7 @@ def test_delete_all_items():
     assert len(quali_db.items) == 0
     assert isinstance(quali_db.items, list)
 
-def test_increment_unknown_counter():
-    quali_db = QualiComponentDatabase()
-    quali_db.increment_unkown_counter()
-    assert quali_db.unknown_counter == 1
-    
-def test_update_unknown_counter():
-    quali_db = QualiComponentDatabase()
-    test_db = create_test_peak_db()
-    test_db.peaks[0].compound_id = "unknown_5"
-    test_db.peaks[4].compound_id = "unknown_12"
-    test_db.peaks[7].compound_id = "unknown_6"
-    quali_db.update_unknown_counter(test_db)
-    assert quali_db.unknown_counter == 12
-
-def test_update_1():
+def test_update():
     peak_db = create_test_peak_db()
     quali_db = QualiComponentDatabase()
     quali_db.update(peak_db)
@@ -131,16 +117,6 @@ def test_update_1():
     compound_ids = ["0", "1", "2", "3"]
     for compound_id in compound_ids:
         assert compound_id in quali_db
-
-def test_update_2():
-    peak_db = create_test_peak_db()
-    peak_db.peaks[0].compound_id = "unknown_5"
-    peak_db.peaks[4].compound_id = "unknown_12"
-    peak_db.peaks[7].compound_id = "unknown_6"
-    quali_db = QualiComponentDatabase()
-    quali_db.update(peak_db)
-    assert quali_db.unknown_counter == 12
-    assert len(quali_db.items) == 7
 
 def filter_func(peaks):
     return [peak for peak in peaks if int(peak.compound_id) > 1]

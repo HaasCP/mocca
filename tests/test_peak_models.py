@@ -20,7 +20,7 @@ for data in test_data:
     plot_test_data(data)
 """
 
-from mocca.peak.models import BasePeak, PickedPeak, QuantifiedPeak
+from mocca.peak.models import BasePeak, PickedPeak, PreprocessedPeak, ProcessedPeak
 
 def test_equals_1():
     peak_1 = BasePeak(left=1, right=3, maximum=2)
@@ -43,19 +43,33 @@ def test_equals_4():
     assert not peak_1 == peak_2
 
 def test_equals_5():
-    peak_1 = QuantifiedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
+    peak_1 = PreprocessedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
+                            saturation=False, pure=False, compound_id=None, integral=12)
+    peak_2 = PreprocessedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
+                            saturation=False, pure=True, compound_id="compound", integral=12)
+    assert peak_1 == peak_2
+
+def test_equals_6():
+    peak_1 = PreprocessedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
+                            saturation=False, pure=False, compound_id=None, integral=12)
+    peak_2 = PreprocessedPeak(left=1, right=3, maximum=2, dataset=test_data[1], idx=1,
+                            saturation=False, pure=False, compound_id=[], integral=12)
+    assert not peak_1 == peak_2
+
+def test_equals_7():
+    peak_1 = ProcessedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
                             saturation=False, pure=False, compound_id=None, integral=12,
                             concentration=None)
-    peak_2 = QuantifiedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
+    peak_2 = ProcessedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
                             saturation=False, pure=True, compound_id="compound", integral=12,
                             concentration=12.3)
     assert peak_1 == peak_2
 
-def test_equals_6():
-    peak_1 = QuantifiedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
+def test_equals_8():
+    peak_1 = ProcessedPeak(left=1, right=3, maximum=2, dataset=test_data[0], idx=1,
                             saturation=False, pure=False, compound_id=None, integral=12,
                             concentration=None)
-    peak_2 = QuantifiedPeak(left=1, right=3, maximum=2, dataset=test_data[1], idx=1,
+    peak_2 = ProcessedPeak(left=1, right=3, maximum=2, dataset=test_data[1], idx=1,
                             saturation=False, pure=False, compound_id=None, integral=12,
                             concentration=None)
     assert not peak_1 == peak_2

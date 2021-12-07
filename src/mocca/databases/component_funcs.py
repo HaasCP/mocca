@@ -5,8 +5,10 @@ Created on Fri Dec  3 09:54:04 2021
 
 @author: haascp
 """
-from mocca.databases.utils import average_ret_times_over_peaks, average_spectra_over_peaks
+from mocca.databases.utils import (average_ret_times_over_peaks,
+                                   average_spectra_over_peaks)
 from mocca.databases.component_models import QualiComponent
+
 
 def create_quali_component(peaks):
     """
@@ -19,11 +21,11 @@ def create_quali_component(peaks):
         mean_left, mean_right, mean_maximum = average_ret_times_over_peaks(peaks)
         mean_spectrum = average_spectra_over_peaks(peaks)
         return QualiComponent(compound_id=peaks[0].compound_id,
-                         left=mean_left,
-                         right=mean_right,
-                         maximum=mean_maximum,
-                         spectrum=mean_spectrum,
-                         created_from=peaks)
+                              left=mean_left,
+                              right=mean_right,
+                              maximum=mean_maximum,
+                              spectrum=mean_spectrum,
+                              created_from=peaks)
     else:
         raise AttributeError("All peaks have to have the same compound_id to "
                              "create a component")
