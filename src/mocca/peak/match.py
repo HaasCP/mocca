@@ -87,4 +87,4 @@ def match_peak(integrated_peak, component_db, spectrum_correl_coef_thresh,
                             saturation=integrated_peak.saturation,
                             pure=integrated_peak.pure,
                             integral=integrated_peak.integral,
-                            compound_id=matches)
+                            matches=matches)

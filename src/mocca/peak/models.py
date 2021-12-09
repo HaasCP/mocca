@@ -54,7 +54,7 @@ class PreprocessedPeak(IntegratedPeak):
     Class for preprocessed peaks containing a list of possible component matches
     in the attribute compound_id.
     """
-    compound_id : List[dict]
+    matches : List[dict]
 
 
 @dataclass(frozen=True)

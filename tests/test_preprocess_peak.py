@@ -198,8 +198,8 @@ def test_match_peak():
     quali_db.update(peak_db, peak_filter_function=None)
     matched_peak = match_peak(peak, quali_db, spectrum_correl_coef_thresh=0.99999,
                               relative_distance_thresh=0.1, print_similarity_dicts=True)
-    assert len(matched_peak.compound_id) == 2
-    assert matched_peak.compound_id[0]['compound_id'] == "0" and matched_peak.compound_id[1]['compound_id'] == "1"
+    assert len(matched_peak.matches) == 2
+    assert matched_peak.matches[0]['compound_id'] == "0" and matched_peak.matches[1]['compound_id'] == "1"
 
 
 from mocca.peak.preprocessor import preprocess_peak
@@ -217,8 +217,8 @@ def test_preprocess_peak():
     assert not preprocessed_peak.saturation
     assert preprocessed_peak.pure
     assert preprocessed_peak.integral > 0.9
-    assert len(preprocessed_peak.compound_id) == 2
-    assert preprocessed_peak.compound_id[0]['compound_id'] == "0" and preprocessed_peak.compound_id[1]['compound_id'] == "1"
+    assert len(preprocessed_peak.matches) == 2
+    assert preprocessed_peak.matches[0]['compound_id'] == "0" and preprocessed_peak.matches[1]['compound_id'] == "1"
 
     #logging.warning("{}".format(dicts))
 """

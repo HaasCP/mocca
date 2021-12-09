@@ -21,9 +21,20 @@ class InitializationChromatogram(Chromatogram):
     def __init__(self, istd_key=None):
         self.istd_key = istd_key
 
-    def process_peaks():
+    def process_peaks(self):
+        compounds = get_compounds(dataset)
+        if not any(peak.matches['compound_id'].startswith(compounds[0]) for peak in self.peaks):
+            pass
         pass
 
 class ReactionChromatogram(Chromatogram):
+    def assign_peaks(self):
+        max_similarity_peak = self.peaks[0]
+        for peak in self.peaks:
+            sorted(peak.matches, reverse=True,
+                                   key=lambda dic: dic['spectrum_correl_coef'])
+            if peak.matches > max_similarity_peak:
+                pass
+    
     def process_peaks():
         pass
