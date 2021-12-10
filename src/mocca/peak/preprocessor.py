@@ -16,8 +16,8 @@ from mocca.peak.match import match_peak
 
 def preprocess_peak(picked_peak: PickedPeak, component_db: QualiComponentDatabase,
                     absorbance_threshold: int, detector_limit: int,
-                    spectrum_correl_thresh: float = 0.9,  # spectrum_correl_coef_thresh
-                    relative_distance_thresh: float = 0.01,  # relative_distance_thresh
+                    spectrum_correl_thresh: float,  # spectrum_correl_coef_thresh
+                    relative_distance_thresh: float,  # relative_distance_thresh
                     print_purity_check: bool = False,
                     print_compound_prediction: bool = False) -> PreprocessedPeak:
     """

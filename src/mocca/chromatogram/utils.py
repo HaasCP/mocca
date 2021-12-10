@@ -22,7 +22,6 @@ def check_overlap(peak, other):
     Returns True if peak overlaps with the peak 'other', and False otherwise.
     Raises Exception if the two peaks are not from the same dataset.
     """
-    check_same_dataset(peak, other)
     return peak.left <= other.left <= peak.right \
         or other.left <= peak.left <= other.right
 

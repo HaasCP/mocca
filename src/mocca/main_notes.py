@@ -44,4 +44,22 @@ component_db.update()
 
 Impure peak always gets None in compound_id and concentration
 
+
+
+Get list of chromatograms. Input can be accessed via peak.dataset
+
+def get_preprocessed_chromatogram(self, component_db, absorbance_threshold=500,
+                                  peaks_high_pass=None, peaks_low_pass=None,
+                                  spectrum_correl_thresh = 0.9,
+                                  relative_distance_thresh = 0.1):
+    chromatogram = pick_peaks(self, absorbance_threshold, peaks_high_pass, 
+                              peaks_low_pass)
+    return preprocess_chromatogram(chromatogram, component_db,
+                                   absorbance_threshold, 
+                                   self.detector_limit, 
+                                   spectrum_correl_thresh,
+                                   relative_distance_thresh)
+
+
+
 """
