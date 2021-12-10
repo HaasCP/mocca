@@ -5,9 +5,9 @@ Created on Fri Dec  3 09:54:04 2021
 
 @author: haascp
 """
-from mocca.databases.utils import (average_ret_times_over_peaks,
+from mocca.components.utils import (average_ret_times_over_peaks,
                                    average_spectra_over_peaks)
-from mocca.databases.component_models import QualiComponent
+from mocca.components.models import QualiComponent
 
 
 def create_quali_component(peaks):

@@ -6,7 +6,7 @@ Created on Thu Dec  2 09:21:06 2021
 @author: haascp
 """
 from mocca.peak.models import PickedPeak, PreprocessedPeak
-from mocca.databases.component_dbs import QualiComponentDatabase
+from mocca.components.databases import QualiComponentDatabase
 
 from mocca.peak.expand import expand_peak
 from mocca.peak.check import check_peak

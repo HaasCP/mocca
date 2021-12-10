@@ -7,7 +7,7 @@ Created on Tue Nov 30 10:14:38 2021
 """
 
 # tests for peak_db.py
-from mocca.databases.peak_db import PeakDatabase
+from mocca.peak.database import PeakDatabase
 from mocca.peak.models import ProcessedPeak, PickedPeak
 from chromatogram_gen import generate_test_chromatograms, plot_test_data
 

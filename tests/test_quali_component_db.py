@@ -7,17 +7,17 @@ Created on Wed Dec  1 10:49:37 2021
 """
 
 from mocca.peak.models import ProcessedPeak
-from mocca.databases.component_dbs import QualiComponentDatabase
-from mocca.databases.peak_db import PeakDatabase
-from mocca.databases.utils import get_filtered_peaks_by_compound, average_spectra_over_peaks
+from mocca.components.databases import QualiComponentDatabase
+from mocca.peak.database import PeakDatabase
+from mocca.components.utils import get_filtered_peaks_by_compound, average_spectra_over_peaks
 
 from chromatogram_gen import generate_test_chromatograms, plot_test_data
 
 import logging
 import pytest
 
-from mocca.databases.component_models import QualiComponent
-from mocca.databases.component_funcs import create_quali_component
+from mocca.components.models import QualiComponent
+from mocca.components.funcs import create_quali_component
 
 
 # GET TEST DATA

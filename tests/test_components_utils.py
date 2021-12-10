@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 
 from mocca.peak.models import PickedPeak, ProcessedPeak
 from mocca.peak.utils import average_peak_spectrum
-from mocca.databases.peak_db import PeakDatabase
+from mocca.peak.database import PeakDatabase
 
 from chromatogram_gen import generate_test_chromatograms, plot_test_data
 
-from mocca.databases.utils import (get_valid_peaks, filter_peaks, 
+from mocca.components.utils import (get_valid_peaks, filter_peaks, 
                                    get_filtered_peaks, sort_peaks_by_compound,
                                    get_filtered_peaks_by_compound,
                                    average_spectra_over_peaks, 

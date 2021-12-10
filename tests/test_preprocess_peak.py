@@ -8,8 +8,8 @@ Created on Mon Dec  6 10:15:37 2021
 import logging
 
 from chromatogram_gen import generate_test_chromatograms, plot_test_data
-from mocca.databases.component_dbs import QualiComponentDatabase
-from mocca.databases.peak_db import PeakDatabase
+from mocca.components.databases import QualiComponentDatabase
+from mocca.peak.database import PeakDatabase
 
 # MODIFY AS NEEDED FOR TESTING
 show_peak_purity_analytics = False

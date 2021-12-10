@@ -5,8 +5,8 @@ Created on Thu Dec  2 16:32:36 2021
 
 @author: haascp
 """
-from mocca.databases.utils import get_filtered_peaks, get_filtered_peaks_by_compound
-from mocca.databases.component_funcs import create_quali_component
+from mocca.components.utils import get_filtered_peaks, get_filtered_peaks_by_compound
+from mocca.components.funcs import create_quali_component
 
 
 class BaseDatabase():
