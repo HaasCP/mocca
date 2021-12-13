@@ -20,7 +20,6 @@ def check_same_dataset(peak, other):
 def check_overlap(peak, other):
     """
     Returns True if peak overlaps with the peak 'other', and False otherwise.
-    Raises Exception if the two peaks are not from the same dataset.
     """
     return peak.left <= other.left <= peak.right \
         or other.left <= peak.left <= other.right
@@ -29,7 +28,5 @@ def check_overlap(peak, other):
 def get_distance_between(peak, other):
     """
     Returns the distance from the maxima of peak and the other peak.
-    Raises Exception if the two peaks are not from the same dataset.
     """
-    check_same_dataset(peak, other)
     return abs(peak.maximum - other.maximum)

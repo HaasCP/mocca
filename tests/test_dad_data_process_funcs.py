@@ -21,7 +21,7 @@ gradient_data = GradientData("labsolutions", gradient_path)
 data_path = os.path.join(file_path,
                          "example_data/labsolutions_api/labsolutions_test_data.txt")
 test_input = {'a': 0, 'b': 0.1, 'c': 0, 'd': 1}
-compound_data = CompoundData("labsolutions", data_path, test_input, gradient_data)
+compound_data = CompoundData("labsolutions", data_path, gradient_data, compound_input=test_input)
 
 
 def test_sum_absorbance_by_time():
@@ -64,9 +64,9 @@ def test_pick_peaks():
     
     chromatogram = pick_peaks(compound_data, absorbance_threshold, peaks_high_pass, peaks_low_pass)
     
-    logging.warning("{}".format(len(chromatogram.peaks)))
     assert len(chromatogram.peaks) == 2
     assert any(peak.maximum == 1406 for peak in chromatogram.peaks)
-    
-    
+
+# logging.warning("{}".format(len(chromatogram.peaks)))
+
     

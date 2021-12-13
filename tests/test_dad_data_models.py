@@ -57,7 +57,7 @@ def test_compound_data():
     data_path = os.path.join(file_path,
                              "example_data/labsolutions_api/labsolutions_test_data.txt")
     test_input = {'a': 0, 'b': 0.1, 'c': 0, 'd': 1}
-    compound_data = CompoundData("labsolutions", data_path, test_input, gradient_data)
+    compound_data = CompoundData("labsolutions", data_path, gradient_data, compound_input=test_input)
     assert compound_data.path == data_path
     assert compound_data.hplc_system_tag == "labsolutions"
     assert len(compound_data.time) == 3001
@@ -66,3 +66,14 @@ def test_compound_data():
     assert np.amin(compound_data.data) > -20
     assert get_compound_names(compound_data) == ['b', 'd']
     assert get_compound_concentration(compound_data, 'a') == 0
+
+def test_wl_thresholds():
+    file_path = os.path.dirname(os.path.abspath(__file__))
+    gradient_path = os.path.join(file_path,
+                                 "example_data/labsolutions_test_gradient.txt")
+    gradient_data = GradientData("labsolutions", gradient_path, wl_high_pass=250, wl_low_pass=259)
+    data_path = os.path.join(file_path,
+                             "example_data/labsolutions_api/labsolutions_test_data.txt")
+    compound_data = CompoundData("labsolutions", data_path, gradient_data, wl_high_pass=250, wl_low_pass=259)
+    assert gradient_data.data.shape[0] == 3  # -4 due to filter
+    assert compound_data.data.shape[0] == 3  # -4 due to filter

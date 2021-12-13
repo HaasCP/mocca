@@ -45,23 +45,9 @@ def test_peak_overlap_2():
     assert check_overlap(peak_1, peak_2)
     assert check_overlap(peak_2, peak_1)
 
-def test_peak_overlap_3():
-    # check that different dataset peaks do throw an exception
-    with pytest.raises(Exception):
-        peak_1 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
-        peak_2 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[1], idx=1)
-        check_overlap(peak_1, peak_2)
-
 def test_peak_distance_1():
     # check that peak distances are correct
     peak_1 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
     peak_2 = PickedPeak(left=250, right=350, maximum=300, dataset=test_data[0], idx=1)
     assert get_distance_between(peak_1, peak_2) == 150
     assert get_distance_between(peak_2, peak_1) == 150
-
-def test_peak_distance_2():
-    # check that peak distances are correct
-    with pytest.raises(Exception):
-        peak_1 = PickedPeak(left=100, right=200, maximum=150, dataset=test_data[0], idx=1)
-        peak_2 = PickedPeak(left=250, right=350, maximum=300, dataset=test_data[1], idx=1)
-        get_distance_between(peak_1, peak_2)

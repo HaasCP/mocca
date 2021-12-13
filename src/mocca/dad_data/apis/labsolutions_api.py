@@ -11,7 +11,7 @@ Created on Mon Aug 30 15:17:53 2021
 import pandas as pd
 
 
-def read_txt_shimadzu(path, wl_high_pass=None):
+def read_txt_shimadzu(path, wl_high_pass=None, wl_low_pass=None):
     """
     Reads the 3D data exported by the LabSolutions software. 
     Parameters
@@ -58,5 +58,7 @@ def read_txt_shimadzu(path, wl_high_pass=None):
     df['absorbance'] = df['absorbance'] / 1000
     if wl_high_pass:
         df = df[df.wavelength >= wl_high_pass]
+    if wl_low_pass:
+        df = df[df.wavelength <= wl_low_pass]
     return df
 
