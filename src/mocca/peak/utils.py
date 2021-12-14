@@ -12,9 +12,15 @@ import numpy as np
 def get_peak_data(peak):
     """
     Returns absorbance data from the left to the right border of the peak
-    for all wavelengths.
+    for all wavelengths. If the peak was offset-corrected, the left and right
+    border are un-offset in order to access the correct data.
     """
-    return peak.dataset.data[:, peak.left:(peak.right + 1)]
+    left = peak.left
+    right = peak.right
+    if hasattr(peak, 'offset'):
+        left = left + peak.offset
+        right = right + peak.offset
+    return peak.dataset.data[:, left:(right + 1)]
 
 
 def average_peak_spectrum(peak):

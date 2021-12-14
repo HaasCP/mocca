@@ -40,7 +40,7 @@ def create_test_peak_db():
     db_peaks = []
     for i in range(11):
         peak = ProcessedPeak(left=100+i, right=200+i, maximum=100+i, dataset=test_data[0], idx=1,
-                            saturation=False, pure=True, compound_id=str(int(i/3)), integral=12,
+                            saturation=False, pure=True, offset=0, compound_id=str(int(i/3)), integral=12,
                             concentration=12.3)
         db_peaks.append(peak)
     test_db.peaks = db_peaks

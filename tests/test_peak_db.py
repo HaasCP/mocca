@@ -36,10 +36,10 @@ def test_init_1():
 def test_init_2():
     peaks = []
     peaks.append(ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="None", integral=12,
+                            saturation=False, pure=False, compound_id="None", offset=0, integral=12,
                             concentration=None))
     peaks.append(ProcessedPeak(left=250, right=350, maximum=300, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id=None, integral=12,
+                            saturation=False, pure=False, compound_id=None, offset=0, integral=12,
                             concentration=None))
     test_db = PeakDatabase(peaks)
     assert len(test_db.peaks) == 2
@@ -48,7 +48,7 @@ def test_init_2():
 def test_init_3():
     peaks = []
     peaks.append(ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="None", integral=12,
+                            saturation=False, pure=False, compound_id="None", offset=0, integral=12,
                             concentration=None))
     peaks.append(PickedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1))
     with pytest.raises(Exception):
@@ -57,10 +57,10 @@ def test_init_3():
 def test_iter():
     test_db = PeakDatabase()
     peak_1 = ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id=None, integral=12,
+                            saturation=False, pure=False, compound_id=None, offset=0, integral=12,
                             concentration=None)
     peak_2 = ProcessedPeak(left=250, right=350, maximum=300, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id=None, integral=12,
+                            saturation=False, pure=False, compound_id=None, offset=0, integral=12,
                             concentration=None)
     test_db.peaks = [peak_1, peak_2]
     for i, peak in enumerate(test_db):
@@ -69,10 +69,10 @@ def test_iter():
 def test_contains():
     test_db = PeakDatabase()
     peak_1 = ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id=None, integral=12,
+                            saturation=False, pure=False, compound_id=None, offset=0, integral=12,
                             concentration=None)
     peak_2 = ProcessedPeak(left=250, right=350, maximum=300, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id=None, integral=12,
+                            saturation=False, pure=False, compound_id=None, offset=0, integral=12,
                             concentration=None)
     test_db.peaks = [peak_1]
     assert peak_1 in test_db
@@ -81,10 +81,10 @@ def test_contains():
 def test_update_unknown_counter():
     test_db = PeakDatabase()
     peak_1 = ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="unknown_12", integral=12,
+                            saturation=False, pure=False, compound_id="unknown_12", offset=0, integral=12,
                             concentration=None)
     peak_2 = ProcessedPeak(left=250, right=350, maximum=300, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="unknown_5", integral=12,
+                            saturation=False, pure=False, compound_id="unknown_5", offset=0, integral=12,
                             concentration=None)
     test_db.peaks = [peak_1, peak_2]
     test_db.update_unknown_counter()
@@ -98,10 +98,10 @@ def test_increment_unknown_counter():
 def test_insert_1():  # insert new peak
     test_db = PeakDatabase()
     peak_1 = ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="a", integral=12,
+                            saturation=False, pure=False, compound_id="a", offset=0, integral=12,
                             concentration=None)
     peak_2 = ProcessedPeak(left=250, right=350, maximum=300, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="b", integral=12,
+                            saturation=False, pure=False, compound_id="b", offset=0, integral=12,
                             concentration=None)
     test_db.insert_peak(peak_1)
     test_db.insert_peak(peak_2)
@@ -112,10 +112,10 @@ def test_insert_1():  # insert new peak
 def test_insert_2(caplog):
     test_db = PeakDatabase()
     peak_1 = ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="unknown_12", integral=12,
+                            saturation=False, pure=False, compound_id="unknown_12", offset=0, integral=12,
                             concentration=None)
     peak_2 = ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="a", integral=12,
+                            saturation=False, pure=False, compound_id="a", offset=0, integral=12,
                             concentration=12.3)
     with caplog.at_level(logging.WARNING):
         test_db.insert_peak(peak_1)
@@ -129,7 +129,7 @@ def test_insert_2(caplog):
 def test_insert_3(caplog):
     test_db = PeakDatabase()
     peak_1 = ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
-                            saturation=False, pure=False, compound_id="None", integral=12,
+                            saturation=False, pure=False, compound_id="None", offset=0, integral=12,
                             concentration=None)
     peak_2 = PickedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1)
     test_db.insert_peak(peak_1)

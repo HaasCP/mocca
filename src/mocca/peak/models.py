@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import Optional, Any, List
-# TODO: Replace Any by DadData
+from typing import Optional, List
+
+from mocca.dad_data.models import CompoundData
 
 
 @dataclass(frozen=True)
@@ -18,7 +19,7 @@ class PickedPeak(BasePeak):
     """
     Class for picked peaks out of DAD data. Also valid for expanded peaks.
     """
-    dataset : Any  # DADData parent of peak
+    dataset : CompoundData  # DADData parent of peak
     idx : int
 
     def __eq__(self, other):
@@ -49,7 +50,17 @@ class IntegratedPeak(CheckedPeak):
 
 
 @dataclass(frozen=True, eq=False)
-class PreprocessedPeak(IntegratedPeak):
+class CorrectedPeak(IntegratedPeak):
+    """
+    Class for peaks with added retention time offset. From this class on,
+    retention times in the peaks are already corrected. This means, that accessing
+    data from the dataset attribute require prior un-offsetting.
+    """
+    offset : int
+
+
+@dataclass(frozen=True, eq=False)
+class PreprocessedPeak(CorrectedPeak):
     """
     Class for preprocessed peaks containing a list of possible component matches
     in the attribute compound_id.
@@ -65,13 +76,14 @@ class ProcessedPeak():
     left : int
     right : int
     maximum : int
-    dataset : Any  # DADData parent of peak
+    dataset : CompoundData
     idx : int
     saturation : bool
     pure : bool
-    compound_id : Optional[str]
     integral : float
-    concentration : Optional[float]
+    offset : int
+    compound_id : Optional[str] = None
+    concentration : Optional[float] = None
 
     def __eq__(self, other):
         if not isinstance(other, ProcessedPeak):

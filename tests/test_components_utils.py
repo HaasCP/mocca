@@ -36,21 +36,21 @@ print_graphs = False
 # TEST PEAKS
 
 peaks = [] 
-peaks.append(ProcessedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1, 
+peaks.append(ProcessedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1, offset=0,
                           saturation=True, pure=True, compound_id="1", integral=123, concentration=12.3))
-peaks.append(ProcessedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1, 
+peaks.append(ProcessedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1, offset=0,
                           saturation=False, pure=True, compound_id="2", integral=123, concentration=12.3))
-peaks.append(ProcessedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1, 
+peaks.append(ProcessedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1, offset=0,
                           saturation=False, pure=False, compound_id="3", integral=123, concentration=12.3))
-peaks.append(ProcessedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1, 
+peaks.append(ProcessedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1, offset=0,
                           saturation=False, pure=True, compound_id=None, integral=123, concentration=None))
-peaks.append(ProcessedPeak(left=180, right=220, maximum=200, dataset=test_data[0], idx=1, 
+peaks.append(ProcessedPeak(left=180, right=220, maximum=200, dataset=test_data[0], idx=1, offset=0,
                           saturation=True, pure=True, compound_id="1", integral=123, concentration=12.3))
-peaks.append(ProcessedPeak(left=180, right=220, maximum=200, dataset=test_data[0], idx=1, 
+peaks.append(ProcessedPeak(left=180, right=220, maximum=200, dataset=test_data[0], idx=1, offset=0,
                           saturation=False, pure=True, compound_id="2", integral=123, concentration=12.3))
-peaks.append(ProcessedPeak(left=180, right=220, maximum=200, dataset=test_data[0], idx=1, 
+peaks.append(ProcessedPeak(left=180, right=220, maximum=200, dataset=test_data[0], idx=1, offset=0,
                           saturation=False, pure=False, compound_id="3", integral=123, concentration=12.3))
-peaks.append(ProcessedPeak(left=180, right=220, maximum=200, dataset=test_data[0], idx=1, 
+peaks.append(ProcessedPeak(left=180, right=220, maximum=200, dataset=test_data[0], idx=1, offset=0,
                           saturation=False, pure=True, compound_id=None, integral=123, concentration=None))
 
 # TESTS

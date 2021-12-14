@@ -24,7 +24,8 @@ for data in test_data:
 """
 
 # ACTUAL TESTS
-from mocca.peak.models import PickedPeak, CheckedPeak, IntegratedPeak, PreprocessedPeak, ProcessedPeak
+from mocca.peak.models import (PickedPeak, CheckedPeak, IntegratedPeak, 
+                               CorrectedPeak, PreprocessedPeak, ProcessedPeak)
 
 
 # TEST PEAK PROCESS FUNCTIONS
@@ -109,7 +110,6 @@ def test_integrate_peak_1():
     assert integrated_peak.integral is not None
     assert integrated_peak.integral < 0.005  # approximate noise level
 
-
 def test_integrate_peak_2():
     # check that peak integral is large over actual peak
     peak = CheckedPeak(left=90, right=110, maximum=100, dataset=test_data[0], idx=1,
@@ -121,6 +121,19 @@ def test_integrate_peak_2():
     # as spectra are normalized to area 1
 
 
+from mocca.peak.correct import correct_offset
+
+def test_correct_offset():
+    peak = IntegratedPeak(left=90, right=110, maximum=100, dataset=test_data[0], idx=1,
+                       pure=False, saturation=False, integral=0.99)
+    corrected_peak_1 = correct_offset(peak, 5)
+    corrected_peak_2 = correct_offset(peak, 0)
+    corrected_peak_3 = correct_offset(peak, -10)
+    assert corrected_peak_1.left == 85
+    assert corrected_peak_2.right == 110
+    assert corrected_peak_3.maximum == 110
+    assert hasattr(corrected_peak_1, 'offset')
+
 from mocca.peak.match import (get_spectrum_correl_coef, get_relative_distance,
                                get_similarity_dicts, get_filtered_similarity_dicts,
                                match_peak)
@@ -130,7 +143,7 @@ def create_test_peak_db():
     db_peaks = []
     for i in range(11):
         peak = ProcessedPeak(left=79+i, right=119+i, maximum=99+i, dataset=test_data[0], idx=1,
-                            saturation=False, pure=True, compound_id=str(int(i/3)), integral=12,
+                            saturation=False, pure=True, compound_id=str(int(i/3)), integral=12, offset=0,
                             concentration=12.3)
         db_peaks.append(peak)
     test_db.peaks = db_peaks
@@ -190,9 +203,9 @@ def test_get_filtered_similarity_dicts_2():
     assert len(matches) == 2
     assert matches[0]['compound_id'] == "0" and matches[1]['compound_id'] == "1"
 
-def test_match_peak():
-    peak = IntegratedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1,
-                          pure=True, saturation=True, integral=123)
+def test_match_peak_1():
+    peak = CorrectedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1,
+                          pure=True, saturation=True, integral=123, offset=0)
     peak_db = create_test_peak_db()
     quali_db = QualiComponentDatabase()
     quali_db.update(peak_db, peak_filter_function=None)
@@ -201,36 +214,15 @@ def test_match_peak():
     assert len(matched_peak.matches) == 2
     assert matched_peak.matches[0]['compound_id'] == "0" and matched_peak.matches[1]['compound_id'] == "1"
 
-
-from mocca.peak.preprocessor import preprocess_peak
-
-def test_preprocess_peak():
-    peak = PickedPeak(left=99, right=101, maximum=100, dataset=test_data[0], idx=1)
+def test_match_peak_2():
+    peak = CorrectedPeak(left=80, right=120, maximum=100, dataset=test_data[0], idx=1,
+                          pure=False, saturation=True, integral=123, offset=0)
     peak_db = create_test_peak_db()
     quali_db = QualiComponentDatabase()
     quali_db.update(peak_db, peak_filter_function=None)
-    
-    preprocessed_peak = preprocess_peak(peak, quali_db, absorbance_threshold=0.1, detector_limit=10,
-    spectrum_correl_thresh= 0.99999, relative_distance_thresh=0.1)
-    
-    assert preprocessed_peak.left < 99 and preprocessed_peak.right > 101
-    assert not preprocessed_peak.saturation
-    assert preprocessed_peak.pure
-    assert preprocessed_peak.integral > 0.9
-    assert len(preprocessed_peak.matches) == 2
-    assert preprocessed_peak.matches[0]['compound_id'] == "0" and preprocessed_peak.matches[1]['compound_id'] == "1"
+    matched_peak = match_peak(peak, quali_db, spectrum_correl_coef_thresh=0.99999,
+                              relative_distance_thresh=0.1, print_similarity_dicts=True)
+    assert matched_peak.matches is None
 
     #logging.warning("{}".format(dicts))
-"""
-# TEST PICKED PEAK PROCESSOR
-from mocca.peak.processor import process_peak
 
-def test_peak_process():
-    peak = PickedPeak(left=298, right=302, maximum=300, dataset=test_data[0], idx=1)
-    processed_peak = process_peak(peak, detector_limit=10, absorbance_threshold=0.1)
-    assert processed_peak.left < 295
-    assert processed_peak.right > 305
-    assert processed_peak.saturation is not None
-    assert processed_peak.pure is not None
-    assert type(processed_peak) == ProcessedPeak
-"""

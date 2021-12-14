@@ -70,21 +70,25 @@ def get_filtered_similarity_dicts(peak, component_db, spectrum_correl_coef_thres
     return matches
 
 
-def match_peak(integrated_peak, component_db, spectrum_correl_coef_thresh,
-               relative_distance_thresh, print_similarity_dicts):
+def match_peak(corrected_peak, component_db, spectrum_correl_coef_thresh,
+               relative_distance_thresh, print_similarity_dicts=False):
     """
     Routine to assign possible matches to a returned preprocessed peak.
     """
-    matches = get_filtered_similarity_dicts(integrated_peak, component_db,
-                                            spectrum_correl_coef_thresh,
-                                            relative_distance_thresh,
-                                            print_similarity_dicts)
-    return PreprocessedPeak(left=integrated_peak.left,
-                            right=integrated_peak.right,
-                            maximum=integrated_peak.maximum,
-                            dataset=integrated_peak.dataset,
-                            idx=integrated_peak.idx,
-                            saturation=integrated_peak.saturation,
-                            pure=integrated_peak.pure,
-                            integral=integrated_peak.integral,
+    if corrected_peak.pure is False:
+        matches = None
+    else:
+        matches = get_filtered_similarity_dicts(corrected_peak, component_db,
+                                                spectrum_correl_coef_thresh,
+                                                relative_distance_thresh,
+                                                print_similarity_dicts)
+    return PreprocessedPeak(left=corrected_peak.left,
+                            right=corrected_peak.right,
+                            maximum=corrected_peak.maximum,
+                            dataset=corrected_peak.dataset,
+                            idx=corrected_peak.idx,
+                            saturation=corrected_peak.saturation,
+                            pure=corrected_peak.pure,
+                            integral=corrected_peak.integral,
+                            offset=corrected_peak.offset,
                             matches=matches)
