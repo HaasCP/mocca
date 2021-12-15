@@ -49,28 +49,28 @@ def generate_random_chromatogram_param(length):
 def generate_test_chromatograms():
     # TEST DATA GENERATION
     test_data = []
-    test_data.append(Chromatogram(1000, concs=[1] * 10,
-                               elution_widths=[5, 10, 5, 5, 3, 10, 3, 6, 15, 15],
-                               elution_times=[100, 150, 200, 250, 300,
-                                              400, 500, 700, 800, 850]))
-    test_data.append(Chromatogram(1000))  # random chromatogram
-    test_data.append(Chromatogram(1000, concs=[100000] + [0] * 9,
-                               elution_times=[200] + [0] * 9))
-    test_data.append(Chromatogram(1000, concs=[1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-                               elution_widths=[10]*10,
-                               elution_times=[50, 0, 0, 0, 55, 0, 0, 0, 0, 0]))  # overlap
-    test_data.append(Chromatogram(1000, concs=[1, 0, 0, 0, 0.2, 0, 0.2, 0, 1, 0],
-                               elution_widths=[15]*10,
-                               elution_times=[50, 0, 0, 0, 51, 0, 53, 0, 60, 0]))  # overlap
-    test_data.append(Chromatogram(1000, concs=[10000, 0, 0, 0, 2000, 0, 2000, 0, 10000, 0],
-                               elution_widths=[15]*10,
-                               elution_times=[50, 0, 0, 0, 51, 0, 53, 0, 60, 0]))
-    test_data.append(Chromatogram(1000, concs=[1] * 10,
-                               elution_widths=[5, 10, 5, 5, 3, 10, 3, 6, 15, 15],
-                               elution_times=[100, 150, 200, 250, 300,
+    test_data.append(TestChromatogram(1000, concs=[1] * 10,
+                                      elution_widths=[5, 10, 5, 5, 3, 10, 3, 6, 15, 15],
+                                      elution_times=[100, 150, 200, 250, 300,
+                                                     400, 500, 700, 800, 850]))
+    test_data.append(TestChromatogram(1000))  # random chromatogram
+    test_data.append(TestChromatogram(1000, concs=[100000] + [0] * 9,
+                                      elution_times=[200] + [0] * 9))
+    test_data.append(TestChromatogram(1000, concs=[1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+                                      elution_widths=[10]*10,
+                                      elution_times=[50, 0, 0, 0, 55, 0, 0, 0, 0, 0]))  # overlap
+    test_data.append(TestChromatogram(1000, concs=[1, 0, 0, 0, 0.2, 0, 0.2, 0, 1, 0],
+                                      elution_widths=[15]*10,
+                                      elution_times=[50, 0, 0, 0, 51, 0, 53, 0, 60, 0]))  # overlap
+    test_data.append(TestChromatogram(1000, concs=[10000, 0, 0, 0, 2000, 0, 2000, 0, 10000, 0],
+                                      elution_widths=[15]*10,
+                                      elution_times=[50, 0, 0, 0, 51, 0, 53, 0, 60, 0]))
+    test_data.append(TestChromatogram(1000, concs=[1] * 10,
+                                      elution_widths=[5, 10, 5, 5, 3, 10, 3, 6, 15, 15],
+                                      elution_times=[100, 150, 200, 250, 300,
                                               400, 500, 700, 800, 850], add_noise=False))
-    test_data.append(Chromatogram(1000, concs=[1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               elution_widths=[10]*10, elution_times=[150]*10))
+    test_data.append(TestChromatogram(1000, concs=[1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                      elution_widths=[10]*10, elution_times=[150]*10))
     return test_data
 
 def plot_test_data(data):
@@ -84,7 +84,7 @@ def plot_test_data(data):
     plt.plot(data.data)
     plt.show()
 
-class Chromatogram():
+class TestChromatogram():
     def __init__(self, length, concs=None, elution_times=None,
                  elution_widths=None, add_noise=True):
         self.times, self.widths, self.concs = generate_random_chromatogram_param(length)

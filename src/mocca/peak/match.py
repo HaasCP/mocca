@@ -48,7 +48,7 @@ def get_similarity_dicts(peak, component_db):
 
 
 def get_filtered_similarity_dicts(peak, component_db, spectrum_correl_coef_thresh,
-                                  relative_distance_thresh, print_out):
+                                  relative_distance_thresh, print_out=False):
     """
     Filters the list of similarity dictionaries with regard to the given thresholds.
     Return possible matches which have a spectral correlation coefficient higher
@@ -58,9 +58,9 @@ def get_filtered_similarity_dicts(peak, component_db, spectrum_correl_coef_thres
     similarity_dict = get_similarity_dicts(peak, component_db)
     if print_out:
         print(similarity_dict)
-    for d in similarity_dict:
-        print(d['spectrum_correl_coef'] >= spectrum_correl_coef_thresh)
-        print(d['relative_distance'] <= spectrum_correl_coef_thresh)
+        for d in similarity_dict:
+            print(d['spectrum_correl_coef'] >= spectrum_correl_coef_thresh)
+            print(d['relative_distance'] <= spectrum_correl_coef_thresh)
     matches = [d for d in similarity_dict if ((d['spectrum_correl_coef'] >=
                                               spectrum_correl_coef_thresh) and
                                               (d['relative_distance'] <=
@@ -75,7 +75,7 @@ def match_peak(corrected_peak, component_db, spectrum_correl_coef_thresh,
     """
     Routine to assign possible matches to a returned preprocessed peak.
     """
-    if corrected_peak.pure is False:
+    if not corrected_peak.pure:
         matches = None
     else:
         matches = get_filtered_similarity_dicts(corrected_peak, component_db,

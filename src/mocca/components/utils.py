@@ -15,8 +15,8 @@ def get_valid_peaks(peaks):
     Returns a list of peaks from the database which are pure and unsaturated
     and have a compound_id.
     """
-    return [peak for peak in peaks if (peak.pure is True and
-                                       peak.saturation is False and
+    return [peak for peak in peaks if (peak.pure and
+                                       not peak.saturation and
                                        peak.compound_id is not None)]
 
 

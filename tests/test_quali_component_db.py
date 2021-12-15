@@ -63,6 +63,19 @@ def test_create_quali_component_2():
     with pytest.raises(Exception):
          create_quali_component(test_db.peaks)
 
+def test_create_quali_component_3():
+    test_db = PeakDatabase()
+    test_db.peaks = [ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
+                     saturation=False, pure=True, offset=0, compound_id="1", integral=12,
+                     concentration=12.3)]
+    peak_dict = get_filtered_peaks_by_compound(test_db, filter_function=None)
+    quali_components = []
+    for key, value in peak_dict.items():
+        comp = create_quali_component(value)
+        quali_components.append(comp)
+    for comp in quali_components:
+        assert isinstance(comp, QualiComponent)
+
 def create_test_components():
     test_db = create_test_peak_db()
     peak_dict = get_filtered_peaks_by_compound(test_db, filter_function=None)
@@ -109,7 +122,7 @@ def test_delete_all_items():
     assert len(quali_db.items) == 0
     assert isinstance(quali_db.items, list)
 
-def test_update():
+def test_update_1():
     peak_db = create_test_peak_db()
     quali_db = QualiComponentDatabase()
     quali_db.update(peak_db)
@@ -117,6 +130,15 @@ def test_update():
     compound_ids = ["0", "1", "2", "3"]
     for compound_id in compound_ids:
         assert compound_id in quali_db
+
+def test_update_2():
+    test_db = PeakDatabase()
+    test_db.peaks = [ProcessedPeak(left=100, right=200, maximum=100, dataset=test_data[0], idx=1,
+                     saturation=False, pure=True, offset=0, compound_id="1", integral=12,
+                     concentration=12.3)]
+    quali_db = QualiComponentDatabase()
+    quali_db.update(test_db)
+    assert len(quali_db.items) == 1
 
 def filter_func(peaks):
     return [peak for peak in peaks if int(peak.compound_id) > 1]

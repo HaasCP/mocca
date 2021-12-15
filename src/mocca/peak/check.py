@@ -24,7 +24,7 @@ def check_peak_saturation(picked_peak, detector_limit):
     based on if the peak absorbance exceeds detector_limit.
     """
     max_absorbance = picked_peak.dataset.data[:, picked_peak.maximum].max()
-    return max_absorbance > detector_limit
+    return bool(max_absorbance > detector_limit)
 
 
 def check_peak_purity(peak, param=2.5, show_analytics=False):
