@@ -93,7 +93,7 @@ def correct_istd_offset(chromatogram, istd_key, quali_component_db,
                         spectrum_correl_coef_thresh, relative_distance_thresh)
     corrected_peaks = []
     for peak in chromatogram.peaks:
-        correct_offset(peak, istd_offset)
-        corrected_peaks.append(peak)
+        new_peak = correct_offset(peak, istd_offset)
+        corrected_peaks.append(new_peak)
     chromatogram.peaks = corrected_peaks
     return chromatogram

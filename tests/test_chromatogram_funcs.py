@@ -133,21 +133,31 @@ def test_get_istd_offset_2():
                              spectrum_correl_coef_thresh=0.99, relative_distance_thresh=0.01)
     assert offset == 0
 
-def test_correct_istd_offset():
+def test_correct_istd_offset_1():
     peak_db = create_test_peak_db(test_data[0])
     quali_db = QualiComponentDatabase()
     quali_db.update(peak_db, peak_filter_function=None)
     
     chromatogram = create_shifted_test_chrom(test_data[0])
-    logging.warning("{}".format(chromatogram.peaks[2]))
-    
+
     chromatogram = correct_istd_offset(chromatogram, '3', quali_db, 
                              spectrum_correl_coef_thresh=0.99, relative_distance_thresh=0.01)
-    logging.warning("{}".format(chromatogram.peaks[2]))
+
     assert chromatogram.peaks[2].maximum == quali_db['3'].maximum
 
-#TODO add impure peak tests
+def test_correct_istd_offset_2():
+    peak_db = create_test_peak_db(test_data[0])
+    quali_db = QualiComponentDatabase()
+    quali_db.update(peak_db, peak_filter_function=None)
     
+    chromatogram = create_shifted_test_chrom(test_data[0])
+    
+    chromatogram = correct_istd_offset(chromatogram, '11', quali_db, 
+                             spectrum_correl_coef_thresh=0.99, relative_distance_thresh=0.01)
+    assert chromatogram.peaks[2].maximum == quali_db['3'].maximum - 12
+
+#TODO add impure peak tests
+    #    logging.warning("{}".format(chromatogram.peaks[2]))
 
 
     
