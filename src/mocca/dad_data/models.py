@@ -77,7 +77,8 @@ class _ParafacDataBase(_DadDataBase):
 
 @dataclass
 class ParafacData(DadData, _ParafacDataBase):
-    def __post_init__(self, parafac_peak, original_dataset, hplc_system_tag, path):
+    def __post_init__(self, parafac_peak, original_dataset, wl_high_pass, wl_low_pass):
+        # https://github.com/python/mypy/issues/9254
         self.detector_limit = np.inf
         self.time = original_dataset.time
         self.wavelength = original_dataset.wavelength
