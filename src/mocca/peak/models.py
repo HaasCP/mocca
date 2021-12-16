@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional, List
 
-from mocca.dad_data.models import CompoundData
-
+import mocca.dad_data.models
+import numpy as np
 
 @dataclass(frozen=True)
 class BasePeak():
@@ -19,7 +19,8 @@ class PickedPeak(BasePeak):
     """
     Class for picked peaks out of DAD data. Also valid for expanded peaks.
     """
-    dataset : CompoundData  # DADData parent of peak
+    # https://www.python.org/dev/peps/pep-0484/#forward-references
+    dataset : 'mocca.dad_data.models.CompoundData'  # DADData parent of peak
     idx : int
 
     def __eq__(self, other):
@@ -76,7 +77,7 @@ class ProcessedPeak():
     left : int
     right : int
     maximum : int
-    dataset : CompoundData
+    dataset : 'mocca.dad_data.models.CompoundData'
     idx : int
     saturation : bool
     pure : bool
@@ -93,3 +94,10 @@ class ProcessedPeak():
                 self.right == other.right and
                 self.maximum == other.maximum and
                 self.dataset == other.dataset)
+
+@dataclass(frozen=True)
+class ParafacPeak(BasePeak):
+    integral : float
+    spectra : np.ndarray
+    elution : np.ndarray
+    offset : int

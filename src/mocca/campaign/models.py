@@ -7,9 +7,9 @@ Created on Mon Dec 13 09:05:19 2021
 """
 import dill
 
-from mocca.data_data.models import GradientData, CompoundData
+from mocca.dad_data.models import GradientData, CompoundData
 from mocca.dad_data.process_funcs import pick_peaks
-from mocca.chromatogram.funcs import preprocess_chromatogram
+from mocca.chromatogram.preprocessor import preprocess_chromatogram
 
 class HplcDadCampaign():
     """

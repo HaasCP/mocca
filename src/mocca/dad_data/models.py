@@ -7,7 +7,7 @@ Created on Tue Aug  3 13:16:51 2021
 """
 
 from dataclasses import dataclass, field, InitVar
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import numpy as np
 from mocca.dad_data.utils import absorbance_to_array, apply_filter, trim_data
@@ -16,6 +16,7 @@ from mocca.dad_data.process_gradientdata import bsl_als
 from mocca.dad_data.apis.chemstation_api import read_csv_agilent, tidy_df_agilent
 from mocca.dad_data.apis.labsolutions_api import read_txt_shimadzu
 
+import mocca.peak.models
 
 # Parameter inheritance issues solved as shown in:
 # https://stackoverflow.com/questions/51575931/class-inheritance-in-python-3-7-dataclasses
@@ -69,6 +70,28 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
         self.time = df.time.unique()
         self.wavelength = df.wavelength.unique()
 
+@dataclass 
+class _ParafacDataBase(_DadDataBase):
+    parafac_peak : InitVar['mocca.peak.models.ParafacPeak']  # https://www.python.org/dev/peps/pep-0484/#forward-references
+    original_dataset : InitVar[DadData]
+
+@dataclass
+class ParafacData(DadData, _ParafacDataBase):
+    def __post_init__(self, parafac_peak, original_dataset, hplc_system_tag, path):
+        self.detector_limit = np.inf
+        self.time = original_dataset.time
+        self.wavelength = original_dataset.wavelength
+        self.data = np.zeros((len(self.wavelength), len(self.time)))
+        self._make_data_from_parafac_peak(parafac_peak)
+
+    def _make_data_from_parafac_peak(self, parafac_peak):
+        # make 2D data corresponding to parafac-generated spectra and elution
+        parafac_peak_data = parafac_peak.spectra.reshape(len(self.wavelength), 1) \
+                          * parafac_peak.elution.reshape(1, parafac_peak.right + 1 - parafac_peak.left) \
+                          * parafac_peak.integral
+        # replace self data with parafac peak data
+        self.data[:, parafac_peak.left + parafac_peak.offset:parafac_peak.right + parafac_peak.offset + 1] = parafac_peak_data
+
 
 @dataclass(eq=False)
 class GradientData(DadData):
@@ -85,12 +108,12 @@ class _CompoundDataBase(_DadDataBase):
 @dataclass()
 class _CompoundDataDefaultsBase(_DadDataDefaultsBase):
     # input dictionary for compounds mapping compound_id to concentration
-    compound_input : Dict = None
+    compound_input : Optional[Dict] = None
 
     # data properties to be set by class, do not initialize
-    warnings : List[str] = field(default_factory=list)
-    translation_shift : int = None
-    area_correction : float = None
+    warnings : List[str] = field(default_factory=list, init=False)
+    translation_shift : int = field(init=False)
+    area_correction : float = field(init=False)
 
 
 @dataclass(eq=False)
