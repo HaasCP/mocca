@@ -3,6 +3,7 @@ from mocca.peak.models import ParafacPeak, PickedPeak
 from mocca.dad_data.process_funcs import pick_peaks
 from mocca.dad_data.models import ParafacData
 from mocca.peak.check import check_peak_purity
+from mocca.peak.resolve_impure import get_relevant_data
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -34,3 +35,6 @@ def test_parafac_data_creation_1():
 
 	# sum of two deconvolved peaks should be approximately the peak in the original dataset
 	assert abs(np.sum((parafac_data1.data + parafac_data2.data - test_data[0].data)[750:900])) < 0.05
+
+def test_get_data():
+	get_relevant_data(left=750, right=899, peak_database=None)
