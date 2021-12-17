@@ -28,7 +28,7 @@ for data in test_data:
     plot_test_data(data)
 """
 
-from mocca.chromatogram.funcs import get_pure_istd_peak, get_istd_peak, get_istd_offset, correct_istd_offset
+from mocca.chromatogram.correct import get_pure_istd_peak, get_istd_peak, get_istd_offset, correct_istd_offset
 
 def create_test_peak_db(test_data, absorbance_threshold=0.1, detector_limit=10,
                         print_purity_check=False):

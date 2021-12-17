@@ -34,6 +34,13 @@ class Chromatogram():
         else:
             raise AttributeError("{} not found in Database!"
                                  "".format(compound_id))
+    
+    def __eq__(self, other):
+        if not isinstance(other, Chromatogram):
+            # don't attempt to compare against unrelated types
+            raise ValueError("Both chromatograms must be of the mocca "
+                             "Chromatogram type!")
+        return self.dataset == other.dataset
 
     def insert_peak(self, peak):
         if self.dataset:
