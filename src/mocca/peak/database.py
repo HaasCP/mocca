@@ -59,11 +59,10 @@ class PeakDatabase():
                     cur_count = num
         self.unknown_counter = cur_count
 
-    def increment_unkown_counter(self):
+    def increment_unknown_counter(self):
         """
         Increments the unknown counter by one.
         """
-        self.update_unknown_counter()
         self.unknown_counter += 1
 
     def insert_peak(self, new_peak):

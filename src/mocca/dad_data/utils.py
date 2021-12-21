@@ -8,7 +8,7 @@ Created on Fri Dec 10 13:31:37 2021
 
 import numpy as np
 
-def get_compound_names(coumpound_data):
+def get_compound_ids(coumpound_data):
     # iterate through all values to find compounds with nonzero concs
     # input is a dictionary mapping compounds to concentrations
     return [compound for compound, conc in

@@ -92,3 +92,15 @@ def match_peak(corrected_peak, component_db, spectrum_correl_coef_thresh,
                             integral=corrected_peak.integral,
                             offset=corrected_peak.offset,
                             matches=matches)
+
+def update_matches(peak, new_matches):
+    return PreprocessedPeak(left=peak.left,
+                            right=peak.right,
+                            maximum=peak.maximum,
+                            dataset=peak.dataset,
+                            idx=peak.idx,
+                            saturation=peak.saturation,
+                            pure=peak.pure,
+                            integral=peak.integral,
+                            offset=peak.offset,
+                            matches=new_matches)
