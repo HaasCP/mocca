@@ -27,9 +27,7 @@ class PickedPeak(BasePeak):
         if not isinstance(other, BasePeak):
             # don't attempt to compare against unrelated types
             raise ValueError("Both peaks must be of the same type!")
-        return (self.left == other.left and
-                self.right == other.right and
-                self.maximum == other.maximum and
+        return (self.maximum == other.maximum and
                 self.dataset == other.dataset)
 
 
@@ -90,9 +88,7 @@ class ProcessedPeak():
         if not isinstance(other, ProcessedPeak):
             # don't attempt to compare against unrelated types
             raise ValueError("Both peaks must be of the same type!")
-        return (self.left == other.left and
-                self.right == other.right and
-                self.maximum == other.maximum and
+        return (self.maximum + self.offset == other.maximum + other.offset and
                 self.dataset == other.dataset)
 
 @dataclass(frozen=True)

@@ -8,14 +8,6 @@ Created on Fri Dec 10 13:31:37 2021
 
 import numpy as np
 
-def get_compound_ids(coumpound_data):
-    # iterate through all values to find compounds with nonzero concs
-    # input is a dictionary mapping compounds to concentrations
-    return [compound for compound, conc in
-            coumpound_data.compound_input.items() if conc != 0]
-
-def get_compound_concentration(coumpound_data, compound_id):
-    return coumpound_data.compound_input[compound_id]
 
 def sum_absorbance_by_time(data):
     """
@@ -34,12 +26,14 @@ def sum_absorbance_by_time(data):
     """
     return data.sum(axis=0)
 
+
 def trim_data(data, time, length):
     """Trims the 2D DADData in the time dimension to the length provided"""
     if length < data.shape[1]:
         return data[:, :length], time[:length]
     else:
         return data, time
+
 
 def absorbance_to_array(df):
     """
@@ -63,6 +57,7 @@ def absorbance_to_array(df):
     absorbance_array = df.absorbance.to_numpy().\
         reshape(df.wavelength.nunique(), df.time.nunique())
     return absorbance_array
+
 
 def apply_filter(dataframe):
     """

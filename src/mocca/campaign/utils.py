@@ -5,9 +5,22 @@ Created on Mon Dec 13 15:47:14 2021
 
 @author: haascp
 """
-
+import dill
 import logging
 import numpy as np
+
+
+def save_instance(campaign, path):
+    with open(path, 'wb') as file:
+    #for chromatogram in self.chromatograms:
+    #    for peak in chromatogram.peaks:
+    #        peak.dataset.data = []
+        dill.dump(campaign, file)
+
+
+def load_instance(path):
+    with open(path, 'rb') as file:
+        dill.load(file)
 
 
 def suggest_initialization_runs(n_calib_dict, max_conc_dict=None, istd_key=None,

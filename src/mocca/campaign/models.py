@@ -5,26 +5,35 @@ Created on Mon Dec 13 09:05:19 2021
 
 @author: haascp
 """
-import dill
+import logging
+
+from mocca.peak.database import PeakDatabase
+from mocca.components.databases import QualiComponentDatabase, QuantComponentDatabase
 
 from mocca.dad_data.models import GradientData, CompoundData
 from mocca.dad_data.process_funcs import pick_peaks
+
 from mocca.chromatogram.preprocessor import preprocess_chromatogram
+from mocca.chromatogram.assign import add_quali_component
+
+from mocca.campaign.experiment import Experiment
+from mocca.campaign.settings import Settings
+from mocca.campaign.utils import save_instance
 
 class HplcDadCampaign():
     """
     Main parent class for HPLC-DAD experimental campaigns. We expect the gradient to stay
     constant over the campaign.
     """
-    def __init__(self, hplc_system_tag, gradient_path, istd_id=None):
+    def __init__(self, hplc_system_tag, gradient_path, autosave_path=None):
         self.hplc_system_tag = hplc_system_tag
-        self.istd_key = istd_id
         self.gradient = self._create_gradient(gradient_path)
+        self.autosave_path = autosave_path
         self.experiments = []
-        self.chromatograms = []
-        self.peak_database = None
-        self.quali_component_db = None
-        self.quanti_component_db = None
+        self.settings = Settings()
+        self.peak_db = PeakDatabase()
+        self.quali_comp_db = QualiComponentDatabase()
+        self.quanti_comp_db = QuantComponentDatabase()
 
     def _create_gradient(self, gradient_path):
         """Adds gradient data to the HPLC instance. Gradient data are required
@@ -38,34 +47,92 @@ class HplcDadCampaign():
         #extra since unrelated to the others, no injection at all!
         return GradientData(self.hplc_system_tag, gradient_path)
 
-    def save_instance(self, path='data.pkl'):
-        file = open(path, 'wb')
-        for chromatogram in self.chromatograms:
-            for peak in chromatogram.peaks:
-                peak.dataset.data = []
-        dill.dump(self.__dict__, file)
-        file.close()
-    
-    def load_instance(self, path='data.pkl'):
-        file = open(path, 'rb')
-        self.__dict__.update(dill.load(file))
-        file.close()
+    def add_experiment(self, path, istd, compound):
+        """
+        All reaction concentration are metadata and should be trated like
+        reaction temperature etc. Only give compound_conc if standard.
+        If compound_id given: Add new peak to component db and update it
+        If conc given: Add peak to quanti_component with same compound_id and update
+        Store user input concs as negative conc in peak
+        """
+        if self.autosave_path:
+            save_instance(self, self.autosave_path)
 
-    def add_experiments(self, experiments):
+        new_exp = Experiment(path, compound, istd)
+
+        for i, exp in enumerate(self.experiments):
+            if exp.path == new_exp.path:
+                del self.experiments[i]
+                logging.warning("CampaignWarning: Path {} was already used for "
+                                "different experiment. New experiment replaces "
+                                "the old one.".format(new_exp.path))
+
+        self.experiments.append(new_exp)
+
+    def process_all_experiments(self, absorbance_threshold=500, wl_high_pass=None, 
+                                wl_low_pass=None, peaks_high_pass=None, 
+                                peaks_low_pass=None, spectrum_correl_thresh=0.9, 
+                                relative_distance_thresh=0.01):
         """
-        compound_inputs: list of dicts with scalar values (no lists)
+        Easiest case: only one peak
+        More complicated cases: with istd and/or solvents
+        Assignes highest unmatched peak with compound_id and puts it in component_db.
+        All other given compound_ids must already be in component db and peaks must
+        be found in chromatogram.
+        --> function for one unknown peak!
+        Order:
+            1. solvent
+            2. istd
+            3. 
         """
-        if not isinstance(experiments, list):
-            raise TypeError("Compound inputs have to be given as a list of dictionaries.")
-        if not all("path" in compound_input
-                   for compound_input in experiments):
-            raise AttributeError("For all added experiments, a path to the data "
-                                 "has to be given under the dictionary key 'path'.")
-        if self.istd_id and not all(self.istd_id in compound_input
-                                    for compound_input in experiments):
-            raise AttributeError("In campaigns with an internal standard, an internal "
-                                 "standard input has to be given via the compound input dictionary.")
-        self.experiments.extend(experiments)
+        self.settings.update(self, absorbance_threshold, wl_high_pass, wl_low_pass,
+                             peaks_high_pass, peaks_low_pass, spectrum_correl_thresh, 
+                             relative_distance_thresh)
+        
+        solvent_exps = [exp for exp in self.experiments if exp.compound.solvent]
+        for exp in solvent_exps:
+            compound_data = CompoundData(self.hplc_system_tag, exp, self.gradient,
+                                         self.settings.wl_high_pass, self.settings.wl_low_pass)
+            chromatogram = pick_peaks(compound_data, absorbance_threshold, 
+                                      peaks_high_pass, peaks_low_pass)
+            chromatogram = preprocess_chromatogram(chromatogram, self.istd_key,
+                                                   self.quali_component_db, 
+                                                   absorbance_threshold, 
+                                                   self.detector_limit, 
+                                                   spectrum_correl_thresh,
+                                                   relative_distance_thresh)
+            
+            
+        
+        
+        process_solvents()
+        def order_experiments(self):
+            solvent_exps = []
+            # insert in peak_db, update quali_comp_db
+            istd_exps = []
+            # insert in peak_db, update quali_comp_db
+            compound_exps = []
+            # insert in peak_db, update quali_comp_db
+            calibration_exps = []
+            # insert in peak_db, update quali_comp_db, update quanti_comp_db
+            analysis_exps = []
+
+        compound_data = CompoundData(self.hplc_system_tag, path, 
+                                     self.gradient, {})
+        chromatogram = pick_peaks
+    
+    def process_new_experiment(self, path, compound_id=None, solvent=False, istd=False, compound_conc=None,
+                       istd_id=None, istd_conc=None):
+        """
+        Here, thresholds of the campaign are taken --> we don't have to process all
+        """
+        if not bad_data:
+            update_all_databases(peak, component, compound)
+        pass
+    
+
+
+    
 
     #TODO def load_peak_database()
 
@@ -98,16 +165,40 @@ class HplcDadCampaign():
 
 # TODO develop compound_id assignment algorithms in each child class
 
-class InitializationCampaign(HplcDadCampaign):
+class CalibrationCampaign(HplcDadCampaign):
     
-    def __init__(self, analyte_ids=[]):
-        #super_init
-        self.analyte_keys = analyte_ids
+    # We can even get rid of analyte_key since they are given via experiment input
+    
+    def process_initialization(self, absorbance_threshold, wl_high_pass=None, 
+                               wl_low_pass=None, peaks_high_pass=None, 
+                               peaks_low_pass=None, spectrum_correl_thresh=0.9, 
+                               relative_distance_thresh=0.01):
+        """
+        Easiest case: only one peak
+        More complicated cases: with istd and/or solvents
+        Assignes highest unmatched peak with compound_id and puts it in component_db.
+        All other given compound_ids must already be in component db and peaks must
+        be found in chromatogram.
+        --> function for one unknown peak!
+        Order:
+            1. solvent
+            2. istd
+            3. 
+        """
+        self.thresholds = {
+            'absorbance_threshold': absorbance_threshold
+            }
+        compound_data = CompoundData(self.hplc_system_tag, path, 
+                                     self.gradient, {})
+        chromatogram = pick_peaks
+
+    def add_calibration_run():
+        pass
 
     def process_peaks(self):
-        compounds = get_compounds(dataset)
-        if not any(peak.matches['compound_id'].startswith(compounds[0]) for peak in self.peaks):
-            pass
+        #compounds = get_compounds(dataset)
+        #if not any(peak.matches['compound_id'].startswith(compounds[0]) for peak in self.peaks):
+        #    pass
         pass
     
     def _create_quantification_db(self, plots=True, title=True, warning_threshold=0.98):
@@ -144,4 +235,17 @@ class InitializationCampaign(HplcDadCampaign):
                 db[compound_name].append((peak_integrals[0] * data.area_correction if hasattr(data, 'area_correction') else peak_integrals[0], 
                                       data.get_compound_concentration(compound_name)))
     
-    
+# class ReactionCampaign(HplcDadCampaign):
+     # can overtake component dbs from calib campaign but starts own peak_db
+     # component db is not updated but rather inserted by compound
+     # Another possibility is to create component dbs from existing peak db
+     
+     
+     
+
+
+     
+     
+     
+     
+     

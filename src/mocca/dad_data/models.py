@@ -16,6 +16,8 @@ from mocca.dad_data.process_gradientdata import bsl_als
 from mocca.dad_data.apis.chemstation_api import read_csv_agilent, tidy_df_agilent
 from mocca.dad_data.apis.labsolutions_api import read_txt_shimadzu
 
+from mocca.campaign.experiment import Experiment
+
 import mocca.peak.models
 
 # Parameter inheritance issues solved as shown in:
@@ -23,7 +25,8 @@ import mocca.peak.models
 @dataclass()
 class _DadDataBase():
     hplc_system_tag : str
-    path : str
+    # input information, most importantly the path
+    experiment : Experiment
 
 
 @dataclass()
@@ -35,12 +38,14 @@ class _DadDataDefaultsBase():
 @dataclass()
 class DadData(_DadDataDefaultsBase, _DadDataBase):
     # set during initialization
+    path : str = field(init=False)
     detector_limit : int = field(init=False)
     data : np.ndarray = field(init=False)
     time : np.ndarray = field(init=False)
     wavelength : np.ndarray = field(init=False)
 
     def __post_init__(self, wl_high_pass, wl_low_pass):
+        self._set_path()
         self._set_detector_limit()
         self._read_data(wl_high_pass, wl_low_pass)
 
@@ -49,6 +54,9 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
             # don't attempt to compare against unrelated types
             raise ValueError("Both DAD datasets must be of the same type!")
         return self.path == other.path
+    
+    def _set_path(self):
+        self.path = self.experiment.path
 
     def _set_detector_limit(self):
         if self.hplc_system_tag == 'chemstation':
@@ -106,11 +114,9 @@ class _CompoundDataBase(_DadDataBase):
     # gradient for baseline correction
     gradient : InitVar[GradientData]
 
+
 @dataclass()
 class _CompoundDataDefaultsBase(_DadDataDefaultsBase):
-    # input dictionary for compounds mapping compound_id to concentration
-    compound_input : Optional[Dict] = None
-
     # data properties to be set by class, do not initialize
     warnings : List[str] = field(default_factory=list, init=False)
     translation_shift : int = field(init=False)
@@ -120,7 +126,7 @@ class _CompoundDataDefaultsBase(_DadDataDefaultsBase):
 @dataclass(eq=False)
 class CompoundData(DadData, _CompoundDataDefaultsBase, _CompoundDataBase):
     """
-    Parameter order: hplc_system_tag, path, gradient, wl_high_pass, wl_low_pass, compound_input
+    Parameter order: hplc_system_tag, experiment, gradient, wl_high_pass, wl_low_pass
     """
 
     def __post_init__(self, gradient, wl_high_pass, wl_low_pass):

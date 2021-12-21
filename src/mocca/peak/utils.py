@@ -23,6 +23,13 @@ def get_peak_data(peak):
     return peak.dataset.data[:, left:(right + 1)]
 
 
+def get_retention_time(peak):
+    if hasattr(peak, 'offset'):
+        return peak.dataset.time[peak.maximum + peak.offset]
+    else:
+        return peak.dataset.time[peak.maximum]
+
+
 def average_peak_spectrum(peak):
     """
     Calculates mean spectrum over peak from left to right border.
