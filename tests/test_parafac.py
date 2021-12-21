@@ -3,7 +3,8 @@ from mocca.peak.models import ParafacPeak, PickedPeak
 from mocca.dad_data.process_funcs import pick_peaks
 from mocca.dad_data.models import ParafacData
 from mocca.peak.check import check_peak_purity
-from mocca.peak.resolve_impure import get_relevant_data
+from mocca.peak.resolve_impure import get_relevant_data, get_zero_extended_peak_data, estimate_num_components, parafac, make_new_peak
+from mocca.components.utils import get_closest_peak
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -36,5 +37,27 @@ def test_parafac_data_creation_1():
 	# sum of two deconvolved peaks should be approximately the peak in the original dataset
 	assert abs(np.sum((parafac_data1.data + parafac_data2.data - test_data[0].data)[750:900])) < 0.05
 
+
+def test_get_closest_peak():
+	raise NotImplementedError("Need to write test")
+	get_closest_peak()
+
 def test_get_data():
-	get_relevant_data(left=750, right=899, peak_database=None)
+	raise NotImplementedError("Need to write test")
+	get_relevant_data()
+
+def test_get_zero_extended_peak_data():
+	raise NotImplementedError("Need to write test")
+	get_zero_extended_peak_data()
+
+def test_estimate_num_components():
+	raise NotImplementedError("Need to write test")
+	test_estimate_num_components()
+
+def test_parafac():
+	raise NotImplementedError("Need to write test")
+	test_parafac()
+
+def test_make_new_peak():
+	raise NotImplementedError("Need to write test")
+	make_new_peak()

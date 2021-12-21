@@ -8,6 +8,33 @@ Created on Fri Dec  3 13:23:45 2021
 import numpy as np
 
 from mocca.peak.utils import average_peak_spectrum
+from mocca.components.models import QualiComponent
+from mocca.peak.models import ProcessedPeak
+
+def get_closest_peak(component: QualiComponent) -> ProcessedPeak:
+    """
+    Takes in a QualiComponent and returns the peak it was made from that is the
+    closest to the average left, right, and maximum.
+    """
+    if len(component.created_from) == 0:
+        raise ValueError("This QualiComponent has no peaks in created_from attribute!")
+
+    def get_peak_similarity(peak: ProcessedPeak):
+        """
+        Returns a numeric value computing how similar the input peak is in retention
+        time to the input QualiComponent.
+
+        Calculates score by multiplying together the relative offsets of left, right,
+        and maximum. The best score is 0, and worse scores are higher in value.
+        """
+        relative_left_offset = abs((component.left - peak.left) / component.left)
+        relative_right_offset = abs((component.right - peak.right) / component.right)
+        relative_maximum_offset = abs((component.maximum - peak.maximum) / component.maximum)
+        peak_score = relative_left_offset * relative_right_offset * relative_maximum_offset
+        return peak_score
+
+    #sort list by peak score and return best score.
+    return sorted(component.created_from, key=get_peak_similarity)[0]
 
 
 def get_valid_peaks(peaks):
