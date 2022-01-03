@@ -13,6 +13,8 @@ class Chromatogram():
     def __init__(self):
         self.peaks = []
         self.dataset = None
+        self.warnings = []
+        self.bad_data = False
 
     def __iter__(self):
         """Yields all items inside the database.

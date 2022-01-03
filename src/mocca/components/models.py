@@ -18,12 +18,7 @@ class QualiComponent():
     created_from: List[ProcessedPeak]
 
 
-"""
 @dataclass
 class QuantComponent():
     compound_id: str
-    spectrum: list
-    calibration_factor: float
-    compound_peaks: List[ProcessedPeak]
-    istd_peaks: List[ProcessedPeak] = []
-"""
+    created_from: List[ProcessedPeak]

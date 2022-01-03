@@ -7,7 +7,7 @@ Created on Tue Aug  3 13:16:51 2021
 """
 
 from dataclasses import dataclass, field, InitVar
-from typing import Dict, List, Optional
+from typing import List
 
 import numpy as np
 from mocca.dad_data.utils import absorbance_to_array, apply_filter, trim_data
@@ -33,22 +33,22 @@ class _DadDataBase():
 class _DadDataDefaultsBase():
     wl_high_pass : InitVar[float] = None
     wl_low_pass : InitVar[float] = None
-    detector_limit : InitVar[float] = None
 
 
 @dataclass()
 class DadData(_DadDataDefaultsBase, _DadDataBase):
     # set during initialization
     path : str = field(init=False)
-    detector_limit : int = field(init=False)
     data : np.ndarray = field(init=False)
     time : np.ndarray = field(init=False)
     wavelength : np.ndarray = field(init=False)
+    warnings : List[str] = field(init=False)
 
-    def __post_init__(self, wl_high_pass, wl_low_pass, detector_limit):
+    def __post_init__(self, wl_high_pass, wl_low_pass):
+        self.warnings = []
         self._set_path()
-        self._set_detector_limit(detector_limit)
         self._read_data(wl_high_pass, wl_low_pass)
+        self.experiment.processed = True
 
     def __eq__(self, other):
         if not isinstance(other, type(self)):
@@ -58,17 +58,6 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
     
     def _set_path(self):
         self.path = self.experiment.path
-
-    def _set_detector_limit(self, detector_limit):
-        if detector_limit is None:
-            if self.hplc_system_tag == 'chemstation':
-                self.detector_limit = 2000
-            elif self.hplc_system_tag == 'labsolutions':
-                self.detector_limit = 2000
-            else:
-                raise AttributeError("HPLC System Tag {} not supported!".format(self.hplc_system_tag))
-        else:
-            self.detector_limit = detector_limit
 
     def _read_data(self, wl_high_pass, wl_low_pass):
         if self.hplc_system_tag == 'chemstation':
@@ -91,7 +80,6 @@ class _ParafacDataBase(_DadDataBase):
 class ParafacData(DadData, _ParafacDataBase):
     def __post_init__(self, parafac_peak, original_dataset, wl_high_pass, wl_low_pass):
         # https://github.com/python/mypy/issues/9254
-        self.detector_limit = np.inf
         self.time = original_dataset.time
         self.wavelength = original_dataset.wavelength
         self.data = np.zeros((len(self.wavelength), len(self.time)))
@@ -119,18 +107,10 @@ class _CompoundDataBase(_DadDataBase):
     gradient : InitVar[GradientData]
 
 
-@dataclass()
-class _CompoundDataDefaultsBase(_DadDataDefaultsBase):
-    # data properties to be set by class, do not initialize
-    warnings : List[str] = field(default_factory=list, init=False)
-    translation_shift : int = field(init=False)
-    area_correction : float = field(init=False)
-
-
 @dataclass(eq=False)
-class CompoundData(DadData, _CompoundDataDefaultsBase, _CompoundDataBase):
+class CompoundData(DadData, _CompoundDataBase):
     """
-    Parameter order: hplc_system_tag, experiment, gradient, wl_high_pass, wl_low_pass, detector_limit
+    Parameter order: hplc_system_tag, experiment, gradient, wl_high_pass, wl_low_pass
     """
 
     def __post_init__(self, gradient, wl_high_pass, wl_low_pass):

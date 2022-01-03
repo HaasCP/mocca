@@ -45,5 +45,6 @@ def preprocess_chromatogram(chromatogram, istds, quali_component_db,
                               relative_distance_thresh,
                               print_compound_prediction)
         matched_peaks.append(new_peak)
+    chromatogram.peaks = matched_peaks
     return chromatogram
 

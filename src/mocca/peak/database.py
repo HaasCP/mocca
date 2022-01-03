@@ -41,8 +41,8 @@ class PeakDatabase():
             yield peak
 
     def __contains__(self, peak):
-        """Allows statements such as "'Component 1' in component_database"
-        to see if that Component is inside the database"""
+        """Allows statements such as "peak in peak_db"
+        to see if that Peak is inside the database"""
         return True in [peak == db_peak for db_peak in self.peaks]
 
     def update_unknown_counter(self):
@@ -78,9 +78,9 @@ class PeakDatabase():
             for i, peak in enumerate(self.peaks):
                 if peak == new_peak:
                     self.peaks[i] = new_peak
-                logging.warning("Warning: Peak \n {} \n already exists in database. "
-                                "New peak replaces the "
-                                "old one.".format(new_peak))
+                logging.warning("Warning: Peak with maximum at {} already exists "
+                                "in database. New peak replaces the "
+                                "old one.".format(new_peak.maximum))
         else:
             self.peaks.append(new_peak)
         # update the unknown counter

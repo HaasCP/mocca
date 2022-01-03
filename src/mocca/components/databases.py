@@ -6,7 +6,7 @@ Created on Thu Dec  2 16:32:36 2021
 @author: haascp
 """
 from mocca.components.utils import get_filtered_peaks, get_filtered_peaks_by_compound
-from mocca.components.funcs import create_quali_component
+from mocca.components.quali_funcs import create_quali_component
 
 
 class BaseDatabase():
@@ -97,3 +97,7 @@ class QualiComponentDatabase(BaseDatabase):
         if compound_peaks:
             component = create_quali_component(compound_peaks)
             self.insert_item(component)
+
+class QuantComponentDatabase(BaseDatabase):
+    def update(self, peak_database, peak_filter_function=None):
+        pass
