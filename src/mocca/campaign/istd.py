@@ -16,6 +16,3 @@ class InternalStandard():
     """
     key: str
     conc: Optional[float]
-    
-    def __post_init__(self, quali_component):
-        check_for_component_in_db

@@ -83,6 +83,7 @@ class ProcessedPeak():
     offset : int
     compound_id : Optional[str] = None
     concentration : Optional[float] = None
+    is_compound : bool = False
 
     def __eq__(self, other):
         if not isinstance(other, ProcessedPeak):

@@ -14,6 +14,7 @@ class Settings():
     """
     Data container to store all user given data analysis settings.
     """
+    detector_limit : Optional[float] = None
     absorbance_threshold : Optional[float] = None
     wl_high_pass : Optional[float] = None
     wl_low_pass : Optional[float] = None
@@ -22,9 +23,10 @@ class Settings():
     spectrum_correl_thresh : Optional[float] = None  # Value between 0 and 1
     relative_distance_thresh : Optional[float] = None  # Value between 0 and 1
     
-    def update(self, absorbance_threshold, wl_high_pass, wl_low_pass,
-               peaks_high_pass, peaks_low_pass, spectrum_correl_thresh, 
-               relative_distance_thresh):
+    def update(self, detector_limit, absorbance_threshold, wl_high_pass,
+               wl_low_pass, peaks_high_pass, peaks_low_pass,
+               spectrum_correl_thresh, relative_distance_thresh):
+        self.detector_limit = detector_limit
         self.absorbance_threshold = absorbance_threshold
         self.wl_high_pass = wl_high_pass
         self.wl_low_pass = wl_low_pass

@@ -6,6 +6,7 @@ Created on Fri Dec 17 18:55:41 2021
 @author: haascp
 """
 from operator import attrgetter
+import logging
 
 from mocca.peak.match import update_matches
 from mocca.peak.process import process_peak
@@ -100,12 +101,28 @@ def assign_unmatched_peaks_react(peaks, peak_db):
     return assigned_peaks
 
 
-def get_matched_peaks(chromatogram):
-    return [peak for peak in chromatogram if peak.matches]
+def assign_unmatched_peaks_compound(peaks, compound_id):
+    """
+    Assigns peaks which do not contain matches with unknown compound ids.
+    """
+    peaks = sorted(peaks, key=lambda peak: peak.maximum)
+    assigned_peaks = []
+    impurity_counter = 0
+    for peak in peaks:
+        impurity_counter += 1
+        new_peak = process_peak(peak,
+                                compound_id + "_impurity_" + str(impurity_counter),
+                                None)
+        assigned_peaks.append(new_peak)
+    return assigned_peaks
 
 
-def get_unmatched_peaks(chromatogram):
-    return [peak for peak in chromatogram if not peak.matches]
+def get_matched_peaks(peaks):
+    return [peak for peak in peaks if peak.matches]
+
+
+def get_unmatched_peaks(peaks):
+    return [peak for peak in peaks if not peak.matches]
 
 
 def assign_peaks_react(chromatogram, peak_db):
@@ -113,8 +130,8 @@ def assign_peaks_react(chromatogram, peak_db):
     Assigns peaks of reaction runs with compound ids using unknown compound ids
     for unmatched peaks.
     """
-    matched_peaks = get_matched_peaks(chromatogram)
-    unmatched_peaks = get_unmatched_peaks(chromatogram)
+    matched_peaks = get_matched_peaks(chromatogram.peaks)
+    unmatched_peaks = get_unmatched_peaks(chromatogram.peaks)
     
     assigned_peaks, unassigned_peaks = assign_matched_peaks(matched_peaks)
     
@@ -125,36 +142,58 @@ def assign_peaks_react(chromatogram, peak_db):
     return chromatogram
 
 
-def get_unknown_impurity_peaks(chromatogram):
-    matched_peaks = [peak for peak in chromatogram if peak.matches]
-    return [peak for peak in matched_peaks 
-            if all(("unknown" in match['compound_id'] or
-                    "impurity" in match['compound_id'])
-                   for match in  peak.matches)]
+def get_unknown_impurity_peaks(assigned_peaks):
+    return [peak for peak in assigned_peaks if
+            "unknown" in peak.compound_id or "impurity" in peak.compound_id]
 
 
 def get_max_integral_peak(peaks):
     """
     Returns the peak with the maximum integral value in the given list of peaks.
     """
+    if not peaks:
+        return None
     if not all(hasattr(peak, 'integral') for peak in peaks):
         raise AttributeError("All given peaks must have integral attribute.")
     return max(peaks, key=attrgetter('integral'))
 
 
-def get_compound_peak(chromatogram):
+def assign_compound_peak(chromatogram, compound):
     """
-    Returns unmatched peak with the biggest integral in the chromatogram. In
-    this context, 'impurity' and 'unknown' matched peaks are regarded as unmatched.
+    
     """
-    unmatched_peaks = get_unmatched_peaks(chromatogram)
-    relevant_peaks = unmatched_peaks + get_unknown_impurity_peaks(chromatogram)
-    target_peak = get_max_integral_peak(relevant_peaks)
+    
+    matched_peaks = get_matched_peaks(chromatogram.peaks)
+    unmatched_peaks = get_unmatched_peaks(chromatogram.peaks)
+    
+    assigned_peaks, unassigned_peaks = assign_matched_peaks(matched_peaks)
+    
+    unmatched_peaks = unmatched_peaks + unassigned_peaks
+
+    compound_peak = get_max_integral_peak(unmatched_peaks)
+    if compound_peak is None:
+        logging.warning("RunWarning: No unmatched peak found in dataset so the "
+                        "compound could not be assigned. Dataset moved to bad "
+                        "data container.")
+        return None
+    
+    residual_peaks = [peak for peak in unmatched_peaks if peak != compound_peak]
+    compound_peak = process_peak(compound_peak, compound, compound=True)
+
+    return compound_peak, assigned_peaks, residual_peaks
+
+def check_solvent():
+    if not compound.solvent:
+        raise AttributeError("This function should only be used for assigning "
+                             "solvents, i.e., for compounds with "
+                             "compound.solvent == True")
+
+def assign_compound():
+    #add logging warning when unknown or impurity is overwrittten
     if not target_peak.pure:
         raise ValueError("Mocca identified peak at {} min as compound peak."
                          "This peak is impure! Make sure, compound peaks are"
                          "pure.".format(get_retention_time(target_peak)))
-
 
 def add_quali_component(chromatogram, compound_id, peak_db, quali_comp_db):
     """

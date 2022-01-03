@@ -87,13 +87,21 @@ def get_istd_offset(chromatogram, istd_key, quali_component_db,
     return istd_offset
 
 
-def correct_istd_offset(chromatogram, istd_key, quali_component_db, 
-                    spectrum_correl_coef_thresh, relative_distance_thresh):
-    istd_offset = get_istd_offset(chromatogram, istd_key, quali_component_db, 
-                        spectrum_correl_coef_thresh, relative_distance_thresh)
+def correct_istd_offset(chromatogram, istds, quali_component_db, 
+                        spectrum_correl_coef_thresh, relative_distance_thresh):
+    istd_offsets = []
+    for istd in istds:
+        istd_offset = get_istd_offset(chromatogram, istd.key, quali_component_db, 
+                                      spectrum_correl_coef_thresh,
+                                      relative_distance_thresh)
+        istd_offsets.append(istd_offset)
+
+    istd_offset = int(round(sum(istd_offsets)/len(istd_offsets)))
+    
     corrected_peaks = []
-    for peak in chromatogram.peaks:
+    for peak in chromatogram:
         new_peak = correct_offset(peak, istd_offset)
         corrected_peaks.append(new_peak)
+
     chromatogram.peaks = corrected_peaks
     return chromatogram

@@ -33,6 +33,7 @@ class _DadDataBase():
 class _DadDataDefaultsBase():
     wl_high_pass : InitVar[float] = None
     wl_low_pass : InitVar[float] = None
+    detector_limit : InitVar[float] = None
 
 
 @dataclass()
@@ -44,9 +45,9 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
     time : np.ndarray = field(init=False)
     wavelength : np.ndarray = field(init=False)
 
-    def __post_init__(self, wl_high_pass, wl_low_pass):
+    def __post_init__(self, wl_high_pass, wl_low_pass, detector_limit):
         self._set_path()
-        self._set_detector_limit()
+        self._set_detector_limit(detector_limit)
         self._read_data(wl_high_pass, wl_low_pass)
 
     def __eq__(self, other):
@@ -58,13 +59,16 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
     def _set_path(self):
         self.path = self.experiment.path
 
-    def _set_detector_limit(self):
-        if self.hplc_system_tag == 'chemstation':
-            self.detector_limit = 2000
-        elif self.hplc_system_tag == 'labsolutions':
-            self.detector_limit = 2000
+    def _set_detector_limit(self, detector_limit):
+        if detector_limit is None:
+            if self.hplc_system_tag == 'chemstation':
+                self.detector_limit = 2000
+            elif self.hplc_system_tag == 'labsolutions':
+                self.detector_limit = 2000
+            else:
+                raise AttributeError("HPLC System Tag {} not supported!".format(self.hplc_system_tag))
         else:
-            raise AttributeError("HPLC System Tag {} not supported!".format(self.hplc_system_tag))
+            self.detector_limit = detector_limit
 
     def _read_data(self, wl_high_pass, wl_low_pass):
         if self.hplc_system_tag == 'chemstation':
@@ -126,7 +130,7 @@ class _CompoundDataDefaultsBase(_DadDataDefaultsBase):
 @dataclass(eq=False)
 class CompoundData(DadData, _CompoundDataDefaultsBase, _CompoundDataBase):
     """
-    Parameter order: hplc_system_tag, experiment, gradient, wl_high_pass, wl_low_pass
+    Parameter order: hplc_system_tag, experiment, gradient, wl_high_pass, wl_low_pass, detector_limit
     """
 
     def __post_init__(self, gradient, wl_high_pass, wl_low_pass):

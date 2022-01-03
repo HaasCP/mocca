@@ -6,16 +6,14 @@ Created on Tue Dec 14 16:08:40 2021
 @author: haascp
 """
 
-from mocca.chromatogram.funcs import get_istd_offset
-
 from mocca.peak.expand import expand_peak
 from mocca.peak.check import check_peak
 from mocca.peak.integrate import integrate_peak
-from mocca.peak.correct import correct_offset
+from mocca.chromatogram.correct import correct_istd_offset
 from mocca.peak.match import match_peak
 
 
-def preprocess_chromatogram(chromatogram, istd_key, quali_component_db, 
+def preprocess_chromatogram(chromatogram, istds, quali_component_db, 
                             absorbance_threshold, detector_limit, 
                             spectrum_correl_thresh, relative_distance_thresh,
                             print_purity_check = False,
@@ -32,20 +30,13 @@ def preprocess_chromatogram(chromatogram, istd_key, quali_component_db,
     chromatogram.peaks = integrated_peaks
     
     # 4. correct
-    istd_offset = get_istd_offset(chromatogram, istd_key, quali_component_db, 
-                                  spectrum_correl_thresh,
-                                  relative_distance_thresh)
-    
-    corrected_peaks = []
-    for peak in chromatogram:
-        new_peak = correct_offset(peak, istd_offset)
-        corrected_peaks.append(new_peak)
-            
-    chromatogram.peaks = corrected_peaks
-    
+    chromatogram = correct_istd_offset(chromatogram, istds, quali_component_db, 
+                                       spectrum_correl_thresh, 
+                                       relative_distance_thresh)
+
     # 5. resolve impure
     # TODO
-    
+
     # 6. match
     matched_peaks = []
     for resolved_peak in chromatogram:

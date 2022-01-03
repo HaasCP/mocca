@@ -13,11 +13,10 @@ from mocca.components.databases import QualiComponentDatabase, QuantComponentDat
 from mocca.dad_data.models import GradientData, CompoundData
 from mocca.dad_data.process_funcs import pick_peaks
 
-from mocca.chromatogram.preprocessor import preprocess_chromatogram
-from mocca.chromatogram.assign import add_quali_component
 
 from mocca.campaign.experiment import Experiment
 from mocca.campaign.settings import Settings
+from mocca.campaign.process_funcs import process_solvent_exp
 from mocca.campaign.utils import save_instance
 
 class HplcDadCampaign():
@@ -47,7 +46,7 @@ class HplcDadCampaign():
         #extra since unrelated to the others, no injection at all!
         return GradientData(self.hplc_system_tag, gradient_path)
 
-    def add_experiment(self, path, istd, compound):
+    def add_experiment(self, path, compound, istd):
         """
         All reaction concentration are metadata and should be trated like
         reaction temperature etc. Only give compound_conc if standard.
@@ -66,10 +65,10 @@ class HplcDadCampaign():
                 logging.warning("CampaignWarning: Path {} was already used for "
                                 "different experiment. New experiment replaces "
                                 "the old one.".format(new_exp.path))
-
         self.experiments.append(new_exp)
 
-    def process_all_experiments(self, absorbance_threshold=500, wl_high_pass=None, 
+    def process_all_experiments(self, detector_limit=None,
+                                absorbance_threshold=500, wl_high_pass=None, 
                                 wl_low_pass=None, peaks_high_pass=None, 
                                 peaks_low_pass=None, spectrum_correl_thresh=0.9, 
                                 relative_distance_thresh=0.01):
@@ -85,25 +84,22 @@ class HplcDadCampaign():
             2. istd
             3. 
         """
-        self.settings.update(self, absorbance_threshold, wl_high_pass, wl_low_pass,
+        self.settings.update(self, detector_limit, absorbance_threshold, wl_high_pass, wl_low_pass,
                              peaks_high_pass, peaks_low_pass, spectrum_correl_thresh, 
                              relative_distance_thresh)
         
         solvent_exps = [exp for exp in self.experiments if exp.compound.solvent]
         for exp in solvent_exps:
-            compound_data = CompoundData(self.hplc_system_tag, exp, self.gradient,
-                                         self.settings.wl_high_pass, self.settings.wl_low_pass)
-            chromatogram = pick_peaks(compound_data, absorbance_threshold, 
-                                      peaks_high_pass, peaks_low_pass)
-            chromatogram = preprocess_chromatogram(chromatogram, self.istd_key,
-                                                   self.quali_component_db, 
-                                                   absorbance_threshold, 
-                                                   self.detector_limit, 
-                                                   spectrum_correl_thresh,
-                                                   relative_distance_thresh)
+            chromatogram = process_solvent_exp(exp, self.hplc_system_tag, self.gradient,
+                                               self.quali_comp_db, self.settings)
             
             
-        
+            
+        # compound_exps =
+        if new_exp.istd and new_exp.istd.key not in self.quali_comp_db:
+            raise ValueError("Internal standard {} unknown in this campaign. "
+                             "First add the internal standard as pure "
+                             "compound in a separate run!".format(new_exp.istd.key))
         
         process_solvents()
         def order_experiments(self):
@@ -114,6 +110,7 @@ class HplcDadCampaign():
             compound_exps = []
             # insert in peak_db, update quali_comp_db
             calibration_exps = []
+            # assign impurities only now after all initializaiton is done
             # insert in peak_db, update quali_comp_db, update quanti_comp_db
             analysis_exps = []
 
