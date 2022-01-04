@@ -7,8 +7,8 @@ Created on Wed Dec 22 10:43:13 2021
 """
 
 from mocca.dad_data.models import CompoundData, GradientData
-
 from mocca.dad_data.process_funcs import pick_peaks
+
 from mocca.chromatogram.preprocessor import preprocess_chromatogram
 from mocca.chromatogram.assign import assign_peaks_compound, reassign_impurities
 
@@ -87,20 +87,23 @@ def process_compound_exp(exp, gradient, quali_comp_db, settings):
     # After all compound runs, assign unmatched
 
 
+def check_istd(exp, chrom):
+    if exp.istd:
+        for istd in exp.istd:
+            if not any([peak.compound_id == istd.key for peak in chrom]):
+                chrom.bad_data = True
+    return chrom
+
+
 def process_compound_experiments(experiments, gradient, peak_db,
-                                 quali_comp_db, settings):
+                                 quali_comp_db, quant_comp_db, settings):
     exps = get_sorted_compound_experiments(experiments)
     compound_chroms = []
     bad_chroms = []
     for exp in exps:
         chrom = process_compound_exp(exp, gradient,
                                      quali_comp_db, settings)
-        if not chrom.bad_data:
-            if exp.istd:
-                for istd in exp.istd:
-                    if not any([peak.compound_id == istd.key for peak in chrom]):
-                        chrom.bad_data = True
-
+        chrom = check_istd(exp, chrom)
         if not chrom.bad_data:
             compound_chroms.append(chrom)
             for peak in chrom:
@@ -119,8 +122,8 @@ def process_compound_experiments(experiments, gradient, peak_db,
                 peak_db.insert_peak(peak)
         quali_comp_db.update(peak_db)
 
+    quant_comp_db.update(peak_db)
 
-    #TODO: create quantification db
     return compound_chroms, bad_chroms
 
 

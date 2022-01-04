@@ -9,6 +9,7 @@ import copy
 
 from mocca.peak.match import get_filtered_similarity_dicts, get_relative_distance
 from mocca.peak.correct import correct_offset
+from mocca.peak.models import IstdPeak
 
 
 def get_pure_istd_peak(chromatogram, istd_key, quali_component_db, 
@@ -69,21 +70,15 @@ def get_istd_peak(chromatogram, istd_key, quali_component_db,
         return istd_peak
 
 
-def get_istd_offset(chromatogram, istd_key, quali_component_db, 
-                    spectrum_correl_coef_thresh, relative_distance_thresh):
+def get_istd_offset(istd_peak, istd_key, quali_component_db):
     """
     Finds possible istd peak in the chromatogram and calculates the retention
     time offset of the peak compared to its qualitative component in the database.
     """
     istd_offset = 0
-    
-    if istd_key in quali_component_db:
-        istd_peak = get_istd_peak(chromatogram, istd_key, quali_component_db, 
-                                  spectrum_correl_coef_thresh,
-                                  relative_distance_thresh)
-        if istd_peak is not None:
-            istd_component = quali_component_db[istd_key]
-            istd_offset = istd_peak.maximum - istd_component.maximum
+    if istd_peak is not None:
+        istd_component = quali_component_db[istd_key]
+        istd_offset = istd_peak.maximum - istd_component.maximum
     return istd_offset
 
 
@@ -93,20 +88,33 @@ def correct_istd_offset(chromatogram, istds, quali_component_db,
     Corrects the peaks of the chromatogram by the average of the internal standard
     offsets. Adds the offset to the peak objects.
     """
+    istd_peaks = []
     if istds:
-        istd_offsets = []
         for istd in istds:
-            istd_offset = get_istd_offset(chromatogram, istd.key, quali_component_db, 
-                                          spectrum_correl_coef_thresh,
-                                          relative_distance_thresh)
-            istd_offsets.append(istd_offset)
-        istd_offset = int(round(sum(istd_offsets)/len(istd_offsets)))
+            istd_p = get_istd_peak(chromatogram, istd.key, quali_component_db, 
+                                   spectrum_correl_coef_thresh,
+                                   relative_distance_thresh)
+            if istd_p:
+                istd_offset = get_istd_offset(istd_p, istd.key, quali_component_db)
+                istd_peak = IstdPeak(maximum=istd_p.maximum,
+                                     integral=istd_p.integral,
+                                     offset=istd_offset,
+                                     compound_id=istd.key,
+                                     concentration=istd.conc)
+                istd_peaks.append(istd_peak)
+            else:
+                chromatogram.bad_data = True
+        if istd_peaks:
+            istd_offsets = [peak.offset for peak in istd_peaks]
+            istd_offset = int(round(sum(istd_offsets)/len(istd_offsets)))
+        else:
+            istd_offset = 0
     else:
         istd_offset = 0
-    
+
     corrected_peaks = []
     for peak in chromatogram:
-        new_peak = correct_offset(peak, istd_offset)
+        new_peak = correct_offset(peak, istd_peaks, istd_offset)
         corrected_peaks.append(new_peak)
 
     chromatogram.peaks = corrected_peaks

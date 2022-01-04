@@ -17,6 +17,7 @@ def process_peak(peak, compound, is_compound=False):
                          saturation=peak.saturation,
                          pure=peak.pure,
                          integral=peak.integral,
+                         istd=peak.istd,
                          offset=peak.offset,
                          compound_id=compound.key,
                          concentration=compound.conc,

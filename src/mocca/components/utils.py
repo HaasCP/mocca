@@ -122,3 +122,12 @@ def average_ret_times_over_peaks(peaks):
         right = int(round(sum([peak.right for peak in peaks]) / num_peaks))
         maximum = int(round(sum([peak.maximum for peak in peaks]) / num_peaks))
         return left, right, maximum
+
+
+def get_quant_peaks_by_compound(peak_database, filter_function):
+    filtered_peaks = get_filtered_peaks(peak_database, filter_function)
+    quant_peaks = [peak for peak in filtered_peaks if (peak.is_compound and
+                                                       peak.concentration)]
+    compound_dict = sort_peaks_by_compound(quant_peaks)
+    return compound_dict
+    

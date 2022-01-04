@@ -91,6 +91,7 @@ def match_peak(corrected_peak, component_db, spectrum_correl_coef_thresh,
                             pure=corrected_peak.pure,
                             integral=corrected_peak.integral,
                             offset=corrected_peak.offset,
+                            istd=corrected_peak.istd,
                             matches=matches)
 
 def update_matches(peak, new_matches):
@@ -103,4 +104,5 @@ def update_matches(peak, new_matches):
                             pure=peak.pure,
                             integral=peak.integral,
                             offset=peak.offset,
+                            istd=peak.istd,
                             matches=new_matches)

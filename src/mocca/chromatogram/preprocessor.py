@@ -33,11 +33,12 @@ def preprocess_chromatogram(chromatogram, istds, quali_component_db,
     chromatogram = correct_istd_offset(chromatogram, istds, quali_component_db, 
                                        spectrum_correl_thresh, 
                                        relative_distance_thresh)
-
+    
     # 5. resolve impure
     # TODO
 
     # 6. match
+    
     matched_peaks = []
     for resolved_peak in chromatogram:
         new_peak = match_peak(resolved_peak, quali_component_db,

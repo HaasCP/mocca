@@ -36,7 +36,8 @@ class Settings():
     def update(self, detector_limit, absorbance_threshold, wl_high_pass,
                wl_low_pass, peaks_high_pass, peaks_low_pass,
                spectrum_correl_thresh, relative_distance_thresh):
-        self.detector_limit = detector_limit
+        if detector_limit is not None:
+            self.detector_limit = detector_limit
         self.absorbance_threshold = absorbance_threshold
         self.wl_high_pass = wl_high_pass
         self.wl_low_pass = wl_low_pass

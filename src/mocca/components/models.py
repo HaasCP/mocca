@@ -21,4 +21,6 @@ class QualiComponent():
 @dataclass
 class QuantComponent():
     compound_id: str
+    calib_factors: dict
+    calib_data: dict
     created_from: List[ProcessedPeak]

@@ -48,6 +48,18 @@ class IntegratedPeak(CheckedPeak):
     integral : float
 
 
+@dataclass(frozen=True)
+class IstdPeak():
+    """
+    Class for istd peaks to be added to the peak classes below.
+    """
+    maximum : int
+    integral : float
+    offset : int
+    compound_id : str
+    concentration : float
+
+
 @dataclass(frozen=True, eq=False)
 class CorrectedPeak(IntegratedPeak):
     """
@@ -56,6 +68,7 @@ class CorrectedPeak(IntegratedPeak):
     data from the dataset attribute require prior un-offsetting.
     """
     offset : int
+    istd : List[IstdPeak]
 
 
 @dataclass(frozen=True, eq=False)
@@ -81,6 +94,7 @@ class ProcessedPeak():
     pure : bool
     integral : float
     offset : int
+    istd : List[IstdPeak] = None
     compound_id : Optional[str] = None
     concentration : Optional[float] = None
     is_compound : bool = False
@@ -91,6 +105,7 @@ class ProcessedPeak():
             raise ValueError("Both peaks must be of the same type!")
         return (self.maximum + self.offset == other.maximum + other.offset and
                 self.dataset == other.dataset)
+
 
 @dataclass(frozen=True)
 class ParafacPeak(BasePeak):

@@ -27,7 +27,7 @@ class HplcDadCampaign():
         self.settings = Settings(hplc_system_tag)
         self.peak_db = PeakDatabase()
         self.quali_comp_db = QualiComponentDatabase()
-        self.quanti_comp_db = QuantComponentDatabase()
+        self.quant_comp_db = QuantComponentDatabase()
         self.warnings = []
 
     def add_experiment(self, experiment):
@@ -76,40 +76,21 @@ class HplcDadCampaign():
                                                        self.gradient,
                                                        self.peak_db,
                                                        self.quali_comp_db,
+                                                       self.quant_comp_db,
                                                        self.settings)
         return compound_chroms
 """   
         
         
-        solvent_exps = [exp for exp in self.experiments if exp.compound.solvent]
-        for exp in solvent_exps:
-            chromatogram = process_solvent_exp(exp, self.hplc_system_tag, self.gradient,
-                                               self.quali_comp_db, self.settings)
-            
-            
-            
-        # compound_exps =
+        
         if new_exp.istd and new_exp.istd.key not in self.quali_comp_db:
             raise ValueError("Internal standard {} unknown in this campaign. "
                              "First add the internal standard as pure "
                              "compound in a separate run!".format(new_exp.istd.key))
         
-        process_solvents()
-        def order_experiments(self):
-            solvent_exps = []
-            # insert in peak_db, update quali_comp_db
-            istd_exps = []
-            # insert in peak_db, update quali_comp_db
-            compound_exps = []
-            # insert in peak_db, update quali_comp_db
-            calibration_exps = []
-            # assign impurities only now after all initializaiton is done
-            # insert in peak_db, update quali_comp_db, update quanti_comp_db
-            analysis_exps = []
+        
 
-        compound_data = CompoundData(self.hplc_system_tag, path, 
-                                     self.gradient, {})
-        chromatogram = pick_peaks
+        
     
     def process_new_experiment(self, path, compound_id=None, solvent=False, istd=False, compound_conc=None,
                        istd_id=None, istd_conc=None):

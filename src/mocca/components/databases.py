@@ -5,8 +5,12 @@ Created on Thu Dec  2 16:32:36 2021
 
 @author: haascp
 """
-from mocca.components.utils import get_filtered_peaks, get_filtered_peaks_by_compound
+from mocca.components.utils import (get_filtered_peaks,
+                                    get_filtered_peaks_by_compound,
+                                    get_quant_peaks_by_compound)
+
 from mocca.components.quali_funcs import create_quali_component
+from mocca.components.quant_funcs import create_quant_component
 
 
 class BaseDatabase():
@@ -100,4 +104,10 @@ class QualiComponentDatabase(BaseDatabase):
 
 class QuantComponentDatabase(BaseDatabase):
     def update(self, peak_database, peak_filter_function=None):
-        pass
+        self.delete_all_items()
+        compound_dict = get_quant_peaks_by_compound(peak_database,
+                                                    peak_filter_function)
+        # create components out of compound dict
+        for compound_id, peaks in compound_dict.items():
+            component = create_quant_component(peaks)
+            self.insert_item(component)
