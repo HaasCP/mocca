@@ -38,6 +38,7 @@ def create_quant_component(peaks):
                 calib_data[istd_peak.compound_id].append(calib_point)
     
     calib_factors = {}
+    calib_scores = {}
     for version, calibration_data in calib_data.items(): 
         calibration_curve = LinearRegression(fit_intercept = False)
         x, y = zip(*calibration_data)
@@ -49,8 +50,10 @@ def create_quant_component(peaks):
                             "correlation of {}!".format(version, score))
         
         calib_factors[version] = calibration_curve.coef_[0]
+        calib_scores[version] = score
 
     return QuantComponent(compound_id=compound_id,
                           calib_factors=calib_factors,
                           calib_data=calib_data,
+                          calib_scores=calib_scores,
                           created_from=peaks)

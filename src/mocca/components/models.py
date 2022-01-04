@@ -10,17 +10,18 @@ class QualiComponent():
     Class of a qualitative component created from a number of peaks of the same
     compound_id.
     """
-    compound_id: str
-    left: int
-    right: int
-    maximum: int
-    spectrum: list
-    created_from: List[ProcessedPeak]
+    compound_id : str
+    left : int
+    right : int
+    maximum : int
+    spectrum : list
+    created_from : List[ProcessedPeak]
 
 
 @dataclass
 class QuantComponent():
-    compound_id: str
-    calib_factors: dict
-    calib_data: dict
-    created_from: List[ProcessedPeak]
+    compound_id : str
+    calib_factors : dict
+    calib_data : dict
+    calib_scores : dict
+    created_from : List[ProcessedPeak]

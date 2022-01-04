@@ -27,7 +27,7 @@ def check_peak_saturation(picked_peak, detector_limit):
     return bool(max_absorbance > detector_limit)
 
 
-def check_peak_purity(peak, param=2.5, show_analytics=False):
+def check_peak_purity(peak, show_analytics, param=2.5):
     """
     Returns peak purity prediction by performing the described test sequence.
     Plots and prints infromation about the peak purity prediction.
@@ -56,7 +56,8 @@ def check_peak_purity(peak, param=2.5, show_analytics=False):
         for i in range(peak_data.shape[1]):
             plt.plot(peak_data[:, i])
         plt.show()
-        print(f"Agilent Threshold (True for >0.9): {test_agilent} \n"
+        print(f"Peak at {peak.maximum} \n"
+              f"Agilent Threshold (True for >0.9): {test_agilent} \n"
               f"Unimodality Test (False for False): {test_unimodality} \n"
               f"PCA Variance Explained (True for >0.995): {test_pca} \n"
               f"Minimum Correlation (False for <0.9): {test_correls_1} \n"
@@ -85,7 +86,7 @@ def check_peak_purity(peak, param=2.5, show_analytics=False):
     return False
 
 
-def check_peak(expanded_peak, detector_limit, param=2.5, show_analytics=False):
+def check_peak(expanded_peak, detector_limit, show_analytics, param=2.5):
     """
     Peak checking routine. Returns a checked peak with pure and saturation
     attributes.

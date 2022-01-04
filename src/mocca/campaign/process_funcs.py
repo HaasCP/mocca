@@ -10,7 +10,10 @@ from mocca.dad_data.models import CompoundData, GradientData
 from mocca.dad_data.process_funcs import pick_peaks
 
 from mocca.chromatogram.preprocessor import preprocess_chromatogram
-from mocca.chromatogram.assign import assign_peaks_compound, reassign_impurities
+from mocca.chromatogram.assign import (assign_peaks_compound,
+                                       reassign_impurities,
+                                       assign_peaks_react)
+from mocca.chromatogram.quantify import quantify_peaks
 
 
 def get_gradient_experiment(experiments):
@@ -77,14 +80,9 @@ def process_compound_exp(exp, gradient, quali_comp_db, settings):
     """
     Processes one compound experiment.
     """
-    chromatogram = preprocess_experiment(exp, gradient,
-                                         quali_comp_db, settings)
+    chromatogram = preprocess_experiment(exp, gradient, quali_comp_db, settings)
     chromatogram = assign_peaks_compound(chromatogram, exp.compound)
     return chromatogram
-    
-    # assign matched peaks, assign compound peak (highest unmatched if not in matches), add them to the peak db
-    #update component_db
-    # After all compound runs, assign unmatched
 
 
 def check_istd(exp, chrom):
@@ -127,7 +125,22 @@ def process_compound_experiments(experiments, gradient, peak_db,
     return compound_chroms, bad_chroms
 
 
-def process_experiments(experiments, gradient, peak_db,
-                                 quali_comp_db, settings):
-    pass
-    #exps = get_sorted_compound_experiments(experiments)
+def process_experiments(experiments, gradient, peak_db, quali_comp_db,
+                        quant_comp_db, settings):
+    unprocessed_exps = [exp for exp in experiments if not exp.processed]
+    chroms = []
+    bad_chroms = []
+    for exp in unprocessed_exps:
+        chrom = preprocess_experiment(exp, gradient, quali_comp_db, settings)
+        chrom = assign_peaks_react(chrom, peak_db)
+        chrom = quantify_peaks(chrom, quant_comp_db)
+        chrom = check_istd(exp, chrom)
+
+        if not chrom.bad_data:
+            chroms.append(chrom)
+            for peak in chrom:
+                peak_db.insert_peak(peak)
+            quali_comp_db.update(peak_db)
+        else:
+            bad_chroms.append(chrom)    
+    return chroms, bad_chroms

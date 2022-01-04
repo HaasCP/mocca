@@ -12,7 +12,8 @@ from mocca.components.databases import QualiComponentDatabase, QuantComponentDat
 
 from mocca.campaign.settings import Settings
 from mocca.campaign.process_funcs import (get_gradient,
-                                          process_compound_experiments)
+                                          process_compound_experiments,
+                                          process_experiments)
 from mocca.campaign.utils import save_instance
 
 class HplcDadCampaign():
@@ -28,7 +29,23 @@ class HplcDadCampaign():
         self.peak_db = PeakDatabase()
         self.quali_comp_db = QualiComponentDatabase()
         self.quant_comp_db = QuantComponentDatabase()
+        self.compound_chroms = []
+        self.chroms = []
+        self.bad_chroms = []
         self.warnings = []
+
+    def _reset_campaign(self):
+        self.peak_db = PeakDatabase()
+        self.quali_comp_db = QualiComponentDatabase()
+        self.quanti_comp_db = QuantComponentDatabase()
+        self.compound_chroms = []
+        self.chroms = []
+        self.bad_chroms = []
+        self.warnings = []
+        for experiment in self.experiments:
+            experiment.processed = False
+
+        self.gradient = get_gradient(self.experiments, self.settings)
 
     def add_experiment(self, experiment):
         """
@@ -58,28 +75,36 @@ class HplcDadCampaign():
         This function has to be run if a new compound is added to the component
         database via compound experiment so that all peaks are assigned consistently
         """
-        
         self.settings.update(detector_limit, absorbance_threshold,
                              wl_high_pass, wl_low_pass, peaks_high_pass,
                              peaks_low_pass, spectrum_correl_thresh, 
                              relative_distance_thresh)
-
-        for experiment in self.experiments:
-            experiment.processed == False
-        self.peak_db = PeakDatabase()
-        self.quali_comp_db = QualiComponentDatabase()
-        self.quanti_comp_db = QuantComponentDatabase()
-
-        self.gradient = get_gradient(self.experiments, self.settings)
+        self._reset_campaign()
         
-        compound_chroms = process_compound_experiments(self.experiments,
-                                                       self.gradient,
-                                                       self.peak_db,
-                                                       self.quali_comp_db,
-                                                       self.quant_comp_db,
-                                                       self.settings)
-        return compound_chroms
+        compound_chroms, bad_chroms = process_compound_experiments(
+            self.experiments,
+            self.gradient,
+            self.peak_db,
+            self.quali_comp_db,
+            self.quant_comp_db,
+            self.settings
+            )
+        self.compound_chroms.extend(compound_chroms)
+        self.bad_chroms.extend(bad_chroms)
+
+        chroms, bad_chroms = process_experiments(
+            self.experiments,
+            self.gradient,
+            self.peak_db,
+            self.quali_comp_db,
+            self.quant_comp_db,
+            self.settings
+            )
+        self.chroms.extend(chroms)
+        self.bad_chroms.extend(bad_chroms)
+
 """   
+ 
         
         
         

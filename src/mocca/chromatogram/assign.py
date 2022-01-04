@@ -98,7 +98,12 @@ def assign_unmatched_peaks_react(peaks, peak_db):
     peak_db.update_unknown_counter()
     assigned_peaks = []
     for peak in peaks:
-        new_peak = process_peak(peak, Compound(get_next_unknown_id(peak_db)), None)
+        if peak.matches is None:
+            new_peak = process_peak(peak, Compound(None), False)
+        else:
+            new_peak = process_peak(peak,
+                                    Compound(get_next_unknown_id(peak_db)),
+                                    False)
         assigned_peaks.append(new_peak)
     return assigned_peaks
 
