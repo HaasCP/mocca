@@ -10,10 +10,11 @@ from mocca.peak.expand import expand_peak
 from mocca.peak.check import check_peak
 from mocca.peak.integrate import integrate_peak
 from mocca.chromatogram.correct import correct_istd_offset
+from mocca.peak.resolve_impure import get_parafac_peaks
 from mocca.peak.match import match_peak
 
 
-def preprocess_chromatogram(chromatogram, istds, quali_component_db, 
+def preprocess_chromatogram(chromatogram, istds, quali_comp_db, 
                             absorbance_threshold, detector_limit, 
                             spectrum_correl_thresh, relative_distance_thresh,
                             print_purity_check = False,
@@ -30,18 +31,23 @@ def preprocess_chromatogram(chromatogram, istds, quali_component_db,
     chromatogram.peaks = integrated_peaks
     
     # 4. correct
-    chromatogram = correct_istd_offset(chromatogram, istds, quali_component_db, 
+    chromatogram = correct_istd_offset(chromatogram, istds, quali_comp_db, 
                                        spectrum_correl_thresh, 
                                        relative_distance_thresh)
     
     # 5. resolve impure
-    # TODO
+    impure_peaks = [peak for peak in chromatogram if not peak.pure]
+
+    for impure_peak in impure_peaks:
+        parafac_peaks = get_parafac_peaks(impure_peak, quali_comp_db,
+                                          show_parafac_analytics=False)
+        chromatogram.peaks.extend(parafac_peaks)
 
     # 6. match
     
     matched_peaks = []
     for resolved_peak in chromatogram:
-        new_peak = match_peak(resolved_peak, quali_component_db,
+        new_peak = match_peak(resolved_peak, quali_comp_db,
                               spectrum_correl_thresh,
                               relative_distance_thresh,
                               print_compound_prediction)

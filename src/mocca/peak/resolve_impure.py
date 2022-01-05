@@ -193,7 +193,7 @@ def create_parafac_peaks(impure_peak, parafac_tensor, boundaries):
     return parafac_peaks
 
 
-def get_parafac_peaks(impure_peak, quali_comp_db, show_parafac_analytics=False):
+def get_parafac_peaks(impure_peak, quali_comp_db, show_parafac_analytics):
     parafac_tensor, boundaries = parafac(impure_peak, quali_comp_db,
                                          show_parafac_analytics=False)
     parafac_peaks = create_parafac_peaks(impure_peak, parafac_tensor, boundaries)

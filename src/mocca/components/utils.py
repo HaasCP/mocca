@@ -17,7 +17,8 @@ def get_valid_peaks(peaks):
     """
     return [peak for peak in peaks if (peak.pure and
                                        not peak.saturation and
-                                       peak.compound_id is not None)]
+                                       peak.compound_id is not None and
+                                       peak.idx > 0)]
 
 
 # TODO: implement different filter options for relevant_peaks (e.g. by date)

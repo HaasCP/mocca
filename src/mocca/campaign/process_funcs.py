@@ -116,7 +116,7 @@ def process_compound_experiments(experiments, gradient, peak_db,
                                     settings.spectrum_correl_thresh,
                                     settings.relative_distance_thresh)
         for peak in chrom:
-            if not peak in peak_db:
+            if not peak in peak_db and peak.idx > 0:
                 peak_db.insert_peak(peak)
         quali_comp_db.update(peak_db)
 
@@ -139,7 +139,7 @@ def process_experiments(experiments, gradient, peak_db, quali_comp_db,
         if not chrom.bad_data:
             chroms.append(chrom)
             for peak in chrom:
-                peak_db.insert_peak(peak)
+                    peak_db.insert_peak(peak)
             quali_comp_db.update(peak_db)
         else:
             bad_chroms.append(chrom)    

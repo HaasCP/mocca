@@ -53,7 +53,7 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
     def __eq__(self, other):
         if not isinstance(other, type(self)):
             # don't attempt to compare against unrelated types
-            raise ValueError("Both DAD datasets must be of the same type!")
+            return False
         return self.path == other.path
     
     def _set_path(self):
@@ -118,6 +118,7 @@ class ParafacData():
         # https://github.com/python/mypy/issues/9254
         self.hplc_system_tag = impure_peak.dataset.hplc_system_tag
         self.experiment = impure_peak.dataset.experiment
+        self.path = impure_peak.dataset.path
         self.time = impure_peak.dataset.time
         self.wavelength = impure_peak.dataset.wavelength
         self.data = np.zeros((len(self.wavelength), len(self.time)))
@@ -134,3 +135,9 @@ class ParafacData():
         
         # replace self data with parafac peak data
         self.data[:, boundaries[0]:boundaries[1] + 1] = parafac_peak_data
+    
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            # don't attempt to compare against unrelated types
+            return False
+        return self.path == other.path
