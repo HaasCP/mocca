@@ -140,5 +140,5 @@ def pick_peaks(compound_data, absorbance_threshold, peaks_high_pass, peaks_low_p
                                             right=peak.right,
                                             maximum=peak.maximum,
                                             dataset=compound_data,
-                                            idx=idx))
+                                            idx=idx+1))
     return chromatogram

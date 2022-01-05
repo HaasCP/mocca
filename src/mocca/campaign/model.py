@@ -16,6 +16,8 @@ from mocca.campaign.process_funcs import (get_gradient,
                                           process_experiments)
 from mocca.campaign.utils import save_instance
 
+# TODO: Go through files and clean up uncommented functions + documentation
+
 class HplcDadCampaign():
     """
     Main parent class for HPLC-DAD experimental campaigns. We expect the gradient to stay

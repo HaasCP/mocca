@@ -1,73 +1,95 @@
 import numpy as np
+
 from sklearn.decomposition import PCA
 from tensorly.decomposition import non_negative_parafac_hals
+import matplotlib.pyplot as plt 
+
 from mocca.peak.utils import get_peak_data
-from mocca.peak.models import ParafacPeak, ProcessedPeak
-from mocca.dad_data.models import ParafacData, DadData
-from mocca.components.databases import QualiComponentDatabase
-from mocca.components.models import QualiComponent
-from mocca.components.utils import get_closest_peak
-from typing import Optional, Tuple, List
-import matplotlib.pyplot as plt
+from mocca.peak.models import CorrectedPeak
 
-def get_zero_extended_peak_data(peak: ProcessedPeak, boundaries: Tuple[int, int]):
-	"""
-	Returns zero-extended peak data of shape (wavelengths, boundaries[1] - boundaries[0] + 1)
-	"""
-	peak_data = get_peak_data(peak)
-	output_data = np.zeros((peak_data.shape[0], boundaries[1] - boundaries[0] + 1))
-	output_data[:, peak.left - boundaries[0] : peak.right - boundaries[0] + 1] = peak_data
-	return output_data
+from mocca.dad_data.models import ParafacData
 
 
-def get_relevant_data(left: int, right: int, component_db: QualiComponentDatabase) -> Tuple[List[np.ndarray], Tuple[int, int], int]:
-	"""
-	Given the left and right boundaries of the impure peak, scans the component database
-	for any components that overlap with the impure peak, and chooses the peak most similar
-	to average. Zero-extends the peak data until all peak data has the same length, and
-	returns a list containing all relevant peaks, the overall peak boundaries, as well as
-	the number of distinct peak components the data is from.
-	"""
+def check_comp_overlap(peak, comp):
+    return comp.left <= peak.left <= comp.right \
+        or peak.left <= comp.left <= peak.right
 
-	def overlap(peak: ProcessedPeak, component: QualiComponent):
-		return component.left <= peak.left <= component.right \
-		    or peak.left <= component.left <= peak.right
 
-	relevant_peaks = [peak for component in component_db if overlap(peak := get_closest_peak(component), component)]
-	peak_boundaries = min(peak.left for peak in relevant_peaks), max(peak.right for peak in relevant_peaks)
+def get_relevant_comps(impure_peak, quali_comp_db):
+    return [comp for comp in quali_comp_db if check_comp_overlap(impure_peak, comp)]
 
-	return [get_zero_extended_peak_data(peak=peak, boundaries=peak_boundaries) for peak in relevant_peaks], peak_boundaries, len(relevant_peaks)
 
-def parafac(impure_peak: ProcessedPeak, component_db: QualiComponentDatabase) -> Tuple[np.ndarray, np.ndarray, float]:
+def get_compound_offset(created_from_peak, comp):
+    return created_from_peak.maximum - comp.maximum
+
+
+def get_parafac_boundaries(impure_peak, relevant_comps):
+    lefts = []
+    rights = []
+    for comp in relevant_comps:
+        created_from_peaks = comp.created_from
+        for peak in created_from_peaks:
+            offset = get_compound_offset(peak, comp)
+            lefts.append(peak.left - offset)
+            rights.append(peak.right - offset)
+
+    left_boundaries = lefts + [impure_peak.left]
+    right_boundaries = rights + [impure_peak.right]
+    return (min(left_boundaries), max(right_boundaries))
+
+
+def get_zeros_array(boundaries, n_wavelengths):
+    return np.zeros((n_wavelengths, boundaries[1] - boundaries[0] + 1))
+
+
+def get_zero_extended_peak_data(peak_data, left, boundaries):
     """
-    Runs PARAFAC on an impure peak
+    Returns zero-extended peak data of shape (wavelengths, boundaries[1] - boundaries[0] + 1)
     """
+    peak_data_ze = get_zeros_array(boundaries, peak_data.shape[0])
+    rel_left = left - boundaries[0]
+    rel_right = rel_left + peak_data.shape[1]
+    peak_data_ze[:, rel_left:rel_right] = peak_data
+    return peak_data_ze
 
-    # peak data is all the peaks that overlap with the impure peak in question
-    peak_data, peak_boundaries, num_relevant_peaks = get_relevant_data(impure_peak.left, impure_peak.right, component_db)
+
+def get_comp_ze_peaks(relevant_comps, boundaries):
+    # max alignment!
+    ze_peaks = []
+    for comp in relevant_comps:
+        created_from_peaks = comp.created_from
+        for peak in created_from_peaks:
+            offset = get_compound_offset(peak, comp)
+            peak_data = get_peak_data(peak)
+            peak_data_ze = get_zero_extended_peak_data(peak_data,
+                                                       peak.left - offset,
+                                                       boundaries)
+            ze_peaks.append(peak_data_ze)
+    return ze_peaks
+
+
+def get_impure_ze_peak(impure_peak, boundaries):
+    peak_data = get_peak_data(impure_peak)
+    peak_data_ze = get_zero_extended_peak_data(peak_data, impure_peak.left,
+                                               boundaries)
+    return peak_data_ze
+
+def get_parafac_data(impure_peak, quali_comp_db):
     
-    data_flattened = []
-
-    # add all data to data_flattened and create data tensor
-    for data in (get_zero_extended_peak_data(peak=impure_peak, boundaries=peak_boundaries) + peak_data):
-        data_flattened.append(data[:, :, np.newaxis])
-
-    data_tensor = np.concatenate(data_flattened, axis=2)
-    ncomponents = max(num_relevant_peaks, estimate_num_peak_components(data_tensor.reshape(get_peak_data(impure_peak).shape[0], -1)))
-    tensor = non_negative_parafac_hals(data_tensor, rank=ncomponents, init='svd', n_iter_max=1000, verbose = False, tol=1e-9)
-
-    spectra = tensor[1][0]
-    elutions = tensor[1][1]
-    concs = tensor[1][2]
-
-    spectral_normalization = np.sum(spectra, axis=0)
-    elution_normalization = np.sum(elutions, axis=0)
-    return spectra / spectral_normalization, elutions / elution_normalization, concs * elution_normalization * spectral_normalization
+    relevant_comps = get_relevant_comps(impure_peak, quali_comp_db)
+    
+    boundaries = get_parafac_boundaries(impure_peak, relevant_comps)
+    
+    comp_peaks = get_comp_ze_peaks(relevant_comps, boundaries)
+    
+    impure_peak = get_impure_ze_peak(impure_peak, boundaries)
+    
+    return comp_peaks + [impure_peak], boundaries, relevant_comps
 
 
-def estimate_num_components(data) -> int: 
+def estimate_num_components(data): 
     pca = PCA(n_components=10)
-    peak_data_pca = pca.fit_transform(data)
+    _ = pca.fit_transform(data)
 
     threshold = 0.995
 
@@ -78,27 +100,101 @@ def estimate_num_components(data) -> int:
             return idx + 1
 
 
-def make_new_peak(old_peak: ProcessedPeak, spectra: np.ndarray, elution: np.ndarray, integral: float, component_num: int) -> ProcessedPeak:
-	"""
-	Makes a new ProcessedPeak corresponding to PARAFAC-processed impure processed peak
-	Spectra, Elution, and Integral generated from PARAFAC
+def parafac_analytics(normalized_spectra, normalized_elution, normalized_concs,
+                      boundaries, relevant_comps):
+    print(f"PARAFAC tensor has boundaries of {boundaries}.")
+    plt.plot(normalized_spectra)
+    for comp in relevant_comps:
+        print(f"Compound used for PARAFAC data tensor: {comp.compound_id}")
+        plt.plot([val / (max(comp.spectrum) / normalized_spectra.max()) 
+                  for val in comp.spectrum], "--")
+    plt.show()
+    plt.plot(normalized_elution)
+    plt.show()
+    plt.plot(normalized_concs)
+    plt.show()
 
-	If the old peak had index i, then the new peak has index i_{component_num}
-	"""
-	parafac_peak = ParafacPeak(left=old_peak.left,
-						       right=old_peak.right,
-						       maximum=old_peak.left + argmax(elution),
-						       integral=integral,
-						       spectra=spectra,
-						       elution=elution,
-						       offset=old_peak.offset)
-	sim_parafac_data = ParafacData(parafac_peak=parafac_peak, original_dataset=old_peak.dataset)
-	return ProcessedPeak(left=old_peak.left,
-				         right=old_peak.right,
-			    	     maximum=old_peak.left + argmax(elution),
-			    	     dataset=sim_parafac_data,
-			    	     idx=str(old_peak.idx) + '_' + component_num,
-			    	     saturation=old_peak.saturation,
-			    	     purity='PARAFAC',
-					     integral=integral,
-				         offset=old_peak.offset)
+
+def parafac(impure_peak, quali_comp_db, show_parafac_analytics=False):
+    """
+    Runs PARAFAC on an impure peak
+    """
+
+    parafac_data, boundaries, relevant_comps = get_parafac_data(impure_peak,
+                                                                quali_comp_db)
+
+    # add all data to data_flattened and create data tensor
+    data_flattened = []
+    for data in parafac_data:
+        data_flattened.append(data[:, :, np.newaxis])
+    data_tensor = np.concatenate(data_flattened, axis=2)
+    
+    pca_data = data_tensor.reshape(get_peak_data(impure_peak).shape[0], -1)
+    pca_n_comps = estimate_num_components(pca_data)
+    n_comps = max(len(relevant_comps), pca_n_comps)
+    
+    tensor = non_negative_parafac_hals(data_tensor, rank=n_comps,
+                                       init='svd', n_iter_max=1000,
+                                       verbose = False, tol=1e-9)
+
+    spectra = tensor[1][0]
+    elutions = tensor[1][1]
+    integrals = tensor[1][2]
+
+    spectral_normalization = np.sum(spectra, axis=0)
+    elution_normalization = np.sum(elutions, axis=0)
+
+    normalized_spectra = spectra / spectral_normalization
+    normalized_elution = elutions / elution_normalization
+    normalized_integrals = integrals * elution_normalization * spectral_normalization
+
+    if show_parafac_analytics:
+        parafac_analytics(normalized_spectra, normalized_elution,
+                          normalized_integrals, boundaries, relevant_comps)
+
+    parafac_tensor = (normalized_spectra, normalized_elution, normalized_integrals)
+    
+    return parafac_tensor, boundaries
+
+
+def create_parafac_peaks(impure_peak, parafac_tensor, boundaries):
+    """
+    Makes a new ProcessedPeak corresponding to PARAFAC-processed impure processed peak
+    Spectra, Elution, and Integral generated from PARAFAC
+
+    If the old peak had index i, then the new peak has index i_{component_num}
+    """
+    n_comps = parafac_tensor[0].shape[1]
+    if any(dim.shape[1] != n_comps for dim in parafac_tensor):
+        raise ValueError("All dimensions of PARAFAC tensor must contain same "
+                         "amount of components")
+
+    parafac_peaks = []
+    for i in range(n_comps):
+        #  get tensor for one parafac comonent
+        parafac_comp_tensor = (parafac_tensor[0][:, i],
+                               parafac_tensor[1][:, i],
+                               parafac_tensor[2][:, i])
+        
+        parafac_peak = CorrectedPeak(left=boundaries[0],
+                                     right=boundaries[1],
+                                     maximum=(boundaries[0] +
+                                              np.argmax(parafac_comp_tensor[1])),
+                                     dataset=ParafacData(impure_peak,
+                                                         parafac_comp_tensor,
+                                                         boundaries),
+                                     idx=-impure_peak.idx,
+                                     saturation=impure_peak.saturation,
+                                     pure=True,
+                                     integral=parafac_comp_tensor[2][-1], # reaction run is last in run dimension
+                                     offset=0,
+                                     istd=impure_peak.istd)
+        parafac_peaks.append(parafac_peak)
+    return parafac_peaks
+
+
+def get_parafac_peaks(impure_peak, quali_comp_db, show_parafac_analytics=False):
+    parafac_tensor, boundaries = parafac(impure_peak, quali_comp_db,
+                                         show_parafac_analytics=False)
+    parafac_peaks = create_parafac_peaks(impure_peak, parafac_tensor, boundaries)
+    return parafac_peaks

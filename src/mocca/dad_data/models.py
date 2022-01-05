@@ -8,8 +8,8 @@ Created on Tue Aug  3 13:16:51 2021
 
 from dataclasses import dataclass, field, InitVar
 from typing import List
-
 import numpy as np
+
 from mocca.dad_data.utils import absorbance_to_array, apply_filter, trim_data
 from mocca.dad_data.process_gradientdata import bsl_als
 
@@ -71,28 +71,6 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
         self.time = df.time.unique()
         self.wavelength = df.wavelength.unique()
 
-@dataclass 
-class _ParafacDataBase(_DadDataBase):
-    parafac_peak : InitVar['mocca.peak.models.ParafacPeak']  # https://www.python.org/dev/peps/pep-0484/#forward-references
-    original_dataset : InitVar[DadData]
-
-@dataclass
-class ParafacData(DadData, _ParafacDataBase):
-    def __post_init__(self, parafac_peak, original_dataset, wl_high_pass, wl_low_pass):
-        # https://github.com/python/mypy/issues/9254
-        self.time = original_dataset.time
-        self.wavelength = original_dataset.wavelength
-        self.data = np.zeros((len(self.wavelength), len(self.time)))
-        self._make_data_from_parafac_peak(parafac_peak)
-
-    def _make_data_from_parafac_peak(self, parafac_peak):
-        # make 2D data corresponding to parafac-generated spectra and elution
-        parafac_peak_data = parafac_peak.spectra.reshape(len(self.wavelength), 1) \
-                          * parafac_peak.elution.reshape(1, parafac_peak.right + 1 - parafac_peak.left) \
-                          * parafac_peak.integral
-        # replace self data with parafac peak data
-        self.data[:, parafac_peak.left + parafac_peak.offset:parafac_peak.right + parafac_peak.offset + 1] = parafac_peak_data
-
 
 @dataclass(eq=False)
 class GradientData(DadData):
@@ -127,3 +105,32 @@ class CompoundData(DadData, _CompoundDataBase):
         """Subtracts the baseline of the gradient numpy array from self.data."""
         self._trim_data(gradient.data.shape[1])
         self.data = self.data - gradient.data[:, :self.data.shape[1]]
+
+
+@dataclass
+class ParafacData():
+    # https://www.python.org/dev/peps/pep-0484/#forward-references
+    impure_peak : InitVar['mocca.peak.models.CorrectedPeak']
+    parafac_comp_tensor : InitVar[tuple]
+    boundaries : InitVar[tuple]
+    
+    def __post_init__(self, impure_peak, parafac_comp_tensor, boundaries):
+        # https://github.com/python/mypy/issues/9254
+        self.hplc_system_tag = impure_peak.dataset.hplc_system_tag
+        self.experiment = impure_peak.dataset.experiment
+        self.time = impure_peak.dataset.time
+        self.wavelength = impure_peak.dataset.wavelength
+        self.data = np.zeros((len(self.wavelength), len(self.time)))
+        self._make_data_from_parafac_peak(impure_peak, parafac_comp_tensor,
+                                          boundaries)
+
+    def _make_data_from_parafac_peak(self, impure_peak, parafac_comp_tensor,
+                                     boundaries):
+        # make 2D data corresponding to parafac-generated spectra and elution
+        spectrum = parafac_comp_tensor[0].reshape(len(self.wavelength), 1)
+        retention = parafac_comp_tensor[1].reshape(1, boundaries[1] - boundaries[0] + 1)
+        integral = parafac_comp_tensor[2][-1] # reaction run is last in run dimension
+        parafac_peak_data = spectrum * retention * integral
+        
+        # replace self data with parafac peak data
+        self.data[:, boundaries[0]:boundaries[1] + 1] = parafac_peak_data

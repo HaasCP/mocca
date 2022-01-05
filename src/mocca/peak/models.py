@@ -105,11 +105,3 @@ class ProcessedPeak():
             raise ValueError("Both peaks must be of the same type!")
         return (self.maximum + self.offset == other.maximum + other.offset and
                 self.dataset == other.dataset)
-
-
-@dataclass(frozen=True)
-class ParafacPeak(BasePeak):
-    integral : float
-    spectra : np.ndarray
-    elution : np.ndarray
-    offset : int
