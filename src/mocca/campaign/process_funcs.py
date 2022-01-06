@@ -125,9 +125,18 @@ def process_compound_experiments(experiments, gradient, peak_db,
     return compound_chroms, bad_chroms
 
 
+def get_unprocessed_experiments(experiments, quali_comp_db):
+    unprocessed_exps = [exp for exp in experiments if not exp.processed]
+    for exp in unprocessed_exps:
+        if exp.istd and exp.istd.key not in quali_comp_db:
+            raise ValueError("Internal standard {} unknown in this campaign. "
+                             "First add the internal standard as pure "
+                             "compound in a separate run!".format(exp.istd.key))
+
+
 def process_experiments(experiments, gradient, peak_db, quali_comp_db,
                         quant_comp_db, settings):
-    unprocessed_exps = [exp for exp in experiments if not exp.processed]
+    unprocessed_exps = get_unprocessed_experiments(experiments, quali_comp_db)
     chroms = []
     bad_chroms = []
     for exp in unprocessed_exps:

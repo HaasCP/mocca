@@ -18,6 +18,7 @@ from mocca.campaign.utils import save_instance
 
 # TODO: Go through files and clean up uncommented functions + documentation
 
+
 class HplcDadCampaign():
     """
     Main parent class for HPLC-DAD experimental campaigns. We expect the gradient to stay
@@ -104,73 +105,7 @@ class HplcDadCampaign():
             )
         self.chroms.extend(chroms)
         self.bad_chroms.extend(bad_chroms)
-
-"""   
- 
-        
-        
-        
-        if new_exp.istd and new_exp.istd.key not in self.quali_comp_db:
-            raise ValueError("Internal standard {} unknown in this campaign. "
-                             "First add the internal standard as pure "
-                             "compound in a separate run!".format(new_exp.istd.key))
-        
-        
-
-        
     
-    def process_new_experiment(self, path, compound_id=None, solvent=False, istd=False, compound_conc=None,
-                       istd_id=None, istd_conc=None):
-        "
-        Here, thresholds of the campaign are taken --> we don't have to process all
-        "
-        exps_to_process = [exp for exp in self.experiments if not exp.processed]
-        if any (exp.compound for exp in exps_to_process):
-            raise ValueError("If compound should be added to existing campaign, "
-                             "the user has to run process_all_experiments function "
-                             "to have consistent peak labelling over all experiments.")
-        if not bad_data:
-            update_all_databases(peak, component, compound)
-        pass
-    
+# TODO : process_unprocessed_experiments
 
-
-    
-
-    #TODO def load_peak_database()
-
-    def preprocess_campaign(self, absorbance_threshold, wl_high_pass=None, 
-                        wl_low_pass=None, peaks_high_pass=None, 
-                        peaks_low_pass=None, spectrum_correl_thresh=0.9, 
-                        relative_distance_thresh=0.01):
-        for experiment in self.experiments:
-            compound_data = CompoundData(self.hplc_system_tag, experiment['path'], 
-                                         self.gradient, wl_high_pass, wl_low_pass, 
-                                         experiment['compound_input'])
-            chromatogram = pick_peaks(compound_data, absorbance_threshold, 
-                                      peaks_high_pass, peaks_low_pass)
-            
-            1. expand
-            2. check
-            3. integrate
-            4. correct
-            5. resolve_impure (only impure peaks with component entry close by)
-            6. match
-            
-            chromatogram = preprocess_chromatogram(chromatogram, self.istd_key,
-                                                   self.quali_component_db, 
-                                                   absorbance_threshold, 
-                                                   self.detector_limit, 
-                                                   spectrum_correl_thresh,
-                                                   relative_distance_thresh)
-
-            self.chromatograms.append(chromatogram)
-
-# TODO develop compound_id assignment algorithms in each child class
-"""
-
-     
-     
-     
-     
      

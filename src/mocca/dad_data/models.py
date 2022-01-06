@@ -54,7 +54,8 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
         if not isinstance(other, type(self)):
             # don't attempt to compare against unrelated types
             return False
-        return self.path == other.path
+        return (self.path == other.path and
+                self.data.__array_interface__['data'] == other.data.__array_interface__['data'])
     
     def _set_path(self):
         self.path = self.experiment.path
@@ -140,4 +141,5 @@ class ParafacData():
         if not isinstance(other, type(self)):
             # don't attempt to compare against unrelated types
             return False
-        return self.path == other.path
+        return (self.path == other.path and
+                self.data.__array_interface__['data'] == other.data.__array_interface__['data'])

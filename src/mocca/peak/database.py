@@ -82,6 +82,7 @@ class PeakDatabase():
                 logging.warning("Warning: Peak with maximum at {} already exists "
                                 "in database. New peak replaces the "
                                 "old one.".format(new_peak.maximum))
+                logging.warning("{}{}".format(new_peak.dataset, peak.dataset))
         else:
             self.peaks.append(new_peak)
         # update the unknown counter

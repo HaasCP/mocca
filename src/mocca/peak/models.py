@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 import mocca.dad_data.models
-import numpy as np
+
 
 @dataclass(frozen=True)
 class BasePeak():
@@ -104,4 +104,4 @@ class ProcessedPeak():
             # don't attempt to compare against unrelated types
             raise ValueError("Both peaks must be of the same type!")
         return (self.maximum + self.offset == other.maximum + other.offset and
-                self.dataset == other.dataset)
+                self.idx == other.idx and self.dataset == other.dataset)

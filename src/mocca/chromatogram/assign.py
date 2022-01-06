@@ -6,11 +6,9 @@ Created on Fri Dec 17 18:55:41 2021
 @author: haascp
 """
 from operator import attrgetter
-import logging
 
 from mocca.peak.match import update_matches, match_peak
 from mocca.peak.process import process_peak
-from mocca.peak.utils import get_retention_time
 
 from mocca.campaign.compound import Compound
 
@@ -60,7 +58,8 @@ def assign_best_match_peak(peaks):
     sorted_peaks = sort_peaks_by_best_match(peaks)
 
     compound_id = get_best_match_compound_id(sorted_peaks[0])
-    assigned_peak = process_peak(sorted_peaks[0], Compound(compound_id), None)
+    assigned_peak = process_peak(sorted_peaks[0], Compound(compound_id),
+                                 is_compound=False)
     
     new_peaks = update_peaks_and_matches(sorted_peaks)
     return assigned_peak, new_peaks
@@ -99,7 +98,7 @@ def assign_unmatched_peaks_react(peaks, peak_db):
     assigned_peaks = []
     for peak in peaks:
         if peak.matches is None:
-            new_peak = process_peak(peak, Compound(None), False)
+            new_peak = process_peak(peak, Compound(None), is_compound=False)
         else:
             new_peak = process_peak(peak,
                                     Compound(get_next_unknown_id(peak_db)),
@@ -158,7 +157,7 @@ def assign_unmatched_peaks_compound(peaks, compound_id, impurity_counter=0):
     for peak in peaks:
         impurity_counter += 1
         compound = Compound(compound_id + "_impurity_" + str(impurity_counter))
-        new_peak = process_peak(peak, compound, None)
+        new_peak = process_peak(peak, compound, is_compound=None)
         assigned_peaks.append(new_peak)
     return assigned_peaks
 
@@ -215,6 +214,7 @@ def assign_peaks_compound(chromatogram, compound):
                                 key=lambda peak: peak.maximum)
     return chromatogram
 
+
 def reassign_impurities(chromatogram, peak_db, quali_comp_db, spectrum_correl_coef_thresh,
                         relative_distance_thresh, print_similarity_dicts=False):
     """
@@ -250,7 +250,3 @@ def reassign_impurities(chromatogram, peak_db, quali_comp_db, spectrum_correl_co
     chromatogram.peaks = sorted(compound_peaks + assigned_peaks + impurity_peaks,
                                 key=lambda peak: peak.maximum)
     return chromatogram
-    
-    
-    
-    

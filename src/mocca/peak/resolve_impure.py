@@ -5,7 +5,7 @@ from tensorly.decomposition import non_negative_parafac_hals
 import matplotlib.pyplot as plt 
 
 from mocca.peak.utils import get_peak_data
-from mocca.peak.models import CorrectedPeak
+from mocca.peak.models import CorrectedPeak, IntegratedPeak
 
 from mocca.dad_data.models import ParafacData
 
@@ -157,7 +157,8 @@ def parafac(impure_peak, quali_comp_db, show_parafac_analytics=False):
     return parafac_tensor, boundaries
 
 
-def create_parafac_peaks(impure_peak, parafac_tensor, boundaries):
+def create_parafac_peaks(impure_peak, parafac_tensor, boundaries,
+                         absorbance_threshold):
     """
     Makes a new ProcessedPeak corresponding to PARAFAC-processed impure processed peak
     Spectra, Elution, and Integral generated from PARAFAC
@@ -175,26 +176,45 @@ def create_parafac_peaks(impure_peak, parafac_tensor, boundaries):
         parafac_comp_tensor = (parafac_tensor[0][:, i],
                                parafac_tensor[1][:, i],
                                parafac_tensor[2][:, i])
-        
-        parafac_peak = CorrectedPeak(left=boundaries[0],
-                                     right=boundaries[1],
-                                     maximum=(boundaries[0] +
-                                              np.argmax(parafac_comp_tensor[1])),
-                                     dataset=ParafacData(impure_peak,
-                                                         parafac_comp_tensor,
-                                                         boundaries),
-                                     idx=-impure_peak.idx,
-                                     saturation=impure_peak.saturation,
-                                     pure=True,
-                                     integral=parafac_comp_tensor[2][-1], # reaction run is last in run dimension
-                                     offset=0,
-                                     istd=impure_peak.istd)
-        parafac_peaks.append(parafac_peak)
+        if type(impure_peak) == CorrectedPeak:
+            parafac_peak = CorrectedPeak(left=boundaries[0],
+                                         right=boundaries[1],
+                                         maximum=(boundaries[0] +
+                                                  np.argmax(parafac_comp_tensor[1])),
+                                         dataset=ParafacData(impure_peak,
+                                                             parafac_comp_tensor,
+                                                             boundaries),
+                                         idx=-impure_peak.idx,
+                                         saturation=impure_peak.saturation,
+                                         pure=True,
+                                         integral=parafac_comp_tensor[2][-1], # reaction run is last in run dimension
+                                         offset=0,
+                                         istd=impure_peak.istd)
+        elif type(impure_peak) == IntegratedPeak:
+            parafac_peak = IntegratedPeak(left=boundaries[0],
+                                         right=boundaries[1],
+                                         maximum=(boundaries[0] +
+                                                  np.argmax(parafac_comp_tensor[1])),
+                                         dataset=ParafacData(impure_peak,
+                                                             parafac_comp_tensor,
+                                                             boundaries),
+                                         idx=-impure_peak.idx,
+                                         saturation=impure_peak.saturation,
+                                         pure=True,
+                                         integral=parafac_comp_tensor[2][-1])
+        else:
+            raise TypeError(f"Given impure peak is of type {type(impure_peak)}. "
+                            "Only mocca IntegratedPeak and CorrectedPeak types "
+                            "are allowed.")
+        if np.max(parafac_peak.dataset.data) > absorbance_threshold:
+            parafac_peaks.append(parafac_peak)
     return parafac_peaks
 
 
-def get_parafac_peaks(impure_peak, quali_comp_db, show_parafac_analytics):
+def get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
+                      show_parafac_analytics):
     parafac_tensor, boundaries = parafac(impure_peak, quali_comp_db,
                                          show_parafac_analytics=False)
-    parafac_peaks = create_parafac_peaks(impure_peak, parafac_tensor, boundaries)
+    parafac_peaks = create_parafac_peaks(impure_peak, parafac_tensor, boundaries,
+                                         absorbance_threshold)
     return parafac_peaks

@@ -104,4 +104,3 @@ def get_quant_peaks_by_compound(peak_database, filter_function):
                                                        peak.concentration)]
     compound_dict = sort_peaks_by_compound(quant_peaks)
     return compound_dict
-    

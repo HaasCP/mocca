@@ -18,7 +18,8 @@ def preprocess_chromatogram(chromatogram, istds, quali_comp_db,
                             absorbance_threshold, detector_limit, 
                             spectrum_correl_thresh, relative_distance_thresh,
                             print_purity_check = False,
-                            print_compound_prediction = False):
+                            print_compound_prediction = False,
+                            print_parafac_analytics=False):
     # 1. expand, 2. check, 3. integrate
     integrated_peaks = []
     for picked_peak in chromatogram.peaks:
@@ -31,7 +32,8 @@ def preprocess_chromatogram(chromatogram, istds, quali_comp_db,
     chromatogram.peaks = integrated_peaks
     
     # 4. correct
-    chromatogram = correct_istd_offset(chromatogram, istds, quali_comp_db, 
+    chromatogram = correct_istd_offset(chromatogram, istds, quali_comp_db,
+                                       absorbance_threshold,
                                        spectrum_correl_thresh, 
                                        relative_distance_thresh)
     
@@ -40,7 +42,8 @@ def preprocess_chromatogram(chromatogram, istds, quali_comp_db,
 
     for impure_peak in impure_peaks:
         parafac_peaks = get_parafac_peaks(impure_peak, quali_comp_db,
-                                          show_parafac_analytics=False)
+                                          absorbance_threshold,
+                                          show_parafac_analytics=print_parafac_analytics)
         chromatogram.peaks.extend(parafac_peaks)
 
     # 6. match
@@ -54,4 +57,3 @@ def preprocess_chromatogram(chromatogram, istds, quali_comp_db,
         matched_peaks.append(new_peak)
     chromatogram.peaks = matched_peaks
     return chromatogram
-

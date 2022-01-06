@@ -11,7 +11,8 @@ from mocca.peak.models import ProcessedPeak
 def quantify_peak(peak, quant_comp_db):
     if peak.compound_id in quant_comp_db:
         quant_comp = quant_comp_db[peak.compound_id]
-        if peak.istd:
+        if peak.istd and not any(istd_peak.compound_id == peak.compound_id for
+                                 istd_peak in peak.istd):
             scores = quant_comp.calib_scores
             max_score_version = 'absolute'
             max_score = scores['absolute']

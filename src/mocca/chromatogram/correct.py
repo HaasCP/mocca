@@ -7,8 +7,9 @@ Created on Fri Dec 10 10:54:24 2021
 """
 import copy
 
-from mocca.peak.match import get_filtered_similarity_dicts, get_relative_distance
+from mocca.peak.match import get_filtered_similarity_dicts
 from mocca.peak.correct import correct_offset
+from mocca.peak.resolve_impure import check_comp_overlap, get_parafac_peaks
 from mocca.peak.models import IstdPeak
 
 
@@ -34,22 +35,38 @@ def get_pure_istd_peak(chromatogram, istd_key, quali_component_db,
     return istd_peak
 
 
-def get_impure_istd_peak(chromatogram, istd_key, quali_component_db, 
+def get_impure_istd_peak(chromatogram, istd_key, quali_comp_db, absorbance_threshold,
                        spectrum_correl_coef_thresh, relative_distance_thresh):
     """
     Doubled relative distance threshold
     """
-    istd_component = quali_component_db[istd_key]
+    istd_component = quali_comp_db[istd_key]
     
     impure_peak_targets = [peak for peak in chromatogram if 
                            (not peak.pure and 
-                            get_relative_distance(peak, istd_component) <=
-                            relative_distance_thresh * 2)]
-     # TODO PARAFAC routine on impure peak
-     #return istd_peak # None if not found via iterative PARAFAC
+                            check_comp_overlap(peak, istd_component))]
+
+    istd_peak = None
+    best_correl_coef = 0
+    for impure_peak in impure_peak_targets:
+        parafac_peaks = get_parafac_peaks(impure_peak, quali_comp_db,
+                                          absorbance_threshold,
+                                          show_parafac_analytics=False)
+        for peak in parafac_peaks:
+            matches = get_filtered_similarity_dicts(peak, quali_comp_db, 
+                                                    spectrum_correl_coef_thresh,
+                                                    relative_distance_thresh * 2)
+            if matches:
+                if any(match['compound_id'] == istd_key for match in matches):
+                    for match in matches:
+                        if match['compound_id'] == istd_key:
+                            if match['spectrum_correl_coef'] > best_correl_coef:
+                                best_correl_coef = match['spectrum_correl_coef']
+                                istd_peak = peak
+    return istd_peak
 
 
-def get_istd_peak(chromatogram, istd_key, quali_component_db, 
+def get_istd_peak(chromatogram, istd_key, quali_component_db, absorbance_threshold,
                   spectrum_correl_coef_thresh, relative_distance_thresh):
     """
     Tries to find an istd peak in the chromatogram from both pure or impure peaks.
@@ -65,6 +82,7 @@ def get_istd_peak(chromatogram, istd_key, quali_component_db,
         if istd_peak is None:
             istd_peak = get_impure_istd_peak(chromatogram, istd_key,
                                              quali_component_db,
+                                             absorbance_threshold,
                                              spectrum_correl_coef_thresh,
                                              relative_distance_thresh)
         return istd_peak
@@ -82,7 +100,7 @@ def get_istd_offset(istd_peak, istd_key, quali_component_db):
     return istd_offset
 
 
-def correct_istd_offset(chromatogram, istds, quali_component_db, 
+def correct_istd_offset(chromatogram, istds, quali_component_db, absorbance_threshold,
                         spectrum_correl_coef_thresh, relative_distance_thresh):
     """
     Corrects the peaks of the chromatogram by the average of the internal standard
@@ -91,7 +109,8 @@ def correct_istd_offset(chromatogram, istds, quali_component_db,
     istd_peaks = []
     if istds:
         for istd in istds:
-            istd_p = get_istd_peak(chromatogram, istd.key, quali_component_db, 
+            istd_p = get_istd_peak(chromatogram, istd.key, quali_component_db,
+                                   absorbance_threshold,
                                    spectrum_correl_coef_thresh,
                                    relative_distance_thresh)
             if istd_p:
