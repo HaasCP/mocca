@@ -128,10 +128,13 @@ def process_compound_experiments(experiments, gradient, peak_db,
 def get_unprocessed_experiments(experiments, quali_comp_db):
     unprocessed_exps = [exp for exp in experiments if not exp.processed]
     for exp in unprocessed_exps:
-        if exp.istd and exp.istd.key not in quali_comp_db:
-            raise ValueError("Internal standard {} unknown in this campaign. "
-                             "First add the internal standard as pure "
-                             "compound in a separate run!".format(exp.istd.key))
+        if exp.istd:
+            for istd in exp.istd:
+                if istd.key not in quali_comp_db:
+                    raise ValueError("Internal standard {} unknown in this campaign. "
+                                     "First add the internal standard as pure "
+                                     "compound in a separate run!".format(exp.istd.key))
+    return unprocessed_exps
 
 
 def process_experiments(experiments, gradient, peak_db, quali_comp_db,
