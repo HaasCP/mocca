@@ -68,6 +68,6 @@ def report_experiments(exps, report_path):
     )
     r = dp.Report(
         exp_page
-    )    
+    )
     r.save(path=os.path.join(report_path, "report_experiments.html"), open=True)
 

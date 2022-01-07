@@ -10,6 +10,7 @@ from sklearn.linear_model import LinearRegression
 
 from mocca.components.models import QuantComponent
 
+
 def create_quant_component(peaks):
     """
     Creates a quantitative component object based on the given peaks

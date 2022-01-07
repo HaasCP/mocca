@@ -157,7 +157,7 @@ def assign_unmatched_peaks_compound(peaks, compound_id, impurity_counter=0):
     for peak in peaks:
         impurity_counter += 1
         compound = Compound(compound_id + "_impurity_" + str(impurity_counter))
-        new_peak = process_peak(peak, compound, is_compound=None)
+        new_peak = process_peak(peak, compound, is_compound=False)
         assigned_peaks.append(new_peak)
     return assigned_peaks
 
