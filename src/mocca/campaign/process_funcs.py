@@ -96,22 +96,19 @@ def check_istd(exp, chrom):
 def process_compound_experiments(experiments, gradient, peak_db,
                                  quali_comp_db, quant_comp_db, settings):
     exps = get_sorted_compound_experiments(experiments)
-    compound_chroms = []
-    bad_chroms = []
+    chroms = []
     for exp in exps:
         chrom = process_compound_exp(exp, gradient,
                                      quali_comp_db, settings)
         chrom = check_istd(exp, chrom)
+        chroms.append(chrom)
         if not chrom.bad_data:
-            compound_chroms.append(chrom)
             for peak in chrom:
                 if not 'impurity' in peak.compound_id:
                     peak_db.insert_peak(peak)
             quali_comp_db.update(peak_db)
-        else:
-            bad_chroms.append(chrom)
 
-    for chrom in compound_chroms:
+    for chrom in [chrom for chrom in chroms if not chrom.bad_data]:
         chrom = reassign_impurities(chrom, peak_db, quali_comp_db,
                                     settings.spectrum_correl_thresh,
                                     settings.relative_distance_thresh)
@@ -122,7 +119,7 @@ def process_compound_experiments(experiments, gradient, peak_db,
 
     quant_comp_db.update(peak_db)
 
-    return compound_chroms, bad_chroms
+    return chroms
 
 
 def get_unprocessed_experiments(experiments, quali_comp_db):
@@ -141,18 +138,14 @@ def process_experiments(experiments, gradient, peak_db, quali_comp_db,
                         quant_comp_db, settings):
     unprocessed_exps = get_unprocessed_experiments(experiments, quali_comp_db)
     chroms = []
-    bad_chroms = []
     for exp in unprocessed_exps:
         chrom = preprocess_experiment(exp, gradient, quali_comp_db, settings)
         chrom = assign_peaks_react(chrom, peak_db)
         chrom = quantify_peaks(chrom, quant_comp_db)
         chrom = check_istd(exp, chrom)
-
+        chroms.append(chrom)
         if not chrom.bad_data:
-            chroms.append(chrom)
             for peak in chrom:
                     peak_db.insert_peak(peak)
             quali_comp_db.update(peak_db)
-        else:
-            bad_chroms.append(chrom)    
-    return chroms, bad_chroms
+    return chroms

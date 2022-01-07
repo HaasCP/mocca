@@ -49,9 +49,9 @@ def get_impure_istd_peak(chromatogram, istd_key, quali_comp_db, absorbance_thres
     istd_peak = None
     best_correl_coef = 0
     for impure_peak in impure_peak_targets:
-        parafac_peaks = get_parafac_peaks(impure_peak, quali_comp_db,
-                                          absorbance_threshold,
-                                          show_parafac_analytics=False)
+        parafac_peaks, _ = get_parafac_peaks(impure_peak, quali_comp_db,
+                                             absorbance_threshold,
+                                             show_parafac_analytics=False)
         for peak in parafac_peaks:
             matches = get_filtered_similarity_dicts(peak, quali_comp_db, 
                                                     spectrum_correl_coef_thresh,

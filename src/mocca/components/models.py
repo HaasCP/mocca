@@ -14,6 +14,7 @@ class QualiComponent():
     left : int
     right : int
     maximum : int
+    offset : int
     spectrum : list
     created_from : List[ProcessedPeak]
 

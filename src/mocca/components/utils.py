@@ -95,7 +95,8 @@ def average_ret_times_over_peaks(peaks):
         left = int(round(sum([peak.left for peak in peaks]) / num_peaks))
         right = int(round(sum([peak.right for peak in peaks]) / num_peaks))
         maximum = int(round(sum([peak.maximum for peak in peaks]) / num_peaks))
-        return left, right, maximum
+        offset = int(round(sum([peak.offset for peak in peaks]) / num_peaks))
+        return left, right, maximum, offset
 
 
 def get_quant_peaks_by_compound(peak_database, filter_function):

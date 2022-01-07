@@ -8,6 +8,7 @@ from mocca.peak.utils import get_peak_data
 from mocca.peak.models import CorrectedPeak, IntegratedPeak
 
 from mocca.dad_data.models import ParafacData
+from mocca.dad_data.utils import sum_absorbance_by_time
 
 
 def check_comp_overlap(peak, comp):
@@ -16,7 +17,9 @@ def check_comp_overlap(peak, comp):
 
 
 def get_relevant_comps(impure_peak, quali_comp_db):
-    return [comp for comp in quali_comp_db if check_comp_overlap(impure_peak, comp)]
+    return [comp for comp in quali_comp_db if (check_comp_overlap(impure_peak, comp)
+                                               and (not 'unknown' in comp.compound_id
+                                                    and not 'impurity' in comp.compound_id))]
 
 
 def get_compound_offset(created_from_peak, comp):
@@ -58,6 +61,10 @@ def get_comp_ze_peaks(relevant_comps, boundaries):
     ze_peaks = []
     for comp in relevant_comps:
         created_from_peaks = comp.created_from
+        # only take 5 peaks
+        fac = len(created_from_peaks) // 5
+        if fac > 0:
+            created_from_peaks = created_from_peaks[::fac]
         for peak in created_from_peaks:
             offset = get_compound_offset(peak, comp)
             peak_data = get_peak_data(peak)
@@ -171,6 +178,7 @@ def create_parafac_peaks(impure_peak, parafac_tensor, boundaries,
                          "amount of components")
 
     parafac_peaks = []
+    chrom_peaks = []
     for i in range(n_comps):
         #  get tensor for one parafac comonent
         parafac_comp_tensor = (parafac_tensor[0][:, i],
@@ -206,15 +214,18 @@ def create_parafac_peaks(impure_peak, parafac_tensor, boundaries,
             raise TypeError(f"Given impure peak is of type {type(impure_peak)}. "
                             "Only mocca IntegratedPeak and CorrectedPeak types "
                             "are allowed.")
-        if np.max(parafac_peak.dataset.data) > absorbance_threshold:
-            parafac_peaks.append(parafac_peak)
-    return parafac_peaks
+        parafac_peaks.append(parafac_peak)
+        if np.max(sum_absorbance_by_time(parafac_peak.dataset.data)) > absorbance_threshold:
+            chrom_peaks.append(parafac_peak)
+    return chrom_peaks, (impure_peak, parafac_peaks)
 
 
 def get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
                       show_parafac_analytics):
     parafac_tensor, boundaries = parafac(impure_peak, quali_comp_db,
                                          show_parafac_analytics=False)
-    parafac_peaks = create_parafac_peaks(impure_peak, parafac_tensor, boundaries,
-                                         absorbance_threshold)
-    return parafac_peaks
+    chrom_peaks, parafac_report_tuple = create_parafac_peaks(impure_peak,
+                                                               parafac_tensor,
+                                                               boundaries,
+                                                               absorbance_threshold)
+    return chrom_peaks, parafac_report_tuple

@@ -9,16 +9,16 @@ Created on Tue Aug  3 13:16:51 2021
 from dataclasses import dataclass, field, InitVar
 from typing import List
 import numpy as np
+import copy
 
 from mocca.dad_data.utils import absorbance_to_array, apply_filter, trim_data
 from mocca.dad_data.process_gradientdata import bsl_als
-
 from mocca.dad_data.apis.chemstation_api import read_csv_agilent, tidy_df_agilent
 from mocca.dad_data.apis.labsolutions_api import read_txt_shimadzu
 
 from mocca.campaign.experiment import Experiment
-
 import mocca.peak.models
+
 
 # Parameter inheritance issues solved as shown in:
 # https://stackoverflow.com/questions/51575931/class-inheritance-in-python-3-7-dataclasses
@@ -75,8 +75,10 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
 
 @dataclass(eq=False)
 class GradientData(DadData):
+    original_data : np.ndarray = field(init=False)
     def __post_init__(self, wl_high_pass, wl_low_pass):
         super().__post_init__(wl_high_pass, wl_low_pass)
+        self.original_data = copy.deepcopy(self.data)
         self.data = bsl_als(self.data)
 
 

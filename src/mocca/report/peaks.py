@@ -14,7 +14,7 @@ def peaks_to_dict(peaks):
     peaks_dict = {'left': [],
                   'right': [],
                   'maximum': [],
-                  'dataset': [],
+                  'file': [],
                   'peak_id': [],
                   'is_saturated': [],
                   'is_pure': [],
@@ -27,10 +27,10 @@ def peaks_to_dict(peaks):
                   'is_compound': []}
     for peak in peaks:
         times = peak.dataset.time
-        peaks_dict['left'].append(times[peak.left])
-        peaks_dict['right'].append(times[peak.right])
-        peaks_dict['maximum'].append(times[peak.maximum])
-        peaks_dict['dataset'].append(peak.dataset.path)
+        peaks_dict['left'].append(times[peak.left + peak.offset])
+        peaks_dict['right'].append(times[peak.right + peak.offset])
+        peaks_dict['maximum'].append(times[peak.maximum + peak.offset])
+        peaks_dict['file'].append(os.path.basename(peak.dataset.path))
         peaks_dict['peak_id'].append(peak.idx)
         peaks_dict['is_saturated'].append(peak.saturation)
         peaks_dict['is_pure'].append(peak.pure)
@@ -68,7 +68,7 @@ def report_peaks(peak_db, report_path):
             ),
             dp.Text("### Table: Peaks in the peak database of the campaign."),
             dp.DataTable(peak_df, label="peak_table")
-        ],        
+        ],
     )
     r = dp.Report(
         peak_page

@@ -12,7 +12,7 @@ import datapane as dp
 
 
 def exps_to_dict(exps):
-    exp_dict = {'path': [],
+    exp_dict = {'file': [],
                 'compound_key': [],
                 'compound_conc': [],
                 'compound_is_solvent': [],
@@ -22,7 +22,7 @@ def exps_to_dict(exps):
                 'is_gradient': [],
                 'processed': []}
     for exp in exps:
-        exp_dict['path'].append(exp.path)
+        exp_dict['file'].append(os.path.basename(exp.path))
         if exp.compound:
             exp_dict['compound_key'].append(exp.compound.key)
             exp_dict['compound_conc'].append(exp.compound.conc)
@@ -64,7 +64,7 @@ def report_experiments(exps, report_path):
             ),
             dp.Text("### Table: Experiments as given by the user."),
             dp.DataTable(exp_df, label="experiment_table")
-        ],        
+        ],
     )
     r = dp.Report(
         exp_page

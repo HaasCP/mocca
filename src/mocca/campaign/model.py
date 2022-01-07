@@ -32,9 +32,7 @@ class HplcDadCampaign():
         self.peak_db = PeakDatabase()
         self.quali_comp_db = QualiComponentDatabase()
         self.quant_comp_db = QuantComponentDatabase()
-        self.compound_chroms = []
         self.chroms = []
-        self.bad_chroms = []
         self.warnings = []
 
     def _reset_campaign(self):
@@ -84,18 +82,7 @@ class HplcDadCampaign():
                              relative_distance_thresh)
         self._reset_campaign()
         
-        compound_chroms, bad_chroms = process_compound_experiments(
-            self.experiments,
-            self.gradient,
-            self.peak_db,
-            self.quali_comp_db,
-            self.quant_comp_db,
-            self.settings
-            )
-        self.compound_chroms.extend(compound_chroms)
-        self.bad_chroms.extend(bad_chroms)
-
-        chroms, bad_chroms = process_experiments(
+        chroms = process_compound_experiments(
             self.experiments,
             self.gradient,
             self.peak_db,
@@ -104,7 +91,16 @@ class HplcDadCampaign():
             self.settings
             )
         self.chroms.extend(chroms)
-        self.bad_chroms.extend(bad_chroms)
+
+        chroms = process_experiments(
+            self.experiments,
+            self.gradient,
+            self.peak_db,
+            self.quali_comp_db,
+            self.quant_comp_db,
+            self.settings
+            )
+        self.chroms.extend(chroms)
     
 # TODO : process_unprocessed_experiments
 

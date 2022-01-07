@@ -9,7 +9,7 @@ import os
 import pandas as pd
 import datapane as dp
 
-from mocca.utils.visualization import plot_calibration_curves
+from mocca.visualization.calibration_plots import plot_calibration_curves
 from mocca.report.peaks import peaks_to_df
 
 
@@ -77,7 +77,7 @@ def report_quant_comps(quant_comp_db, report_path):
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
             ),
-            dp.Text("### Table: Components in the quantitative component database."
+            dp.Text("### Table: Components in the quantitative component database "
                     "of the campaign."),
             dp.DataTable(comp_df, label="comp_table")
         ],        

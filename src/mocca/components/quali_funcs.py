@@ -18,12 +18,13 @@ def create_quali_component(peaks):
     if not peaks:
         return
     if all(peak.compound_id == peaks[0].compound_id for peak in peaks):
-        mean_left, mean_right, mean_maximum = average_ret_times_over_peaks(peaks)
+        mean_left, mean_right, mean_maximum, mean_offset = average_ret_times_over_peaks(peaks)
         mean_spectrum = average_spectra_over_peaks(peaks)
         return QualiComponent(compound_id=peaks[0].compound_id,
                               left=mean_left,
                               right=mean_right,
                               maximum=mean_maximum,
+                              offset=mean_offset,
                               spectrum=mean_spectrum,
                               created_from=peaks)
     else:
