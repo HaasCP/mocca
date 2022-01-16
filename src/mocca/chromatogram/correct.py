@@ -9,8 +9,9 @@ import copy
 
 from mocca.peak.match import get_filtered_similarity_dicts
 from mocca.peak.correct import correct_offset
-from mocca.peak.resolve_impure import check_comp_overlap, get_parafac_peaks
 from mocca.peak.models import IstdPeak
+from mocca.peak.resolve_impure import get_parafac_peaks
+from mocca.decomposition.utils import check_comp_overlap
 
 
 def get_pure_istd_peak(chromatogram, istd_key, quali_component_db, 

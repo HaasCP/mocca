@@ -11,7 +11,7 @@ import numpy as np
 
 from mocca.peak.utils import get_peak_data
 from mocca.visualization.basic_plots import plot_1D_data
-
+from mocca.dad_data.utils import sum_absorbance_by_time
 
 def plot_impure_peak_spectra(impure_peak):
     peak_data = get_peak_data(impure_peak)
@@ -40,6 +40,7 @@ def plot_impure_peak_spectra(impure_peak):
     ).interactive()
     return fig
 
+
 def plot_parafac_peak_spec(parafac_peak):
     wls = parafac_peak.dataset.wavelength
     
@@ -51,6 +52,47 @@ def plot_parafac_peak_spec(parafac_peak):
     
     return plot_1D_data(df, xlabel='Wavelength (nm)', ylabel='Absorbance (mAU)',
                         title='', reduce_data=True)
+
+
+def plot_retention(impure_peak, parafac_peaks):
+    times = impure_peak.dataset.time
+    peak_retention = sum_absorbance_by_time(impure_peak.dataset.data)
     
+    left = parafac_peaks[0].left
+    right = parafac_peaks[0].right
     
+    df = pd.DataFrame({'x': times[(left + impure_peak.offset):\
+                                  (right + impure_peak.offset + 1)],
+                       'y': peak_retention[(left + impure_peak.offset):\
+                                           (right + impure_peak.offset + 1)]})
+    
+    impure_chart = alt.Chart(df, title='').mark_line().encode(
+        x=alt.X(df.columns[0], axis=alt.Axis(title='Time (min)')),
+        y=alt.Y(df.columns[1], axis=alt.Axis(title='Absorbance (mAU)'))
+    )
+    
+    charts = []
+    for peak in parafac_peaks:
+        summed_data = sum_absorbance_by_time(peak.dataset.data)
+        df = pd.DataFrame({'x': times[left:right + 1],
+                           'y': summed_data[left:right + 1]})
+        chart = alt.Chart(df, title='').mark_line().encode(
+            x=alt.X(df.columns[0], axis=alt.Axis(title='Time (min)')),
+            y=alt.Y(df.columns[1], axis=alt.Axis(title='Absorbance (mAU)'))
+        )
+        charts.append(chart)
+    
+    fig = impure_chart
+    for chart in charts:
+        fig = fig + chart
+    
+    fig = fig.configure_axis(
+        grid=False,
+        titleFontSize = 16,
+        titleFontWeight='normal'
+    ).configure_view(
+        strokeWidth=0
+    ).interactive()
+    return fig
+
     

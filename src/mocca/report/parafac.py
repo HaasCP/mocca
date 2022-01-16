@@ -11,7 +11,9 @@ import math
 import pandas as pd
 import datapane as dp
 
-from mocca.visualization.parafac_plots import plot_impure_peak_spectra, plot_parafac_peak_spec
+from mocca.visualization.parafac_plots import (plot_impure_peak_spectra,
+                                               plot_parafac_peak_spec,
+                                               plot_retention)
 
 
 def parafac_chroms_to_dict(chroms):
@@ -39,8 +41,9 @@ def parafac_chroms_to_df(chroms):
     return chrom_df
 
 
-def create_parafac_page(chrom, index):
+def create_parafac_pages(chrom, index):
     
+    parafac_pages = []
     for parafac_data in chrom.parafac_report_data:
         impure_peak = parafac_data[0]
         parafac_peaks = parafac_data[1]
@@ -65,20 +68,28 @@ def create_parafac_page(chrom, index):
                             columns=2
                             )
             spectra.append(group)
+        
+        retention_plot = plot_retention(impure_peak, parafac_peaks)
 
-    return dp.Page(
-        title=str(index),
-        blocks=[
-            dp.Group(
-                dp.Text(f"## Details to chromatogram {index}"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
-                columns=2
-            ),
-            dp.Text("### Figures: 1st figure is spectra of impure peak at all "
-                    "time points. All other figures are spectra of parafac peaks "
-                    "at elution maximum.")
-        ] + spectra,      
-    )
+        parafac_page = dp.Page(
+            title=str(index) + f"peak {impure_peak.idx}",
+            blocks=[
+                dp.Group(
+                    dp.Text(f"## Details to chromatogram {index}"),
+                    dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                    columns=2
+                ),
+                dp.Text("### Figures: 1st figure is spectra of impure peak at all "
+                        "time points. All other figures are spectra of parafac peaks "
+                        "at elution maximum.")
+            ] + spectra +
+            [dp.Text("### Figure: Retention of impure peak overlayed with "
+                     "calculated PARAFAC retention profiles."),
+             dp.Plot(retention_plot)
+                ] 
+        )
+        parafac_pages.append(parafac_page)
+        return parafac_pages
 
 
 def report_parafac(chroms, report_path):
@@ -98,8 +109,8 @@ def report_parafac(chroms, report_path):
     parafac_pages = []
     for i, chrom in enumerate(chroms):
         if chrom.parafac_report_data:
-            page = create_parafac_page(chrom, i + 1)
-            parafac_pages.append(page)
+            pages = create_parafac_pages(chrom, i + 1)
+            parafac_pages.extend(pages)
     r = dp.Report(
         summary_page,
         *parafac_pages

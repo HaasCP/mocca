@@ -11,7 +11,7 @@ import pandas as pd
 import datapane as dp
 
 from mocca.report.experiments import exps_to_df
-from mocca.visualization.utils import sum_absorbance_by_time
+from mocca.dad_data.utils import sum_absorbance_by_time
 from mocca.visualization.basic_plots import plot_1D_data
 
 
