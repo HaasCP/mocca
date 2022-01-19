@@ -54,6 +54,8 @@ def parafac(impure_peak, quali_comp_db, iter_offset, show_parafac_analytics):
     PARAFAC decomposition processing routine of impure peaks. An iteration offset
     is introduced to allow for iterative PARAFAC approach.
     """
+    print(f"----- new PARAFAC decomposition with iteration offset {iter_offset}"
+          " -----")
     data_tensor, boundaries, relevant_comps, comp_tensor_shape =\
         get_parafac_tensor(impure_peak, quali_comp_db, iter_offset)
 
@@ -74,6 +76,7 @@ def parafac(impure_peak, quali_comp_db, iter_offset, show_parafac_analytics):
     if show_parafac_analytics:
         print_parafac_analytics(normalized_spectra, normalized_elution,
                                 normalized_integrals, boundaries, relevant_comps)
+        print(f"integral_array = {normalized_integrals}")
 
     parafac_factors = (normalized_spectra, normalized_elution, normalized_integrals)
     

@@ -9,8 +9,10 @@ import os
 import pandas as pd
 import datapane as dp
 
+from mocca.visualization.basic_plots import plot_1D_data
 from mocca.visualization.results_plot import plot_chrom_with_peaks
 from mocca.report.utils import settings_to_df
+from mocca.peak.utils import average_peak_spectrum
 
 
 def chroms_to_dict(chroms):
@@ -60,6 +62,20 @@ def peaks_to_result_df(peaks):
 
 def create_chrom_page(chrom, index):
     chrom_plot = plot_chrom_with_peaks(chrom)
+    
+    spectrum_plots = []
+    for peak in chrom:
+        spectrum = average_peak_spectrum(peak)
+        wls = peak.dataset.wavelength
+        
+        df = pd.DataFrame({'x': wls,
+                           'y': spectrum})
+        plot = plot_1D_data(df, xlabel='Wavelength (nm)',
+                            ylabel='Absorbance (mAU)',
+                            title='UV-Vis spectrum of peak at '
+                            f'{round(peak.dataset.time[peak.maximum +peak.offset], 2)}'
+                            ' min')
+        spectrum_plots.append(plot)
 
     peaks_df = peaks_to_result_df(chrom.peaks)
     return dp.Page(
@@ -73,7 +89,12 @@ def create_chrom_page(chrom, index):
             dp.Text("### Figure: Chromatogram with highlighted peaks."),
             dp.Plot(chrom_plot),
             dp.Text("### Table: Peaks found in the chromatogram."),
-            dp.DataTable(peaks_df)
+            dp.DataTable(peaks_df),
+            dp.Text("### Figures: Average UV-Vis spectra of the picked peaks."),
+            dp.Group(
+                *spectrum_plots,
+                columns=2
+                )
         ],        
     )
 

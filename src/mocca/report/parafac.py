@@ -51,23 +51,7 @@ def create_parafac_pages(chrom, index):
         impure_peak_spec_plot = plot_impure_peak_spectra(impure_peak)
         parafac_spec_plots = [plot_parafac_peak_spec(peak) for peak in parafac_peaks]
         
-        plots = [impure_peak_spec_plot] + parafac_spec_plots
-        
-        spectra = []
-        for i in range(math.ceil(len(plots) / 2)):
-            if 2 * i + 1 < len(plots):
-                group = dp.Group(
-                            dp.Plot(plots[2 * i]),
-                            dp.Plot(plots[2 * i + 1]),
-                            columns=2
-                            )
-            else:
-                group = dp.Group(
-                            dp.Plot(plots[2 * i]),
-                            dp.Text("blank"),
-                            columns=2
-                            )
-            spectra.append(group)
+        spectra = [impure_peak_spec_plot] + parafac_spec_plots
         
         retention_plot = plot_retention(impure_peak, parafac_peaks)
 
@@ -81,12 +65,15 @@ def create_parafac_pages(chrom, index):
                 ),
                 dp.Text("### Figures: 1st figure is spectra of impure peak at all "
                         "time points. All other figures are spectra of parafac peaks "
-                        "at elution maximum.")
-            ] + spectra +
-            [dp.Text("### Figure: Retention of impure peak overlayed with "
-                     "calculated PARAFAC retention profiles."),
-             dp.Plot(retention_plot)
-                ] 
+                        "at elution maximum."),
+                dp.Group(
+                    *spectra,
+                    columns=2
+                    ),
+                dp.Text("### Figure: Retention of impure peak overlayed with "
+                        "calculated PARAFAC retention profiles."),
+                dp.Plot(retention_plot)
+                ]
         )
         parafac_pages.append(parafac_page)
         return parafac_pages

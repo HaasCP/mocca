@@ -43,8 +43,8 @@ def plot_chrom_with_peaks(chrom):
         else:
             color = 'red'
         peak_df = pd.DataFrame({
-            'start': [chrom.dataset.time[peak.left]],
-            'stop': [chrom.dataset.time[peak.right]]
+            'start': [chrom.dataset.time[peak.left + peak.offset]],
+            'stop': [chrom.dataset.time[peak.right + peak.offset]]
         })
         area = alt.Chart(
             peak_df
@@ -61,7 +61,7 @@ def plot_chrom_with_peaks(chrom):
     
     peak_tips = {'peak_max': []}
     for peak in chrom:
-        peak_tips['peak_max'].append(chrom.dataset.time[peak.maximum])                             
+        peak_tips['peak_max'].append(chrom.dataset.time[peak.maximum + peak.offset])                             
     rules = alt.Chart(pd.DataFrame(peak_tips)).mark_rule(strokeDash=[5,5]).encode(
       x='peak_max')
     

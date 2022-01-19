@@ -63,7 +63,7 @@ def get_tensor_boundaries(impure_peak, relevant_comps, iter_offset):
     right = max(right_boundaries)
 
     if iter_offset < 0:
-        left = left - iter_offset
+        right = right - iter_offset
     elif iter_offset > 0:
         right = right + iter_offset
 
@@ -85,11 +85,10 @@ def get_zero_extended_peak_data(peak_data, left, boundaries):
     rel_left = left - boundaries[0]
     rel_right = rel_left + peak_data.shape[1]
     peak_data_ze[:, rel_left:rel_right] = peak_data
-    
     return peak_data_ze
 
 
-def get_comp_peak_data_list(relevant_comps, boundaries):
+def get_comp_peak_data_list(relevant_comps, boundaries, iter_offset):
     """
     Returns a list of maximum-aligned peak data of the comp peaks of the
     relevant components. Moreover, returns the shape of the component list
@@ -103,8 +102,12 @@ def get_comp_peak_data_list(relevant_comps, boundaries):
         for peak in created_from_peaks:
             offset = get_offset_peak_to_comp(peak, comp)
             peak_data = get_peak_data(peak)
+            if iter_offset < 0:
+                left = peak.left - offset - iter_offset
+            else:
+                left = peak.left - offset
             peak_data_ze = get_zero_extended_peak_data(peak_data,
-                                                       peak.left - offset,
+                                                       left,
                                                        boundaries)
             ze_peaks.append(peak_data_ze)
     return ze_peaks, comp_tensor_shape
@@ -117,8 +120,12 @@ def get_zero_extended_impure_peak_data(impure_peak, boundaries, iter_offset):
     the iterative PARAFAC algorithm is used.
     """
     peak_data = get_peak_data(impure_peak)
+    if iter_offset > 0:
+        left = impure_peak.left + iter_offset
+    else:
+        left = impure_peak.left
     peak_data_ze = get_zero_extended_peak_data(peak_data,
-                                               impure_peak.left + iter_offset,
+                                               left,
                                                boundaries)
     return peak_data_ze
 
@@ -132,7 +139,8 @@ def get_parafac_data_list(impure_peak, quali_comp_db, iter_offset):
     boundaries = get_tensor_boundaries(impure_peak, relevant_comps, iter_offset)
 
     comp_peaks, comp_tensor_shape = get_comp_peak_data_list(relevant_comps,
-                                                            boundaries)
+                                                            boundaries,
+                                                            iter_offset)
 
     impure_peak = get_zero_extended_impure_peak_data(impure_peak, boundaries,
                                                      iter_offset)
@@ -152,11 +160,7 @@ def get_parafac_tensor(impure_peak, quali_comp_db, iter_offset):
     for data in parafac_data:
         data_flattened.append(data[:, :, np.newaxis])
     data_tensor = np.concatenate(data_flattened, axis=2)
+    print(f"new data tensor with boundaries {boundaries} and shape"
+          f"{comp_tensor_shape} built from "
+          f"{[comp.compound_id for comp in relevant_comps]}.")
     return data_tensor, boundaries, relevant_comps, comp_tensor_shape
-
-#print(np.argmax(np.sum(peak_data_ze, axis=0)))
-#display(contour_map(peak_data_ze, list(range(peak_data_ze.shape[1])),
-#                    list(range(peak_data_ze.shape[0]))))
-#print(np.argmax(np.sum(peak_data_ze, axis=0)))
-#display(contour_map(peak_data_ze, list(range(peak_data_ze.shape[1])),
-#                    list(range(peak_data_ze.shape[0]))))

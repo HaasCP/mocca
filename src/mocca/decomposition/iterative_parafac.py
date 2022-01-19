@@ -17,11 +17,13 @@ def get_non_comp_sum(parafac_factors, start_slice, end_slice):
     non_comp_sum_list = []
     for i in range(n_comps):
         sorted_integrals = sorted(parafac_factors[2][:, i][start_slice:end_slice])
-        non_comp_sum_i = sum(sorted_integrals[:-1])
+        non_comp_sum_i = sum(sorted_integrals)
         non_comp_sum_list.append(non_comp_sum_i)
-    return sum(non_comp_sum_list)
+    sorted_sums_ex_max = sorted(non_comp_sum_list)[:-1]
+    return sum(sorted_sums_ex_max)
 
-def get_all_non_comp_sum(parafac_factors, comp_tensor_shape):
+def get_all_non_comp_sum(parafac_factors, comp_tensor_shape,
+                         show_parafac_analytics):
     """
     Iterative PARAFAC approach is a minimization problem. Based on the component
     tensor data shape, the maximal sum of integrals is found for every component
@@ -38,6 +40,8 @@ def get_all_non_comp_sum(parafac_factors, comp_tensor_shape):
         non_comp_sum = get_non_comp_sum(parafac_factors, start_slice, end_slice)
         non_comp_sum_list.append(non_comp_sum)
         start_slice += comp_tensor_shape[i]
+    if show_parafac_analytics:
+        print(f"objective_val = {sum(non_comp_sum_list)}")
     return sum(non_comp_sum_list)
 
 
@@ -62,8 +66,9 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics=True):
                                                                      quali_comp_db,
                                                                      iter_offset,
                                                                      show_parafac_analytics)
-    non_comp_sum_cur = get_all_non_comp_sum(parafac_factors_cur, comp_tensor_shape)
-    print(non_comp_sum_cur)
+    non_comp_sum_cur = get_all_non_comp_sum(parafac_factors_cur,
+                                            comp_tensor_shape,
+                                            show_parafac_analytics)
     
     # first move positive
     iter_offset = 1
@@ -71,8 +76,9 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics=True):
                                                      quali_comp_db,
                                                      iter_offset,
                                                      show_parafac_analytics)
-    non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new, comp_tensor_shape)
-    print(non_comp_sum_new)
+    non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new,
+                                            comp_tensor_shape,
+                                            show_parafac_analytics)
 
     # check if it gets better in positive direction
     if non_comp_sum_new < non_comp_sum_cur:
@@ -88,8 +94,9 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics=True):
                                                              quali_comp_db,
                                                              iter_offset,
                                                              show_parafac_analytics)
-            non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new, comp_tensor_shape)
-            print(non_comp_sum_new)
+            non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new,
+                                                    comp_tensor_shape,
+                                                    show_parafac_analytics)
         return parafac_factors_cur, boundaries_cur
     
     # if positive was wrong direction, let's go negative
@@ -99,8 +106,9 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics=True):
                                                          quali_comp_db,
                                                          iter_offset,
                                                          show_parafac_analytics)
-        non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new, comp_tensor_shape)
-        print(non_comp_sum_new)
+        non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new,
+                                                comp_tensor_shape,
+                                                show_parafac_analytics)
         
         # check if it gets better in negative direction
         if non_comp_sum_new < non_comp_sum_cur:
@@ -116,8 +124,9 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics=True):
                                                                  quali_comp_db,
                                                                  iter_offset,
                                                                  show_parafac_analytics)
-                non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new, comp_tensor_shape)
-                print(non_comp_sum_new)
+                non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new,
+                                                        comp_tensor_shape,
+                                                        show_parafac_analytics)
             return parafac_factors_cur, boundaries_cur
         
         # if negative also does not give progress, start point is minimum

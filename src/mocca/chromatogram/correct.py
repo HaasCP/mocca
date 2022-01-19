@@ -17,7 +17,7 @@ from mocca.decomposition.utils import check_comp_overlap
 def get_pure_istd_peak(chromatogram, istd_key, quali_component_db, 
                        spectrum_correl_coef_thresh, relative_distance_thresh):
     """
-    Doubled relative distance threshold
+    not doubled relative distance threshold
     """
     istd_peak = None
     best_correl_coef = 0
@@ -25,7 +25,7 @@ def get_pure_istd_peak(chromatogram, istd_key, quali_component_db,
     for peak in pure_peaks:
         matches = get_filtered_similarity_dicts(peak, quali_component_db, 
                                                 spectrum_correl_coef_thresh,
-                                                relative_distance_thresh * 2)
+                                                relative_distance_thresh)
         if matches:
             if any(match['compound_id'] == istd_key for match in matches):
                 for match in matches:
@@ -39,7 +39,7 @@ def get_pure_istd_peak(chromatogram, istd_key, quali_component_db,
 def get_impure_istd_peak(chromatogram, istd_key, quali_comp_db, absorbance_threshold,
                        spectrum_correl_coef_thresh, relative_distance_thresh):
     """
-    Doubled relative distance threshold
+    not doubled relative distance threshold
     """
     istd_component = quali_comp_db[istd_key]
     
@@ -52,11 +52,12 @@ def get_impure_istd_peak(chromatogram, istd_key, quali_comp_db, absorbance_thres
     for impure_peak in impure_peak_targets:
         parafac_peaks, _ = get_parafac_peaks(impure_peak, quali_comp_db,
                                              absorbance_threshold,
+                                             spectrum_correl_coef_thresh,
                                              show_parafac_analytics=False)
         for peak in parafac_peaks:
             matches = get_filtered_similarity_dicts(peak, quali_comp_db, 
                                                     spectrum_correl_coef_thresh,
-                                                    relative_distance_thresh * 2)
+                                                    relative_distance_thresh)
             if matches:
                 if any(match['compound_id'] == istd_key for match in matches):
                     for match in matches:

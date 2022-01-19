@@ -46,8 +46,10 @@ def preprocess_chromatogram(chromatogram, istds, quali_comp_db,
         parafac_peaks, parafac_report_data = get_parafac_peaks(impure_peak,
                                                                quali_comp_db,
                                                                absorbance_threshold,
+                                                               spectrum_correl_thresh,
                                                                show_parafac_analytics=print_parafac_analytics)
-        chromatogram.parafac_report_data.append(parafac_report_data)
+        if parafac_report_data:
+            chromatogram.parafac_report_data.append(parafac_report_data)
         chromatogram.peaks.extend(parafac_peaks)
 
     # 6. match
