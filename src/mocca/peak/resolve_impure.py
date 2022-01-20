@@ -22,8 +22,8 @@ def check_same_uvvis(parafac_factors, spectrum_correl_coef_thresh, n_comps):
     else:
         return False
 
-def create_parafac_peaks(impure_peak, parafac_factors, boundaries,
-                         absorbance_threshold, spectrum_correl_coef_thresh):
+def create_parafac_peaks(impure_peak, parafac_factors, boundaries, iter_offset,
+                         y_offset, absorbance_threshold, spectrum_correl_coef_thresh):
     """
     Makes a new ProcessedPeak corresponding to PARAFAC-processed impure processed peak
     Spectra, Elution, and Integral generated from PARAFAC
@@ -75,7 +75,9 @@ def create_parafac_peaks(impure_peak, parafac_factors, boundaries,
                                                       np.argmax(parafac_comp_factors[1])),
                                              dataset=ParafacData(impure_peak,
                                                                  parafac_comp_factors,
-                                                                 boundaries),
+                                                                 boundaries,
+                                                                 iter_offset,
+                                                                 y_offset),
                                              idx=-impure_peak.idx,
                                              saturation=impure_peak.saturation,
                                              pure=True,
@@ -89,7 +91,9 @@ def create_parafac_peaks(impure_peak, parafac_factors, boundaries,
                                                       np.argmax(parafac_comp_factors[1])),
                                              dataset=ParafacData(impure_peak,
                                                                  parafac_comp_factors,
-                                                                 boundaries),
+                                                                 boundaries,
+                                                                 iter_offset,
+                                                                 y_offset),
                                              idx=-impure_peak.idx,
                                              saturation=impure_peak.saturation,
                                              pure=True,
@@ -103,7 +107,7 @@ def create_parafac_peaks(impure_peak, parafac_factors, boundaries,
             if max_absorbance > absorbance_threshold:
                 chrom_peaks.append(parafac_peak)
             integral_sum_comp_runs.append(sum(parafac_comp_factors[2][:-1]))
-    
+
         return chrom_peaks, (impure_peak, parafac_peaks)
 
 
@@ -113,10 +117,13 @@ def get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
     Runs PARAFAC decomposition function and returns the calculated peaks as well
     as information required for the PARAFAC report.
     """
-    parafac_factors, boundaries = iterative_parafac(impure_peak, quali_comp_db)
+    parafac_factors, boundaries, iter_offset, y_offset =\
+        iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics)
     chrom_peaks, parafac_report_tuple = create_parafac_peaks(impure_peak,
-                                                               parafac_factors,
-                                                               boundaries,
-                                                               absorbance_threshold,
-                                                               spectrum_correl_coef_thresh)
+                                                             parafac_factors,
+                                                             boundaries,
+                                                             iter_offset,
+                                                             y_offset,
+                                                             absorbance_threshold,
+                                                             spectrum_correl_coef_thresh)
     return chrom_peaks, parafac_report_tuple

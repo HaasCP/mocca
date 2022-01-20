@@ -116,8 +116,11 @@ class ParafacData():
     impure_peak : InitVar['mocca.peak.models.CorrectedPeak']
     parafac_comp_tensor : InitVar[tuple]
     boundaries : InitVar[tuple]
+    iter_offset : InitVar[int]
+    y_offset : InitVar[float]
     
-    def __post_init__(self, impure_peak, parafac_comp_tensor, boundaries):
+    def __post_init__(self, impure_peak, parafac_comp_tensor, boundaries,
+                      iter_offset, y_offset):
         # https://github.com/python/mypy/issues/9254
         self.hplc_system_tag = impure_peak.dataset.hplc_system_tag
         self.experiment = impure_peak.dataset.experiment
@@ -126,10 +129,10 @@ class ParafacData():
         self.wavelength = impure_peak.dataset.wavelength
         self.data = np.zeros((len(self.wavelength), len(self.time)))
         self._make_data_from_parafac_peak(impure_peak, parafac_comp_tensor,
-                                          boundaries)
+                                          boundaries, iter_offset, y_offset)
 
     def _make_data_from_parafac_peak(self, impure_peak, parafac_comp_tensor,
-                                     boundaries):
+                                     boundaries, iter_offset, y_offset):
         # make 2D data corresponding to parafac-generated spectra and elution
         spectrum = parafac_comp_tensor[0].reshape(len(self.wavelength), 1)
         retention = parafac_comp_tensor[1].reshape(1, boundaries[1] - boundaries[0] + 1)
@@ -137,7 +140,9 @@ class ParafacData():
         parafac_peak_data = spectrum * retention * integral
         
         # replace self data with parafac peak data
-        self.data[:, boundaries[0]:boundaries[1] + 1] = parafac_peak_data
+        left = boundaries[0] + iter_offset
+        right = boundaries[1] + iter_offset + 1
+        self.data[:, left:right] = parafac_peak_data + y_offset
     
     def __eq__(self, other):
         if not isinstance(other, type(self)):

@@ -23,8 +23,8 @@ def plot_impure_peak_spectra(impure_peak):
                            'y': peak_data[:, i]})
         chart = alt.Chart(df, title='').mark_line().encode(
             x=alt.X(df.columns[0], axis=alt.Axis(title='Wavelength (nm)')),
-            y=alt.Y(df.columns[1], axis=alt.Axis(title='Absorbance (mAU)'))
-        )
+            y=alt.Y(df.columns[1], axis=alt.Axis(title='Absorbance (mAU)')),
+            strokeWidth=alt.value(0.5))
         charts.append(chart)
     
     fig = charts[0]
@@ -68,7 +68,8 @@ def plot_retention(impure_peak, parafac_peaks):
     
     impure_chart = alt.Chart(df, title='').mark_line().encode(
         x=alt.X(df.columns[0], axis=alt.Axis(title='Time (min)')),
-        y=alt.Y(df.columns[1], axis=alt.Axis(title='Absorbance (mAU)'))
+        y=alt.Y(df.columns[1], axis=alt.Axis(title='Absorbance (mAU)')),
+        color=alt.value("#FFAA00")
     )
     
     charts = []

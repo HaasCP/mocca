@@ -109,6 +109,8 @@ def get_comp_peak_data_list(relevant_comps, boundaries, iter_offset):
             peak_data_ze = get_zero_extended_peak_data(peak_data,
                                                        left,
                                                        boundaries)
+            if peak_data_ze.min() < 0:
+                peak_data_ze = peak_data_ze - peak_data_ze.min()
             ze_peaks.append(peak_data_ze)
     return ze_peaks, comp_tensor_shape
 
@@ -127,7 +129,12 @@ def get_zero_extended_impure_peak_data(impure_peak, boundaries, iter_offset):
     peak_data_ze = get_zero_extended_peak_data(peak_data,
                                                left,
                                                boundaries)
-    return peak_data_ze
+    if peak_data_ze.min() < 0:
+        y_offset = peak_data_ze.min()
+        peak_data_ze = peak_data_ze - peak_data_ze.min()
+    else:
+        y_offset = 0
+    return peak_data_ze, y_offset
 
 def get_parafac_data_list(impure_peak, quali_comp_db, iter_offset):
     """
@@ -142,17 +149,20 @@ def get_parafac_data_list(impure_peak, quali_comp_db, iter_offset):
                                                             boundaries,
                                                             iter_offset)
 
-    impure_peak = get_zero_extended_impure_peak_data(impure_peak, boundaries,
-                                                     iter_offset)
+    impure_peak, y_offset = get_zero_extended_impure_peak_data(impure_peak,
+                                                               boundaries,
+                                                               iter_offset)
 
-    return comp_peaks + [impure_peak], boundaries, relevant_comps, comp_tensor_shape
+    return (comp_peaks + [impure_peak], boundaries, relevant_comps,
+            comp_tensor_shape, y_offset)
 
 
-def get_parafac_tensor(impure_peak, quali_comp_db, iter_offset):
+def get_parafac_tensor(impure_peak, quali_comp_db, iter_offset,
+                       show_parafac_analytics):
     """
     Returns the data tensor used for subsequent PARAFAC decomposition.
     """
-    parafac_data, boundaries, relevant_comps, comp_tensor_shape = \
+    parafac_data, boundaries, relevant_comps, comp_tensor_shape, y_offset = \
         get_parafac_data_list(impure_peak, quali_comp_db, iter_offset)
 
     # add all data to data_flattened and create data tensor
@@ -160,7 +170,8 @@ def get_parafac_tensor(impure_peak, quali_comp_db, iter_offset):
     for data in parafac_data:
         data_flattened.append(data[:, :, np.newaxis])
     data_tensor = np.concatenate(data_flattened, axis=2)
-    print(f"new data tensor with boundaries {boundaries} and shape"
-          f"{comp_tensor_shape} built from "
-          f"{[comp.compound_id for comp in relevant_comps]}.")
-    return data_tensor, boundaries, relevant_comps, comp_tensor_shape
+    if show_parafac_analytics:
+        print(f"new data tensor with boundaries {boundaries} and shape"
+              f"{comp_tensor_shape} built from "
+              f"{[comp.compound_id for comp in relevant_comps]}.")
+    return data_tensor, boundaries, relevant_comps, comp_tensor_shape, y_offset
