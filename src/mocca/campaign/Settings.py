@@ -45,3 +45,4 @@ class Settings():
         self.peaks_low_pass = peaks_low_pass
         self.spectrum_correl_thresh = spectrum_correl_thresh
         self.relative_distance_thresh = relative_distance_thresh
+

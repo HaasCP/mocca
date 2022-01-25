@@ -73,7 +73,7 @@ def create_chrom_page(chrom, index):
         plot = plot_1D_data(df, xlabel='Wavelength (nm)',
                             ylabel='Absorbance (mAU)',
                             title='UV-Vis spectrum of peak at '
-                            f'{round(peak.dataset.time[peak.maximum +peak.offset], 2)}'
+                            f'{round(peak.dataset.time[peak.maximum +peak.offset], 3)}'
                             ' min')
         spectrum_plots.append(plot)
 

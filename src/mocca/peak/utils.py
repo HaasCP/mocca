@@ -15,18 +15,13 @@ def get_peak_data(peak):
     for all wavelengths. If the peak was offset-corrected, the left and right
     border are un-offset in order to access the correct data.
     """
-    left = peak.left
-    right = peak.right
-    if hasattr(peak, 'offset'):
-        left = left + peak.offset
-        right = right + peak.offset
-    return peak.dataset.data[:, left:(right + 1)]
+    return peak.dataset.data[:, peak.left:(peak.right + 1)]
 
 
 def get_retention_times(peak):
-    left = peak.dataset.time[peak.left + peak.offset]
-    right = peak.dataset.time[peak.right + peak.offset]
-    maximum = peak.dataset.time[peak.maximum + peak.offset]
+    left = peak.dataset.time[peak.left]
+    right = peak.dataset.time[peak.right]
+    maximum = peak.dataset.time[peak.maximum]
     return (left, right, maximum)
 
 

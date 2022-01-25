@@ -15,52 +15,27 @@ from mocca.chromatogram.assign import (assign_peaks_compound,
                                        assign_peaks_react)
 from mocca.chromatogram.quantify import quantify_peaks
 
-
-def get_gradient_experiment(experiments):
-    gradient_experiments = [exp for exp in experiments if exp.gradient]
-    warnings = []
-    if not gradient_experiments:
-        raise ValueError("Gradient run must be provided for the campaign! "
-                         "Add blank gradient run data via add_experiment "
-                         "function with the gradient attribute equals True.")
-        
-    elif len(gradient_experiments) > 1:
-        warnings.append("Gradient Warning: More than one gradient run were "
-                        "detected in the experiments. Per default, the latest "
-                        "is taken for this campaign.")
-    return gradient_experiments[-1]
+from mocca.campaign.utils import check_istd
+from mocca.campaign.experiment_funcs import (get_gradient_experiment,
+                                             get_sorted_compound_experiments,
+                                             get_unprocessed_experiments)
 
 
-def get_gradient(experiments, settings):
+def process_gradient(experiments, settings):
+    """
+    Returns processed gradient data.
+    """
     gradient_experiment = get_gradient_experiment(experiments)
     return GradientData(settings.hplc_system_tag, gradient_experiment,
                         settings.wl_high_pass, settings.wl_low_pass)
 
 
-def get_sorted_compound_experiments(experiments):
-    """
-    Fitlers experiments for experiments with given compound. Sorts these
-    experiments in the order: 1. solvent runs, 2. istd runs, 3. compound runs.
-    In these categories, experiments are sorted in the order the user has given.
-    """
-    compound_exps = [exp for exp in experiments if exp.compound]
-    
-    solvent_exps = [exp for exp in compound_exps if exp.compound.solvent]
-
-    istd_exps = [exp for exp in compound_exps if exp.compound.istd]
-    
-    other_exps = [exp for exp in compound_exps if not
-                  exp.compound.solvent and not exp.compound.istd]
-
-    conc_exps = [exp for exp in other_exps if exp.compound.conc]
-    sorted_conc_exps = sorted(conc_exps, key=lambda exp:
-                              (exp.compound.key, -exp.compound.conc))
-    non_conc_exps = [exp for exp in other_exps if not exp.compound.conc]
-
-    return solvent_exps + istd_exps + sorted_conc_exps + non_conc_exps
-
-
 def preprocess_experiment(exp, gradient, quali_comp_db, settings):
+    """
+    Returns a chromatogram object created out of the given experiment.
+    The peaks in the chromatogram already have assigned possible matches
+    but they are not yet assigned or quantified.
+    """
     compound_data = CompoundData(settings.hplc_system_tag, exp, gradient,
                                  wl_high_pass=settings.wl_high_pass,
                                  wl_low_pass=settings.wl_low_pass)
@@ -85,16 +60,13 @@ def process_compound_exp(exp, gradient, quali_comp_db, settings):
     return chromatogram
 
 
-def check_istd(exp, chrom):
-    if exp.istd:
-        for istd in exp.istd:
-            if not any([peak.compound_id == istd.key for peak in chrom]):
-                chrom.bad_data = True
-    return chrom
-
-
 def process_compound_experiments(experiments, gradient, peak_db,
                                  quali_comp_db, quant_comp_db, settings):
+    """
+    Sorts and processes all compound experiments (experiments from which the
+    program learns). Updates both qualitative and quantitative component
+    databases.
+    """
     exps = get_sorted_compound_experiments(experiments)
     chroms = []
     for exp in exps:
@@ -122,23 +94,16 @@ def process_compound_experiments(experiments, gradient, peak_db,
     return chroms
 
 
-def get_unprocessed_experiments(experiments, quali_comp_db):
-    unprocessed_exps = [exp for exp in experiments if not exp.processed]
-    for exp in unprocessed_exps:
-        if exp.istd:
-            for istd in exp.istd:
-                if istd.key not in quali_comp_db:
-                    raise ValueError("Internal standard {} unknown in this campaign. "
-                                     "First add the internal standard as pure "
-                                     "compound in a separate run!".format(exp.istd.key))
-    return unprocessed_exps
-
-
 def process_experiments(experiments, gradient, peak_db, quali_comp_db,
                         quant_comp_db, settings):
+    """
+    Processes all unprocessed experiments (not compound experiments) which should
+    be analyzed by the program.
+    """
     unprocessed_exps = get_unprocessed_experiments(experiments, quali_comp_db)
     chroms = []
     for exp in unprocessed_exps:
+        print(exp.path)
         chrom = preprocess_experiment(exp, gradient, quali_comp_db, settings)
         chrom = assign_peaks_react(chrom, peak_db)
         chrom = quantify_peaks(chrom, quant_comp_db)

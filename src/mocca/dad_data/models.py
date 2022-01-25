@@ -16,9 +16,11 @@ from mocca.dad_data.process_gradientdata import bsl_als
 from mocca.dad_data.apis.chemstation_api import read_csv_agilent, tidy_df_agilent
 from mocca.dad_data.apis.labsolutions_api import read_txt_shimadzu
 
-from mocca.campaign.experiment import Experiment
+from mocca.campaign.user_objects import Experiment
 import mocca.peak.models
 
+
+# TODO: Documentation of classes!
 
 # Parameter inheritance issues solved as shown in:
 # https://stackoverflow.com/questions/51575931/class-inheritance-in-python-3-7-dataclasses
@@ -116,11 +118,11 @@ class ParafacData():
     impure_peak : InitVar['mocca.peak.models.CorrectedPeak']
     parafac_comp_tensor : InitVar[tuple]
     boundaries : InitVar[tuple]
-    iter_offset : InitVar[int]
+    shift : InitVar[int]
     y_offset : InitVar[float]
     
     def __post_init__(self, impure_peak, parafac_comp_tensor, boundaries,
-                      iter_offset, y_offset):
+                      shift, y_offset):
         # https://github.com/python/mypy/issues/9254
         self.hplc_system_tag = impure_peak.dataset.hplc_system_tag
         self.experiment = impure_peak.dataset.experiment
@@ -129,10 +131,10 @@ class ParafacData():
         self.wavelength = impure_peak.dataset.wavelength
         self.data = np.zeros((len(self.wavelength), len(self.time)))
         self._make_data_from_parafac_peak(impure_peak, parafac_comp_tensor,
-                                          boundaries, iter_offset, y_offset)
+                                          boundaries, shift, y_offset)
 
     def _make_data_from_parafac_peak(self, impure_peak, parafac_comp_tensor,
-                                     boundaries, iter_offset, y_offset):
+                                     boundaries, shift, y_offset):
         # make 2D data corresponding to parafac-generated spectra and elution
         spectrum = parafac_comp_tensor[0].reshape(len(self.wavelength), 1)
         retention = parafac_comp_tensor[1].reshape(1, boundaries[1] - boundaries[0] + 1)
@@ -140,8 +142,8 @@ class ParafacData():
         parafac_peak_data = spectrum * retention * integral
         
         # replace self data with parafac peak data
-        left = boundaries[0] + iter_offset
-        right = boundaries[1] + iter_offset + 1
+        left = boundaries[0] - shift  # impure_peak.offset already included in 
+        right = boundaries[1] - shift + 1
         self.data[:, left:right] = parafac_peak_data + y_offset
     
     def __eq__(self, other):

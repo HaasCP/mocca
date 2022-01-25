@@ -43,14 +43,20 @@ def chroms_to_results(chroms, quali_comp_db):
     return pd.DataFrame(chrom_dict)
 
 
-def create_comp_pages(chroms, quali_comp_db):
+def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
     integral_dict = {comp.compound_id: [] for comp in quali_comp_db}
+    conc_dict = {comp.compound_id: [] for comp in quant_comp_db}
     for chrom in chroms:
         for key in integral_dict.keys():
             if key in chrom:
                 integral_dict[key].append(chrom[key].integral)
             else:
                 integral_dict[key].append(0)
+        for key in conc_dict.keys():
+            if key in chrom:
+                conc_dict[key].append(chrom[key].concentration)
+            else:
+                conc_dict[key].append(0)
 
     chrom_idxs = [i + 1 for i in list(range(len(chroms)))]
     comp_pages = []
@@ -60,23 +66,39 @@ def create_comp_pages(chroms, quali_comp_db):
         comp_plot = plot_1D_data(df, xlabel='Chromatogram index', ylabel='Integral (mAU s)',
                                  title='', reduce_data=True)
         
+        if key in conc_dict:
+            df = pd.DataFrame({'idx': chrom_idxs,
+                               key: conc_dict[key]})
+            conc_plot = plot_1D_data(df, xlabel='Chromatogram index', ylabel='Concentration (mM)',
+                                     title='', reduce_data=True)
+        else:
+            conc_plot = None
+        
+        blocks = [
+            dp.Group(
+                dp.Text(f"## Component {key} over runs"),
+                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                columns=2
+            ),
+            dp.Text(f"### Figure: Integral of component {key} over runs."),
+            dp.Plot(comp_plot)
+        ]
+        
+        if conc_plot:
+            blocks + [
+                dp.Text(f"### Figure: Concentration of component {key} over runs."),
+                dp.Plot(conc_plot)
+                ]
+        
         comp_page = dp.Page(
             title=key,
-            blocks=[
-                dp.Group(
-                    dp.Text(f"## Component {key} over runs"),
-                    dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
-                    columns=2
-                ),
-                dp.Text(f"### Figure: Integral of component {key} over runs."),
-                dp.Plot(comp_plot)
-            ],
+            blocks=blocks,
         )
         comp_pages.append(comp_page)
     return comp_pages
 
 
-def report_runs(chroms, quali_comp_db, report_path):
+def report_runs(chroms, quali_comp_db, quant_comp_db, report_path):
     chrom_df = chroms_to_results(chroms, quali_comp_db)
     summary_page = dp.Page(
         title="Start page",
@@ -90,7 +112,7 @@ def report_runs(chroms, quali_comp_db, report_path):
             dp.DataTable(chrom_df, label="chrom_table")
         ],
     )
-    comp_pages = create_comp_pages(chroms, quali_comp_db)
+    comp_pages = create_comp_pages(chroms, quali_comp_db, quant_comp_db)
     r = dp.Report(
         summary_page,
         *comp_pages

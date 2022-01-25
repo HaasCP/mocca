@@ -66,7 +66,6 @@ def get_tensor_boundaries(impure_peak, relevant_comps, iter_offset):
         right = right - iter_offset
     elif iter_offset > 0:
         right = right + iter_offset
-
     return (left, right)
 
 

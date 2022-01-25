@@ -28,10 +28,10 @@ def get_spectrum_correl_coef(peak, component):
 
 def get_relative_distance(peak, component):
     """
-    Returns the distance of two peak maxima relative to the length of the time
-    vector.
+    Returns the distance of an offset-corrected peak maximum and a component
+    maximum relative to the length of the time vector.
     """
-    distance = abs(peak.maximum - component.maximum)
+    distance = abs(peak.maximum - peak.offset - component.maximum)
     return distance / len(peak.dataset.time)
 
 
@@ -92,12 +92,12 @@ def match_peak(corrected_peak, component_db, spectrum_correl_coef_thresh,
     return PreprocessedPeak(left=corrected_peak.left,
                             right=corrected_peak.right,
                             maximum=corrected_peak.maximum,
+                            offset=corrected_peak.offset,
                             dataset=corrected_peak.dataset,
                             idx=corrected_peak.idx,
                             saturation=corrected_peak.saturation,
                             pure=corrected_peak.pure,
                             integral=corrected_peak.integral,
-                            offset=corrected_peak.offset,
                             istd=corrected_peak.istd,
                             matches=matches)
 
@@ -105,11 +105,11 @@ def update_matches(peak, new_matches):
     return PreprocessedPeak(left=peak.left,
                             right=peak.right,
                             maximum=peak.maximum,
+                            offset=peak.offset,
                             dataset=peak.dataset,
                             idx=peak.idx,
                             saturation=peak.saturation,
                             pure=peak.pure,
                             integral=peak.integral,
-                            offset=peak.offset,
                             istd=peak.istd,
                             matches=new_matches)

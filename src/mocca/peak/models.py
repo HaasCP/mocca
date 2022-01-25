@@ -12,6 +12,7 @@ class BasePeak():
     left : int
     right : int
     maximum : int
+    offset : int  # retention time correction: subtract to correct
 
 
 @dataclass(frozen=True)
@@ -67,7 +68,6 @@ class CorrectedPeak(IntegratedPeak):
     retention times in the peaks are already corrected. This means, that accessing
     data from the dataset attribute require prior un-offsetting.
     """
-    offset : int
     istd : List[IstdPeak]
 
 
@@ -88,12 +88,12 @@ class ProcessedPeak():
     left : int
     right : int
     maximum : int
+    offset : int
     dataset : 'mocca.dad_data.models.CompoundData'
     idx : int
     saturation : bool
     pure : bool
     integral : float
-    offset : int
     istd : List[IstdPeak] = None
     compound_id : Optional[str] = None
     concentration : Optional[float] = None

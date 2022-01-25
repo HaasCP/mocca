@@ -11,16 +11,17 @@ def check_comp_overlap(peak, comp):
     """
     Checks if a given peak overlaps with a given component.
     """
-    return comp.left <= peak.left <= comp.right \
-        or peak.left <= comp.left <= peak.right
+    return comp.left <= peak.left - peak.offset <= comp.right\
+        or peak.left - peak.offset <= comp.left <= peak.right - peak.offset
 
 
-def check_any_comp_overlap(peak, quali_comp_db):
+def check_any_compound_overlap(peak, quali_comp_db):
     """
     Checks if a given peak overlaps with any component in the quali_comp_db.
     """
     return any((check_comp_overlap(peak, comp) and not 'unknown' in comp.compound_id
                 and not 'impurity' in comp.compound_id) for comp in quali_comp_db)
+
 
 def normalize_parafac_factors(spectra, elutions, integrals):
     """

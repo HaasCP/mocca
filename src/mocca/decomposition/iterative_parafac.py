@@ -89,8 +89,8 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics):
     positive it reverses direction. At the point where slope is positive in
     both directions, the best offset is reached.
     """
-    # start point, initialization
-    iter_offset_cur = 0
+    # start point is offset to have good initial guess
+    iter_offset_cur = -impure_peak.offset
     # comp_tensor_shape should not change over iterative parafac runs
     parafac_factors_cur, boundaries_cur, comp_tensor_shape, y_offset =\
         parafac(impure_peak, quali_comp_db, iter_offset_cur, show_parafac_analytics)
@@ -102,7 +102,7 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics):
                                     show_parafac_analytics)
     
     # first move positive
-    iter_offset_new = 1
+    iter_offset_new = iter_offset_cur + 1
     parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
                                                       quali_comp_db,
                                                       iter_offset_new,
@@ -116,7 +116,7 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics):
 
     # check if it gets better in positive direction
     if non_comp_sum_new < non_comp_sum_cur and comp_sum_new > comp_sum_cur:
-        iter_max = int(math.ceil(0.05 * parafac_factors_new[1].shape[0]))
+        iter_max = int(math.ceil(0.05 * parafac_factors_new[1].shape[0])) + iter_offset_cur
         # find local minimum
         while (non_comp_sum_new < non_comp_sum_cur and
                comp_sum_new > comp_sum_cur and iter_offset_new < iter_max):
@@ -139,7 +139,7 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics):
     
     # if positive was wrong direction, let's go negative
     else:
-        iter_offset_new = -1
+        iter_offset_new = iter_offset_cur - 1
         parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
                                                          quali_comp_db,
                                                          iter_offset_new,
@@ -153,7 +153,7 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics):
         
         # check if it gets better in negative direction
         if non_comp_sum_new < non_comp_sum_cur and comp_sum_new > comp_sum_cur:
-            iter_min = -int(math.floor(0.05 * parafac_factors_new[1].shape[0]))
+            iter_min = -int(math.floor(0.05 * parafac_factors_new[1].shape[0])) + iter_offset_cur
             # find local minimum
             while (non_comp_sum_new < non_comp_sum_cur and
                    comp_sum_new > comp_sum_cur and iter_offset_new > iter_min):
@@ -164,7 +164,7 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics):
                 iter_offset_cur = iter_offset_new
                 iter_offset_new -= 1
                 
-                parafac_factors_new, boundaries_new, _ = parafac(impure_peak,
+                parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
                                                                  quali_comp_db,
                                                                  iter_offset_new,
                                                                  show_parafac_analytics)

@@ -18,6 +18,12 @@ def create_quali_component(peaks):
     if not peaks:
         return
     if all(peak.compound_id == peaks[0].compound_id for peak in peaks):
+        compound_id = peaks[0].compound_id
+    else:
+        raise AttributeError("All peaks have to have the same compound_id to "
+                             "create a component")
+
+    if "unknown" in compound_id or "impurity" in compound_id:
         mean_left, mean_right, mean_maximum, mean_offset = average_ret_times_over_peaks(peaks)
         mean_spectrum = average_spectra_over_peaks(peaks)
         return QualiComponent(compound_id=peaks[0].compound_id,
@@ -28,5 +34,13 @@ def create_quali_component(peaks):
                               spectrum=mean_spectrum,
                               created_from=peaks)
     else:
-        raise AttributeError("All peaks have to have the same compound_id to "
-                             "create a component")
+        mean_left, mean_right, mean_maximum, mean_offset = average_ret_times_over_peaks(peaks)
+        compound_peaks = [peak for peak in peaks if peak.is_compound]
+        mean_spectrum = average_spectra_over_peaks(compound_peaks)
+        return QualiComponent(compound_id=compound_id,
+                              left=mean_left,
+                              right=mean_right,
+                              maximum=mean_maximum,
+                              offset=mean_offset,
+                              spectrum=mean_spectrum,
+                              created_from=compound_peaks)

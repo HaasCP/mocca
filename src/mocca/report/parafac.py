@@ -56,7 +56,7 @@ def create_parafac_pages(chrom, index):
         retention_plot = plot_retention(impure_peak, parafac_peaks)
 
         parafac_page = dp.Page(
-            title=str(index) + f"peak {impure_peak.idx}",
+            title=f"chrom {str(index)}, peak {impure_peak.idx}",
             blocks=[
                 dp.Group(
                     dp.Text(f"## Details to chromatogram {index}"),

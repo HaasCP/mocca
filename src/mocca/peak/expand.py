@@ -47,5 +47,6 @@ def expand_peak(picked_peak, absorbance_threshold):
     return PickedPeak(left=left,
                       right=right,
                       maximum=picked_peak.maximum,
+                      offset=picked_peak.offset,
                       dataset=picked_peak.dataset,
                       idx=picked_peak.idx)

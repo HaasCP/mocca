@@ -32,7 +32,7 @@ def get_peak_locs(summed_data):
                      np.floor(peak_borders[2]).astype(int).tolist(),
                      np.ceil(peak_borders[3]).astype(int).tolist()))
     # peaks is now a list of tuples (maximum, left border, right border)
-    return [BasePeak(maximum=maximum, left=left, right=right)
+    return [BasePeak(maximum=maximum, left=left, right=right, offset=0)
             for maximum, left, right in peaks]
 
 
@@ -74,7 +74,7 @@ def merge_peaks(summed_data, peaks):
         new_peaks.add(tuple(merged_peak))
 
     new_peaks = sorted(new_peaks, key=lambda x: x[0])
-    peak_list = [BasePeak(maximum=maximum, left=left, right=right)
+    peak_list = [BasePeak(maximum=maximum, left=left, right=right, offset=0)
             for maximum, left, right in new_peaks]
 
     if peak_list == peaks:
@@ -139,6 +139,7 @@ def pick_peaks(compound_data, absorbance_threshold, peaks_high_pass, peaks_low_p
         chromatogram.insert_peak(PickedPeak(left= peak.left,
                                             right=peak.right,
                                             maximum=peak.maximum,
+                                            offset=peak.offset,
                                             dataset=compound_data,
                                             idx=idx+1))
     return chromatogram

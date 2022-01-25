@@ -10,7 +10,7 @@ from mocca.peak.expand import expand_peak
 from mocca.peak.check import check_peak
 from mocca.peak.integrate import integrate_peak
 from mocca.chromatogram.correct import correct_istd_offset
-from mocca.decomposition.utils import check_any_comp_overlap
+from mocca.decomposition.utils import check_any_compound_overlap
 from mocca.peak.match import match_peak
 from mocca.peak.resolve_impure import get_parafac_peaks
 
@@ -20,6 +20,11 @@ def preprocess_chromatogram(chromatogram, istds, quali_comp_db,
                             print_purity_check = False,
                             print_compound_prediction = False,
                             print_parafac_analytics=False):
+    """
+    Preprocesses the chromatogram of picked peaks. It includes expanding,
+    checking, integrating, correcting, resolving impures, and matching of the
+    peaks in the chromatogram.
+    """
     # 1. expand, 2. check, 3. integrate
     integrated_peaks = []
     for picked_peak in chromatogram.peaks:
@@ -40,14 +45,13 @@ def preprocess_chromatogram(chromatogram, istds, quali_comp_db,
     # 5. resolve impure
     impure_peaks = [peak for peak in chromatogram if not peak.pure]
     relevant_impure_peaks = [peak for peak in impure_peaks if
-                             check_any_comp_overlap(peak, quali_comp_db)]
+                             check_any_compound_overlap(peak, quali_comp_db)]
 
     for impure_peak in relevant_impure_peaks:
-        parafac_peaks, parafac_report_data = get_parafac_peaks(impure_peak,
-                                                               quali_comp_db,
-                                                               absorbance_threshold,
-                                                               spectrum_correl_thresh,
-                                                               show_parafac_analytics=print_parafac_analytics)
+        parafac_peaks, parafac_report_data =\
+            get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
+                              spectrum_correl_thresh,
+                              show_parafac_analytics=print_parafac_analytics)
         if parafac_report_data:
             chromatogram.parafac_report_data.append(parafac_report_data)
         chromatogram.peaks.extend(parafac_peaks)

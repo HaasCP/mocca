@@ -97,6 +97,7 @@ def check_peak(expanded_peak, detector_limit, show_analytics, param=2.5):
     return CheckedPeak(left=expanded_peak.left,
                        right=expanded_peak.right,
                        maximum=expanded_peak.maximum,
+                       offset=expanded_peak.offset,
                        dataset=expanded_peak.dataset,
                        idx=expanded_peak.idx,
                        saturation=new_saturation,

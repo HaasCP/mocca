@@ -56,27 +56,36 @@ def plot_parafac_peak_spec(parafac_peak):
 
 def plot_retention(impure_peak, parafac_peaks):
     times = impure_peak.dataset.time
-    peak_retention = sum_absorbance_by_time(impure_peak.dataset.data)
-    
-    left = parafac_peaks[0].left
-    right = parafac_peaks[0].right
-    
-    df = pd.DataFrame({'x': times[(left + impure_peak.offset):\
-                                  (right + impure_peak.offset + 1)],
-                       'y': peak_retention[(left + impure_peak.offset):\
-                                           (right + impure_peak.offset + 1)]})
+
+    # impure peak
+    peak_data = get_peak_data(impure_peak)
+    if peak_data.min() < 0:
+        y_offset = peak_data.min()
+        peak_data = peak_data - y_offset
+    else:
+        y_offset = 0
+    summed_peak_data = sum_absorbance_by_time(peak_data)
+
+    df = pd.DataFrame({'x': times[impure_peak.left:impure_peak.right + 1],
+                       'y': summed_peak_data})
     
     impure_chart = alt.Chart(df, title='').mark_line().encode(
         x=alt.X(df.columns[0], axis=alt.Axis(title='Time (min)')),
         y=alt.Y(df.columns[1], axis=alt.Axis(title='Absorbance (mAU)')),
         color=alt.value("#FFAA00")
     )
+
+    #parafac peaks
+    left = parafac_peaks[0].left
+    right = parafac_peaks[0].right + 1
     
     charts = []
     for peak in parafac_peaks:
-        summed_data = sum_absorbance_by_time(peak.dataset.data)
-        df = pd.DataFrame({'x': times[left:right + 1],
-                           'y': summed_data[left:right + 1]})
+        peak_data = get_peak_data(peak)
+        peak_data = peak_data - y_offset
+        summed_peak_data = sum_absorbance_by_time(peak_data)
+        df = pd.DataFrame({'x': times[left:right],
+                           'y': summed_peak_data})
         chart = alt.Chart(df, title='').mark_line().encode(
             x=alt.X(df.columns[0], axis=alt.Axis(title='Time (min)')),
             y=alt.Y(df.columns[1], axis=alt.Axis(title='Absorbance (mAU)'))

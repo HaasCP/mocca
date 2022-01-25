@@ -92,14 +92,19 @@ def average_ret_times_over_peaks(peaks):
     """
     if peaks:
         num_peaks = len(peaks)
-        left = int(round(sum([peak.left for peak in peaks]) / num_peaks))
-        right = int(round(sum([peak.right for peak in peaks]) / num_peaks))
-        maximum = int(round(sum([peak.maximum for peak in peaks]) / num_peaks))
+        left = int(round(sum([peak.left - peak.offset for peak in peaks]) / num_peaks))
+        right = int(round(sum([peak.right - peak.offset for peak in peaks]) / num_peaks))
+        maximum = int(round(sum([peak.maximum - peak.offset for peak in peaks]) / num_peaks))
         offset = int(round(sum([peak.offset for peak in peaks]) / num_peaks))
         return left, right, maximum, offset
 
 
 def get_quant_peaks_by_compound(peak_database, filter_function):
+    """
+    Returns a dict with compound_ids as keys and lists of peaks as values,
+    where only peaks are includud which have is_compound True and which
+    have a given concentration.
+    """
     filtered_peaks = get_filtered_peaks(peak_database, filter_function)
     quant_peaks = [peak for peak in filtered_peaks if (peak.is_compound and
                                                        peak.concentration)]
