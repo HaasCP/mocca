@@ -14,12 +14,12 @@ from mocca.decomposition.utils import check_any_compound_overlap
 from mocca.peak.match import match_peak
 from mocca.peak.resolve_impure import get_parafac_peaks
 
-def preprocess_chromatogram(chromatogram, istds, quali_comp_db, 
+def preprocess_chromatogram(chromatogram, quali_comp_db, 
                             absorbance_threshold, detector_limit, 
                             spectrum_correl_thresh, relative_distance_thresh,
                             print_purity_check = False,
                             print_compound_prediction = False,
-                            print_parafac_analytics=False):
+                            print_parafac_analytics=True):
     """
     Preprocesses the chromatogram of picked peaks. It includes expanding,
     checking, integrating, correcting, resolving impures, and matching of the
@@ -37,7 +37,7 @@ def preprocess_chromatogram(chromatogram, istds, quali_comp_db,
     chromatogram.peaks = integrated_peaks
     
     # 4. correct
-    chromatogram = correct_istd_offset(chromatogram, istds, quali_comp_db,
+    chromatogram = correct_istd_offset(chromatogram, quali_comp_db,
                                        absorbance_threshold,
                                        spectrum_correl_thresh, 
                                        relative_distance_thresh)

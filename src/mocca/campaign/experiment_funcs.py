@@ -6,24 +6,6 @@ Created on Tue Jan 25 09:11:54 2022
 @author: haascp
 """
 
-def get_gradient_experiment(experiments):
-    """
-    Returns the gradient experiment if given by the user, else exception.
-    If more than one gradient is given, the last one is taken for whole cmapaign.
-    """
-    gradient_experiments = [exp for exp in experiments if exp.gradient]
-    warnings = []
-    if not gradient_experiments:
-        raise ValueError("Gradient run must be provided for the campaign! "
-                         "Add blank gradient run data via add_experiment "
-                         "function with the gradient attribute equals True.")
-        
-    elif len(gradient_experiments) > 1:
-        warnings.append("Gradient Warning: More than one gradient run were "
-                        "detected in the experiments. Per default, the latest "
-                        "is taken for this campaign.")
-    return gradient_experiments[-1]
-
 
 def get_sorted_compound_experiments(experiments):
     """
@@ -48,7 +30,7 @@ def get_sorted_compound_experiments(experiments):
 
     return solvent_exps + istd_exps + sorted_conc_exps + non_conc_exps
 
-def get_unprocessed_experiments(experiments, quali_comp_db):
+def get_unprocessed_experiments(experiments, quali_comp_db=None):
     """
     Returns all experiments which have not been processed yet. Checks for
     internal standard condition, ie, that any given istd given in unprocessed
@@ -56,11 +38,12 @@ def get_unprocessed_experiments(experiments, quali_comp_db):
     peak can be found in the chromatogram.
     """
     unprocessed_exps = [exp for exp in experiments if not exp.processed]
-    for exp in unprocessed_exps:
-        if exp.istd:
-            for istd in exp.istd:
-                if istd.key not in quali_comp_db:
-                    raise ValueError("Internal standard {} unknown in this campaign. "
-                                     "First add the internal standard as pure "
-                                     "compound in a separate run!".format(exp.istd.key))
+    if quali_comp_db:
+        for exp in unprocessed_exps:
+            if exp.istd:
+                for istd in exp.istd:
+                    if istd.key not in quali_comp_db:
+                        raise ValueError("Internal standard {} unknown in this campaign. "
+                                         "First add the internal standard as pure "
+                                         "compound in a separate run!".format(exp.istd.key))
     return unprocessed_exps

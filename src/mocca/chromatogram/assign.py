@@ -10,7 +10,7 @@ from operator import attrgetter
 from mocca.peak.match import update_matches, match_peak
 from mocca.peak.process import process_peak
 
-from mocca.campaign.user_objects import Compound
+from mocca.user_interaction.user_objects import Compound
 
 
 def sort_peaks_by_best_match(peaks):

@@ -7,7 +7,6 @@ Created on Fri Jan  7 17:48:17 2022
 """
 
 import os
-import math
 import pandas as pd
 import datapane as dp
 
@@ -29,8 +28,8 @@ def parafac_chroms_to_dict(chroms):
             chrom_dict['index'].append(i + 1)
             chrom_dict['file'].append(os.path.basename(chrom.dataset.path))
             chrom_dict['bad_data'].append(chrom.bad_data)
-            chrom_dict['compound_run'].append(chrom.dataset.experiment.compound is not None)
-            chrom_dict['istd_added'].append(chrom.dataset.experiment.istd is not None)
+            chrom_dict['compound_run'].append(chrom.experiment.compound is not None)
+            chrom_dict['istd_added'].append(chrom.experiment.istd is not None)
             chrom_dict['num_peaks'].append(len(chrom.peaks))
     return chrom_dict
 
@@ -85,7 +84,7 @@ def report_parafac(chroms, report_path):
         title="Start page",
         blocks=[
             dp.Group(
-                dp.Text("# 7 PARAFAC report"),
+                dp.Text("# PARAFAC report"),
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
             ),

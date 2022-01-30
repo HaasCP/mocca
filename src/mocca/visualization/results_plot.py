@@ -43,8 +43,8 @@ def plot_chrom_with_peaks(chrom):
         else:
             color = 'red'
         peak_df = pd.DataFrame({
-            'start': [chrom.dataset.time[peak.left + peak.offset]],
-            'stop': [chrom.dataset.time[peak.right + peak.offset]]
+            'start': [chrom.dataset.time[peak.left]],
+            'stop': [chrom.dataset.time[peak.right]]
         })
         area = alt.Chart(
             peak_df

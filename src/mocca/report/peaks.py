@@ -10,32 +10,29 @@ import pandas as pd
 import datapane as dp
 
 
-def peaks_to_dict(peaks):
-    peaks_dict = {'left': [],
-                  'right': [],
-                  'maximum': [],
+def peaks_to_df(peaks):
+    peaks_dict = {'retention_time': [],
+                  'offset': [],
+                  'compound_id': [],
+                  'integral': [],
+                  'concentration': [],
                   'file': [],
                   'peak_id': [],
                   'is_saturated': [],
                   'is_pure': [],
-                  'integral': [],
-                  'offset': [],
                   'istd_keys': [],
                   'istd_concs': [],
-                  'compound_id': [],
-                  'concentration': [],
                   'is_compound': []}
     for peak in peaks:
         times = peak.dataset.time
-        peaks_dict['left'].append(times[peak.left + peak.offset])
-        peaks_dict['right'].append(times[peak.right + peak.offset])
-        peaks_dict['maximum'].append(times[peak.maximum + peak.offset])
+        offset_factor = times[1] - times[0]
+        peaks_dict['retention_time'].append(times[peak.maximum])
+        peaks_dict['offset'].append(peak.offset * offset_factor)
         peaks_dict['file'].append(os.path.basename(peak.dataset.path))
         peaks_dict['peak_id'].append(peak.idx)
         peaks_dict['is_saturated'].append(peak.saturation)
         peaks_dict['is_pure'].append(peak.pure)
         peaks_dict['integral'].append(peak.integral)
-        peaks_dict['offset'].append(peak.offset)
         if peak.istd:
             istd_keys = [istd.compound_id for istd in peak.istd]
             istd_concs = [istd.concentration for istd in peak.istd]
@@ -47,12 +44,7 @@ def peaks_to_dict(peaks):
         peaks_dict['compound_id'].append(peak.compound_id)
         peaks_dict['concentration'].append(peak.concentration)
         peaks_dict['is_compound'].append(peak.is_compound)
-    return peaks_dict
-
-def peaks_to_df(peaks):
-    peaks_dict = peaks_to_dict(peaks)
-    peak_df = pd.DataFrame(peaks_dict)
-    return peak_df
+    return pd.DataFrame(peaks_dict)
 
 
 def report_peaks(peak_db, report_path):
@@ -62,7 +54,7 @@ def report_peaks(peak_db, report_path):
         title="Start page",
         blocks=[
             dp.Group(
-                dp.Text("# 2 Peak report"),
+                dp.Text("# Peak report"),
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
             ),

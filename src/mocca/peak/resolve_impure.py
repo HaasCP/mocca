@@ -18,7 +18,7 @@ def check_same_uvvis(parafac_factors, n_comps, spectrum_correl_coef_thresh):
     """
     Checks if any two parafac components share the same UV-Vis trace.
     """
-    if any(np.corrcoef(parafac_factors[0][:, i], parafac_factors[0][:, j])[0, 1] > 
+    if all(np.corrcoef(parafac_factors[0][:, i], parafac_factors[0][:, j])[0, 1] > 
            spectrum_correl_coef_thresh for i, j in 
            itertools.combinations(list(range(n_comps)), 2)):
         return True

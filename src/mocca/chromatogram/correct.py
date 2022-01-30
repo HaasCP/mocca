@@ -102,15 +102,15 @@ def get_istd_offset(istd_peak, istd_key, quali_component_db):
     return istd_offset
 
 
-def correct_istd_offset(chromatogram, istds, quali_component_db, absorbance_threshold,
+def correct_istd_offset(chromatogram, quali_component_db, absorbance_threshold,
                         spectrum_correl_coef_thresh, relative_distance_thresh):
     """
     Corrects the peaks of the chromatogram by the average of the internal standard
     offsets. Adds the offset to the peak objects.
     """
     istd_peaks = []
-    if istds:
-        for istd in istds:
+    if chromatogram.experiment.istd:
+        for istd in chromatogram.experiment.istd:
             istd_p = get_istd_peak(chromatogram, istd.key, quali_component_db,
                                    absorbance_threshold,
                                    spectrum_correl_coef_thresh,

@@ -84,7 +84,8 @@ def merge_peaks(summed_data, peaks):
     return peak_list  # otherwise, just return fully merged list
 
 
-def pick_peaks(compound_data, absorbance_threshold, peaks_high_pass, peaks_low_pass):
+def pick_peaks(compound_data, experiment, absorbance_threshold,
+               peaks_high_pass, peaks_low_pass):
     """
     Finds all peaks of data and returns them as a chromatogram
 
@@ -134,7 +135,7 @@ def pick_peaks(compound_data, absorbance_threshold, peaks_high_pass, peaks_low_p
     
     merged_peaks = sorted(merged_peaks, key=lambda peak: peak.maximum)
     
-    chromatogram = Chromatogram()
+    chromatogram = Chromatogram(experiment)
     for idx, peak in enumerate(merged_peaks):
         chromatogram.insert_peak(PickedPeak(left= peak.left,
                                             right=peak.right,

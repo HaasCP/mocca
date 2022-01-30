@@ -12,6 +12,7 @@ import datapane as dp
 from mocca.visualization.basic_plots import plot_1D_data
 from mocca.visualization.results_plot import plot_chrom_with_peaks
 from mocca.report.utils import settings_to_df
+from mocca.report.hplc_input import exps_to_df
 from mocca.peak.utils import average_peak_spectrum
 
 
@@ -27,8 +28,8 @@ def chroms_to_dict(chroms):
         chrom_dict['index'].append(i + 1)
         chrom_dict['file'].append(os.path.basename(chrom.dataset.path))
         chrom_dict['bad_data'].append(chrom.bad_data)
-        chrom_dict['compound_run'].append(chrom.dataset.experiment.compound is not None)
-        chrom_dict['istd_added'].append(chrom.dataset.experiment.istd is not None)
+        chrom_dict['compound_run'].append(chrom.experiment.compound is not None)
+        chrom_dict['istd_added'].append(chrom.experiment.istd is not None)
         chrom_dict['num_peaks'].append(len(chrom.peaks))
     return chrom_dict
 
@@ -44,9 +45,9 @@ def peaks_to_result_df(peaks):
                   'retention_time': [],
                   'compound_id': [],
                   'concentration': [],
+                  'integral': [],
                   'is_pure': [],
                   'is_saturated': [],
-                  'integral': [],
                   'is_compound': []}
     for peak in peaks:
         times = peak.dataset.time
@@ -54,13 +55,15 @@ def peaks_to_result_df(peaks):
         peaks_dict['retention_time'].append(times[peak.maximum + peak.offset])
         peaks_dict['compound_id'].append(peak.compound_id)
         peaks_dict['concentration'].append(peak.concentration)
+        peaks_dict['integral'].append(peak.integral)
         peaks_dict['is_pure'].append(peak.pure)
         peaks_dict['is_saturated'].append(peak.saturation)
-        peaks_dict['integral'].append(peak.integral)
         peaks_dict['is_compound'].append(peak.is_compound)
     return pd.DataFrame(peaks_dict)
 
 def create_chrom_page(chrom, index):
+    exp_df = exps_to_df([chrom.experiment])
+    
     chrom_plot = plot_chrom_with_peaks(chrom)
     
     spectrum_plots = []
@@ -70,11 +73,16 @@ def create_chrom_page(chrom, index):
         
         df = pd.DataFrame({'x': wls,
                            'y': spectrum})
+        title_base = f"UV-Vis spectrum of peak at {round(peak.dataset.time[peak.maximum +peak.offset], 3)} min"
+        if peak.compound_id:
+            title = title_base + f' ({peak.compound_id})'
+        elif not peak.pure:
+            title = title_base + ' (impure)'
+        else:
+            title = title_base
         plot = plot_1D_data(df, xlabel='Wavelength (nm)',
                             ylabel='Absorbance (mAU)',
-                            title='UV-Vis spectrum of peak at '
-                            f'{round(peak.dataset.time[peak.maximum +peak.offset], 3)}'
-                            ' min')
+                            title=title)
         spectrum_plots.append(plot)
 
     peaks_df = peaks_to_result_df(chrom.peaks)
@@ -86,11 +94,13 @@ def create_chrom_page(chrom, index):
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
             ),
+            dp.Text("### Table: Experiment as given by the user."),
+            dp.Table(exp_df, label="experiment_table"),
             dp.Text("### Figure: Chromatogram with highlighted peaks."),
             dp.Plot(chrom_plot),
             dp.Text("### Table: Peaks found in the chromatogram."),
             dp.DataTable(peaks_df),
-            dp.Text("### Figures: Average UV-Vis spectra of the picked peaks."),
+            dp.Text("### Figures: Averaged UV-Vis spectra over the picked peak."),
             dp.Group(
                 *spectrum_plots,
                 columns=2
@@ -105,7 +115,7 @@ def report_chroms(chroms, settings, report_path):
         title="Start page",
         blocks=[
             dp.Group(
-                dp.Text("# 6 Results by chromatogram report"),
+                dp.Text("# Results by chromatogram report"),
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
             ),

@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import datapane as dp
 
-from mocca.visualization.basic_plots import plot_1D_data
+from mocca.visualization.basic_plots import plot_1D_scatter
 
 
 def chroms_to_results(chroms, quali_comp_db):
@@ -38,8 +38,8 @@ def chroms_to_results(chroms, quali_comp_db):
                 chrom_dict["conc_" + comp].append(None)
         chrom_dict['file'].append(os.path.basename(chrom.dataset.path))
         chrom_dict['bad_data'].append(chrom.bad_data)
-        chrom_dict['compound_run'].append(chrom.dataset.experiment.compound is not None)
-        chrom_dict['istd_added'].append(chrom.dataset.experiment.istd is not None)
+        chrom_dict['compound_run'].append(chrom.experiment.compound is not None)
+        chrom_dict['istd_added'].append(chrom.experiment.istd is not None)
     return pd.DataFrame(chrom_dict)
 
 
@@ -61,16 +61,17 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
     chrom_idxs = [i + 1 for i in list(range(len(chroms)))]
     comp_pages = []
     for key, val in integral_dict.items():
-        df = pd.DataFrame({'idx': chrom_idxs,
-                           key: val})
-        comp_plot = plot_1D_data(df, xlabel='Chromatogram index', ylabel='Integral (mAU s)',
-                                 title='', reduce_data=True)
+        df = pd.DataFrame({'chromatogram_index': chrom_idxs,
+                           key + '_integral': [round(i) for i in val]})
+        comp_plot = plot_1D_scatter(df, xlabel='Chromatogram index',
+                                    ylabel='Integral (mAU s)',
+                                    title='', reduce_data=True)
         
         if key in conc_dict:
-            df = pd.DataFrame({'idx': chrom_idxs,
-                               key: conc_dict[key]})
-            conc_plot = plot_1D_data(df, xlabel='Chromatogram index', ylabel='Concentration (mM)',
-                                     title='', reduce_data=True)
+            df = pd.DataFrame({'chromatogram_index': chrom_idxs,
+                               key + '_concentration': conc_dict[key]})
+            conc_plot = plot_1D_scatter(df, xlabel='Chromatogram index', ylabel='Concentration (mM)',
+                                        title='', reduce_data=True)
         else:
             conc_plot = None
         
@@ -84,8 +85,8 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
             dp.Plot(comp_plot)
         ]
         
-        if conc_plot:
-            blocks + [
+        if conc_plot is not None:
+            blocks = blocks + [
                 dp.Text(f"### Figure: Concentration of component {key} over runs."),
                 dp.Plot(conc_plot)
                 ]
@@ -104,7 +105,7 @@ def report_runs(chroms, quali_comp_db, quant_comp_db, report_path):
         title="Start page",
         blocks=[
             dp.Group(
-                dp.Text("# 7 Results of compounds over runs"),
+                dp.Text("# Results of compounds over runs"),
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
             ),

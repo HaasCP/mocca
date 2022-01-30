@@ -23,10 +23,11 @@ def estimate_num_components_pca(data_tensor, impure_peak):
     pca = PCA(n_components=10)
     _ = pca.fit_transform(pca_data)
 
-    threshold = 0.998
+    threshold = 0.999
     cum_sum = 0
     for idx in range(10):
         cum_sum += pca.explained_variance_ratio_[idx]
+        print(cum_sum)
         if cum_sum > threshold:
             return idx + 1
 

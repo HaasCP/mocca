@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import datapane as dp
 
-from mocca.report.experiments import exps_to_df
+from mocca.report.hplc_input import exps_to_df
 from mocca.dad_data.utils import sum_absorbance_by_time
 from mocca.visualization.basic_plots import plot_1D_data
 
@@ -38,7 +38,7 @@ def report_gradient(gradient, report_path):
         title="Start page",
         blocks=[
             dp.Group(
-                dp.Text("# 5 Gradient report"),
+                dp.Text("# Gradient report"),
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2),
             dp.Text("### Table: Gradient experiment as given by the user."),

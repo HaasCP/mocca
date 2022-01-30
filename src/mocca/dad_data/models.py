@@ -16,29 +16,19 @@ from mocca.dad_data.process_gradientdata import bsl_als
 from mocca.dad_data.apis.chemstation_api import read_csv_agilent, tidy_df_agilent
 from mocca.dad_data.apis.labsolutions_api import read_txt_shimadzu
 
-from mocca.campaign.user_objects import Experiment
 import mocca.peak.models
 
 
 # TODO: Documentation of classes!
 
-# Parameter inheritance issues solved as shown in:
-# https://stackoverflow.com/questions/51575931/class-inheritance-in-python-3-7-dataclasses
+
 @dataclass()
-class _DadDataBase():
+class DadData():
     hplc_system_tag : str
-    # input information, most importantly the path
-    experiment : Experiment
-
-
-@dataclass()
-class _DadDataDefaultsBase():
+    experiment : InitVar["mocca.user_interaction.user_objects.HplcInput"]
     wl_high_pass : InitVar[float] = None
     wl_low_pass : InitVar[float] = None
 
-
-@dataclass()
-class DadData(_DadDataDefaultsBase, _DadDataBase):
     # set during initialization
     path : str = field(init=False)
     data : np.ndarray = field(init=False)
@@ -46,11 +36,11 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
     wavelength : np.ndarray = field(init=False)
     warnings : List[str] = field(init=False)
 
-    def __post_init__(self, wl_high_pass, wl_low_pass):
+    def __post_init__(self, experiment, wl_high_pass, wl_low_pass):
         self.warnings = []
-        self._set_path()
+        self._set_path(experiment)
         self._read_data(wl_high_pass, wl_low_pass)
-        self.experiment.processed = True
+        experiment.processed = True
 
     def __eq__(self, other):
         if not isinstance(other, type(self)):
@@ -59,8 +49,8 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
         return (self.path == other.path and
                 self.data.__array_interface__['data'] == other.data.__array_interface__['data'])
     
-    def _set_path(self):
-        self.path = self.experiment.path
+    def _set_path(self, experiment):
+        self.path = experiment.path
 
     def _read_data(self, wl_high_pass, wl_low_pass):
         if self.hplc_system_tag == 'chemstation':
@@ -78,29 +68,21 @@ class DadData(_DadDataDefaultsBase, _DadDataBase):
 @dataclass(eq=False)
 class GradientData(DadData):
     original_data : np.ndarray = field(init=False)
-    def __post_init__(self, wl_high_pass, wl_low_pass):
-        super().__post_init__(wl_high_pass, wl_low_pass)
+    def __post_init__(self, experiment, wl_high_pass, wl_low_pass):
+        super().__post_init__(experiment, wl_high_pass, wl_low_pass)
         self.original_data = copy.deepcopy(self.data)
         self.data = bsl_als(self.data)
 
 
-@dataclass()
-class _CompoundDataBase(_DadDataBase):
-    # gradient for baseline correction
-    gradient : InitVar[GradientData]
-
-
 @dataclass(eq=False)
-class CompoundData(DadData, _CompoundDataBase):
+class CompoundData(DadData):
     """
     Parameter order: hplc_system_tag, experiment, gradient, wl_high_pass, wl_low_pass
     """
 
-    def __post_init__(self, gradient, wl_high_pass, wl_low_pass):
-        if gradient is None:
-            raise TypeError("__init__ missing 1 required argument: 'gradient'")
-        super().__post_init__(wl_high_pass, wl_low_pass)
-        self._subtract_baseline(gradient)
+    def __post_init__(self, experiment, wl_high_pass, wl_low_pass):
+        super().__post_init__(experiment, wl_high_pass, wl_low_pass)
+        self._subtract_baseline(experiment.gradient.dataset)
 
     def _trim_data(self, length):
         """Trims the data in the time dimension to the length provided"""
@@ -125,7 +107,6 @@ class ParafacData():
                       shift, y_offset):
         # https://github.com/python/mypy/issues/9254
         self.hplc_system_tag = impure_peak.dataset.hplc_system_tag
-        self.experiment = impure_peak.dataset.experiment
         self.path = impure_peak.dataset.path
         self.time = impure_peak.dataset.time
         self.wavelength = impure_peak.dataset.wavelength

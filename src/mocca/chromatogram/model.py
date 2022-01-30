@@ -10,7 +10,8 @@ Created on Tue Dec  7 13:22:39 2021
 from mocca.chromatogram.utils import check_same_dataset
 
 class Chromatogram():
-    def __init__(self):
+    def __init__(self, experiment):
+        self.experiment = experiment
         self.peaks = []
         self.dataset = None
         self.warnings = []

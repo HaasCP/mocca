@@ -32,6 +32,29 @@ def plot_1D_data(df, xlabel='', ylabel='', title='', reduce_data=True):
     return chart
 
 
+def plot_1D_scatter(df, xlabel='', ylabel='', title='', reduce_data=True):
+    """
+    Plots a set of 1D data.
+    """
+    if reduce_data:
+        fac = df.shape[0] // 1000
+        if fac > 0:
+            df = df[::fac]
+
+    chart = alt.Chart(df, title=title).mark_circle(size=60).encode(
+        x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
+        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel)),
+        tooltip=[df.columns[0], df.columns[1]]
+    ).configure_axis(
+        grid=False,
+        titleFontSize = 16,
+        titleFontWeight='normal'
+    ).configure_view(
+        strokeWidth=0
+    ).interactive()
+    return chart
+
+
 def contour_map(data, time, wavelength, xlabel='Time',
                 ylabel='Wavelength', title='Contour Plot', reduce_data=True):
     """
