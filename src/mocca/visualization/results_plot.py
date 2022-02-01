@@ -24,7 +24,7 @@ def plot_chrom_with_peaks(chrom):
         df = df[::fac]
 
     xlabel='Time (min)'
-    ylabel='Summed absorbance (mAU s)'
+    ylabel='Summed absorbance (mAU)'
     title=''
 
     chart = alt.Chart(df, title=title).mark_line().encode(

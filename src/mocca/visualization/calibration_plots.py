@@ -24,7 +24,7 @@ def plot_calibration_curves(comp):
         if version != 'absolute':           
             ylabel=f"Relative area * {version} concentration (M)"
         else:
-            ylabel='Area (mAU s)'
+            ylabel='Summed peak absorbance (mAU)'
         
         x, y = zip(*comp.calib_data[version])
         

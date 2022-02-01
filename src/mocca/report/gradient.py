@@ -24,14 +24,14 @@ def report_gradient(gradient, report_path):
         'absorbance': sum_absorbance_by_time(gradient.original_data)
         })
     gradient_plot = plot_1D_data(gradient_df, xlabel='Time (min)',
-                                 ylabel='Summed absorbance (mAU s)',
+                                 ylabel='Summed absorbance (mAU)',
                                  title='', reduce_data=True)
     baseline_df = pd.DataFrame({
         'time': gradient.time,
         'absorbance': sum_absorbance_by_time(gradient.data)
         })
     baseline_plot = plot_1D_data(baseline_df, xlabel='Time (min)',
-                                 ylabel='Summed absorbance (mAU s)',
+                                 ylabel='Summed absorbance (mAU)',
                                  title='', reduce_data=True)
 
     grad_page = dp.Page(

@@ -64,7 +64,7 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
         df = pd.DataFrame({'chromatogram_index': chrom_idxs,
                            key + '_integral': [round(i) for i in val]})
         comp_plot = plot_1D_scatter(df, xlabel='Chromatogram index',
-                                    ylabel='Integral (mAU s)',
+                                    ylabel='Summed peak absorbance (mAU)',
                                     title='', reduce_data=True)
         
         if key in conc_dict:
