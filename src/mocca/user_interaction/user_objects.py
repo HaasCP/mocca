@@ -21,6 +21,9 @@ class Gradient():
     def __post_init__(self):
         if not os.path.exists(self.path):
             raise ValueError(f"Given gradient path {self.path} does not exist.")
+    
+    def __repr__(self):
+        return f"Gradient({self.path})"
 
 
 @dataclass()
@@ -31,8 +34,8 @@ class Compound():
     key: str
     conc: Optional[float] = None
     # following are only for ordering batch of runs
-    solvent: bool = False
-    istd: bool = False
+    is_solvent: bool = False
+    is_istd: bool = False
 
 
 @dataclass()
@@ -41,7 +44,7 @@ class InternalStandard():
     Data container to store user input regarding added internal standards.
     """
     key: str
-    conc: Optional[float]
+    conc: Optional[float] = None
 
 
 @dataclass()

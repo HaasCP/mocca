@@ -46,7 +46,6 @@ def preprocess_experiment(exp, quali_comp_db, settings):
     The peaks in the chromatogram already have assigned possible matches
     but they are not yet assigned or quantified.
     """
-    print(exp.path)
     compound_data = CompoundData(settings.hplc_system_tag, exp,
                                  wl_high_pass=settings.wl_high_pass,
                                  wl_low_pass=settings.wl_low_pass)

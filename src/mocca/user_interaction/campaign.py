@@ -66,7 +66,7 @@ class HplcDadCampaign():
         if self.autosave_path:
             save_instance(self, self.autosave_path)
 
-    def process_all_experiments(self, settings):
+    def process_all_hplc_input(self, settings):
         """
         This function has to be run if a new compound is added to the component
         database via compound experiment so that all peaks are assigned consistently

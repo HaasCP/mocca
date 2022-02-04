@@ -30,9 +30,14 @@ class PickedPeak(BasePeak):
             raise ValueError("Both peaks must be of the same type!")
         return (self.maximum == other.maximum and
                 self.dataset == other.dataset)
+    
+    def __repr__(self):
+        kws = [f"{key}={value!r}" if key != "dataset" else
+               f"{key}={type(value)!r}" for key, value in self.__dict__.items()]
+        return "{}({})".format(type(self).__name__, ", ".join(kws))
 
 
-@dataclass(frozen=True, eq=False)
+@dataclass(frozen=True, eq=False, repr=False)
 class CheckedPeak(PickedPeak):
     """
     Class for peaks checked with regard to saturation and purity.
@@ -41,7 +46,7 @@ class CheckedPeak(PickedPeak):
     pure : bool
 
 
-@dataclass(frozen=True, eq=False)
+@dataclass(frozen=True, eq=False, repr=False)
 class IntegratedPeak(CheckedPeak):
     """
     Class for integrated peaks.
@@ -61,7 +66,7 @@ class IstdPeak():
     concentration : float
 
 
-@dataclass(frozen=True, eq=False)
+@dataclass(frozen=True, eq=False, repr=False)
 class CorrectedPeak(IntegratedPeak):
     """
     Class for peaks with added retention time offset. From this class on,
@@ -71,7 +76,7 @@ class CorrectedPeak(IntegratedPeak):
     istd : List[IstdPeak]
 
 
-@dataclass(frozen=True, eq=False)
+@dataclass(frozen=True, eq=False, repr=False)
 class PreprocessedPeak(CorrectedPeak):
     """
     Class for preprocessed peaks containing a list of possible component matches
@@ -105,3 +110,8 @@ class ProcessedPeak():
             raise ValueError("Both peaks must be of the same type!")
         return (self.maximum + self.offset == other.maximum + other.offset and
                 self.idx == other.idx and self.dataset == other.dataset)
+    
+    def __repr__(self):
+        kws = [f"{key}={value!r}" if key != "dataset" else
+               f"{key}={type(value)!r}" for key, value in self.__dict__.items()]
+        return "{}({})".format(type(self).__name__, ", ".join(kws))

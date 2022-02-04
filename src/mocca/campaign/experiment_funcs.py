@@ -16,12 +16,12 @@ def get_sorted_compound_experiments(experiments):
     """
     compound_exps = [exp for exp in experiments if exp.compound]
     
-    solvent_exps = [exp for exp in compound_exps if exp.compound.solvent]
+    solvent_exps = [exp for exp in compound_exps if exp.compound.is_solvent]
 
-    istd_exps = [exp for exp in compound_exps if exp.compound.istd]
+    istd_exps = [exp for exp in compound_exps if exp.compound.is_istd]
     
     other_exps = [exp for exp in compound_exps if not
-                  exp.compound.solvent and not exp.compound.istd]
+                  exp.compound.is_solvent and not exp.compound.is_istd]
 
     conc_exps = [exp for exp in other_exps if exp.compound.conc]
     sorted_conc_exps = sorted(conc_exps, key=lambda exp:

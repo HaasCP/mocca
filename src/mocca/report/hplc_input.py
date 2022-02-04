@@ -28,8 +28,8 @@ def exps_to_df(exps):
         if exp.compound:
             exp_dict['compound_key'].append(exp.compound.key)
             exp_dict['compound_conc'].append(exp.compound.conc)
-            exp_dict['compound_is_solvent'].append(exp.compound.solvent)
-            exp_dict['compound_is_istd'].append(exp.compound.istd)
+            exp_dict['compound_is_solvent'].append(exp.compound.is_solvent)
+            exp_dict['compound_is_istd'].append(exp.compound.is_istd)
         else:
             exp_dict['compound_key'].append(None)
             exp_dict['compound_conc'].append(None)
@@ -48,7 +48,7 @@ def exps_to_df(exps):
     return pd.DataFrame(exp_dict)
 
 
-def report_experiments(exps, report_path):
+def report_hplc_input(exps, report_path):
     exp_df = exps_to_df(exps)
     exp_page = dp.Page(
         title="Start page",
