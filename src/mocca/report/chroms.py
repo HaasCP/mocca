@@ -26,7 +26,7 @@ def chroms_to_dict(chroms):
 
     for i, chrom in enumerate(chroms):
         chrom_dict['index'].append(i + 1)
-        chrom_dict['file'].append(os.path.basename(chrom.dataset.path))
+        chrom_dict['file'].append(os.path.basename(chrom.experiment.path))
         chrom_dict['bad_data'].append(chrom.bad_data)
         chrom_dict['compound_run'].append(chrom.experiment.compound is not None)
         chrom_dict['istd_added'].append(chrom.experiment.istd is not None)

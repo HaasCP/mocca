@@ -55,10 +55,11 @@ class DadData():
     def _read_data(self, wl_high_pass, wl_low_pass):
         if self.hplc_system_tag == 'chemstation':
             df = read_csv_agilent(self.path)
-            df = apply_filter(tidy_df_agilent(df, wl_high_pass, wl_low_pass))
+            df = tidy_df_agilent(df)
+            df = apply_filter(df, wl_high_pass, wl_low_pass)
         elif self.hplc_system_tag == 'labsolutions':
-            df = read_txt_shimadzu(self.path, wl_high_pass, wl_low_pass)
-            df = apply_filter(df)
+            df = read_txt_shimadzu(self.path)
+            df = apply_filter(df, wl_high_pass, wl_low_pass)
 
         self.data = absorbance_to_array(df)
         self.time = df.time.unique()

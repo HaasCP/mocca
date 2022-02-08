@@ -135,7 +135,7 @@ def pick_peaks(compound_data, experiment, absorbance_threshold,
     
     merged_peaks = sorted(merged_peaks, key=lambda peak: peak.maximum)
     
-    chromatogram = Chromatogram(experiment)
+    chromatogram = Chromatogram(experiment, compound_data)
     for idx, peak in enumerate(merged_peaks):
         chromatogram.insert_peak(PickedPeak(left= peak.left,
                                             right=peak.right,

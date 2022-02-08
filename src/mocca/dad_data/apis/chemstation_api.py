@@ -11,7 +11,6 @@ import os
 
 # Data manipulation
 import pandas as pd
-import math
 
 
 def read_csv_agilent(path):
@@ -66,11 +65,4 @@ def tidy_df_agilent(dataframe, wl_high_pass=None, wl_low_pass=None):
     df = pd.melt(df, id_vars='time', value_vars=df.columns[1:], 
                  var_name='wavelength', value_name='absorbance')
     df['wavelength'] = df['wavelength'].astype(float)
-    if wl_high_pass:
-        df = df[df.wavelength >= wl_high_pass]
-    if wl_low_pass:
-        df = df[df.wavelength <= wl_low_pass]
-    acq_rate = 1 / (acq_time * 60)
-    df.attrs = {'acq_time': acq_time,
-                'acq_rate': round(acq_rate, 2 - int(math.floor(math.log10(abs(acq_rate)))) - 1)} # round to two significant digits calculates acquisition rate in Hz and safes it as dataframe metadata
     return df

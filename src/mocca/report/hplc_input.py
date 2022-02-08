@@ -23,7 +23,7 @@ def exps_to_df(exps):
                 'gradient_file': [],
                 'processed': []}
     for i, exp in enumerate(exps):
-        exp_dict['index'].append(i)
+        exp_dict['index'].append(i + 1)
         exp_dict['file'].append(os.path.basename(exp.path))
         if exp.compound:
             exp_dict['compound_key'].append(exp.compound.key)

@@ -59,7 +59,7 @@ def absorbance_to_array(df):
     return absorbance_array
 
 
-def apply_filter(dataframe):
+def apply_filter(dataframe, wl_high_pass, wl_low_pass, reference_wl=True):
     """
     Filters absorbance data of tidy 3D DAD dataframes to remove noise
     and background systematic error.
@@ -84,9 +84,14 @@ def apply_filter(dataframe):
     df['absorbance'] = df.groupby('time')['absorbance']\
         .rolling(window=5, center=True).mean().reset_index(0,drop=True)
     df = df.dropna().reset_index(0,drop=True)
-    n_times = len(df.time.unique())
-    wls = df.wavelength.unique()
-    df['absorbance'] = df.absorbance - df[df['wavelength'] == wls.max()]\
-        .absorbance.iloc[np.tile(np.arange(n_times), len(wls))]\
-        .reset_index(0,drop=True)
+    if reference_wl:
+        n_times = len(df.time.unique())
+        wls = df.wavelength.unique()
+        df['absorbance'] = df.absorbance - df[df['wavelength'] == wls.max()]\
+            .absorbance.iloc[np.tile(np.arange(n_times), len(wls))]\
+            .reset_index(0,drop=True)
+    if wl_high_pass:
+        df = df[df.wavelength >= wl_high_pass]
+    if wl_low_pass:
+        df = df[df.wavelength <= wl_low_pass]
     return df

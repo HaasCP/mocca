@@ -10,10 +10,10 @@ Created on Tue Dec  7 13:22:39 2021
 from mocca.chromatogram.utils import check_same_dataset
 
 class Chromatogram():
-    def __init__(self, experiment):
+    def __init__(self, experiment, dataset):
         self.experiment = experiment
+        self.dataset = dataset
         self.peaks = []
-        self.dataset = None
         self.warnings = []
         self.bad_data = False
         self.parafac_report_data = []
@@ -48,8 +48,5 @@ class Chromatogram():
 
     def insert_peak(self, peak):
         if self.dataset:
-            check_same_dataset(peak, self.peaks[0])
-        else:
-            self.dataset = peak.dataset
+            check_same_dataset(peak, self)
         self.peaks.append(peak)
-

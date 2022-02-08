@@ -56,9 +56,5 @@ def read_txt_shimadzu(path, wl_high_pass=None, wl_low_pass=None):
     df['wavelength'] = df['wavelength'].astype(float)
     df['wavelength'] = df['wavelength'] / 100
     df['absorbance'] = df['absorbance'] / 1000
-    if wl_high_pass:
-        df = df[df.wavelength >= wl_high_pass]
-    if wl_low_pass:
-        df = df[df.wavelength <= wl_low_pass]
     return df
 
