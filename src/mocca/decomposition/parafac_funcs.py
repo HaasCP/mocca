@@ -27,7 +27,6 @@ def estimate_num_components_pca(data_tensor, impure_peak):
     cum_sum = 0
     for idx in range(10):
         cum_sum += pca.explained_variance_ratio_[idx]
-        print(cum_sum)
         if cum_sum > threshold:
             return idx + 1
 
@@ -84,8 +83,3 @@ def parafac(impure_peak, quali_comp_db, iter_offset, show_parafac_analytics):
     parafac_factors = (normalized_spectra, normalized_elution, normalized_integrals)
     
     return parafac_factors, boundaries, comp_tensor_shape, y_offset
-
-
-#print(len(factors[1]))
-#for data in factors[1]:
-#    print(data.shape)

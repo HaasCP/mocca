@@ -64,7 +64,7 @@ class HplcInput():
         if self.istd is not None and type(self.istd) != list:
             self.istd = [self.istd]
         if self.compound and self.istd:
-            if self.compound.solvent:
+            if self.compound.is_solvent:
                 raise ValueError("Solvent run has an internal standard added. Use "
                                  "solvent == True only for pure solvent runs. These "
                                  "runs will be analyzed first and should cover the "
@@ -72,7 +72,7 @@ class HplcInput():
                                  "active solvent. Solvents can also be added as "
                                  "compounds later on with solvent == False.")
 
-            if self.compound.istd and self.compound.key == self.istd.key:
+            if self.compound.is_istd and self.compound.key == self.istd.key:
                 raise ValueError("Internal standard cannot be analyzed relative "
                                  "to itself. If the internal standard should be "
                                  "added as compound, do not give internal "
