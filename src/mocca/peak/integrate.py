@@ -18,9 +18,9 @@ def integrate_peak(checked_peak):
     set.
     """
     peak_data = get_peak_data(checked_peak)
-    # correct for negative aborbances
-    #if peak_data.min() < 0:
-    #    peak_data = peak_data - peak_data.min()
+    # correct baseline
+    peak_data = peak_data - peak_data.min()
+
     integral = np.sum(peak_data).tolist()
     return IntegratedPeak(left=checked_peak.left,
                           right=checked_peak.right,
