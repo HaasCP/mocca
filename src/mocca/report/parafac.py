@@ -80,6 +80,8 @@ def create_parafac_pages(chrom, index):
 
 def report_parafac(chroms, report_path):
     chrom_df = parafac_chroms_to_df(chroms)
+    if chrom_df.empty:
+        return
     summary_page = dp.Page(
         title="Start page",
         blocks=[

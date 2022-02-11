@@ -50,7 +50,7 @@ def preprocess_chromatogram(chromatogram, quali_comp_db,
     for impure_peak in relevant_impure_peaks:
         parafac_peaks, parafac_report_data =\
             get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
-                              spectrum_correl_thresh,
+                              spectrum_correl_thresh, relative_distance_thresh,
                               show_parafac_analytics=print_parafac_analytics)
         if parafac_report_data:
             chromatogram.parafac_report_data.append(parafac_report_data)

@@ -158,13 +158,15 @@ def create_parafac_peaks(impure_peak, parafac_factors, boundaries, iter_offset,
 
 
 def get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
-                      spectrum_correl_coef_thresh, show_parafac_analytics):
+                      spectrum_correl_coef_thresh, relative_distance_thresh,
+                      show_parafac_analytics):
     """
     Runs PARAFAC decomposition function and returns the calculated peaks as well
     as information required for the PARAFAC report.
     """
     parafac_factors, boundaries, iter_offset, y_offset =\
-        iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics)
+        iterative_parafac(impure_peak, quali_comp_db, relative_distance_thresh,
+                          show_parafac_analytics)
 
     chrom_peaks, parafac_report_tuple =\
         create_parafac_peaks(impure_peak, parafac_factors, boundaries,

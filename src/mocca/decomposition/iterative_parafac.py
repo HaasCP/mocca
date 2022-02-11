@@ -60,8 +60,7 @@ def get_comp_sum(parafac_factors, start_slice, end_slice):
     return max_sum
 
 
-def get_all_comp_sum(parafac_factors, comp_tensor_shape,
-                         show_parafac_analytics):
+def get_all_comp_sum(parafac_factors, comp_tensor_shape, show_parafac_analytics):
     start_slice = 0
     end_slice = 0
     comp_sum_list = []
@@ -75,7 +74,41 @@ def get_all_comp_sum(parafac_factors, comp_tensor_shape,
     return sum(comp_sum_list)
 
 
-def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics):
+def get_total_integral_sum(parafac_factors, show_parafac_analytics):
+    n_comps = parafac_factors[0].shape[1]
+    sum_list = []
+    for i in range(n_comps):
+        integrals = parafac_factors[2][:, i]
+        sum_i = sum(integrals)
+        sum_list.append(sum_i)
+    total_sum = sum(sum_list)
+    if show_parafac_analytics:
+        print(f"objective_total_sum = {total_sum}")
+    return total_sum
+
+
+def get_impure_integral_sum(parafac_factors, show_parafac_analytics):
+    integrals = parafac_factors[2][-1, :]
+    sum_i = sum(integrals)
+    if show_parafac_analytics:
+        print(f"impure_peak_sum = {sum_i}")
+    return sum_i
+
+
+def offset_opt_func(iter_offset_new, impure_peak, quali_comp_db,
+                    show_parafac_analytics):
+    parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
+                                                      quali_comp_db,
+                                                      iter_offset_new,
+                                                      show_parafac_analytics)
+
+    impure_sum_new = get_impure_integral_sum(parafac_factors_new,
+                                         show_parafac_analytics)
+    return impure_sum_new, parafac_factors_new, boundaries_new
+
+
+def iterative_parafac(impure_peak, quali_comp_db, relative_distance_thresh,
+                      show_parafac_analytics):
     """
     The trilinearity-breaking mode retention time requires iterative PARAFAC
     algorithm. The sum of the non-component integrals in the component part
@@ -90,90 +123,60 @@ def iterative_parafac(impure_peak, quali_comp_db, show_parafac_analytics):
     both directions, the best offset is reached.
     """
     # start point is offset to have good initial guess
-    iter_offset_cur = -impure_peak.offset
+    offset_init = -impure_peak.offset
     # comp_tensor_shape should not change over iterative parafac runs
+    # initialize optimization problem
     parafac_factors_cur, boundaries_cur, comp_tensor_shape, y_offset =\
-        parafac(impure_peak, quali_comp_db, iter_offset_cur, show_parafac_analytics)
-    non_comp_sum_cur = get_all_non_comp_sum(parafac_factors_cur,
-                                            comp_tensor_shape,
-                                            show_parafac_analytics)
-    comp_sum_cur = get_all_comp_sum(parafac_factors_cur,
-                                    comp_tensor_shape,
-                                    show_parafac_analytics)
-    
-    # first move positive
-    iter_offset_new = iter_offset_cur + 1
-    parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
-                                                      quali_comp_db,
-                                                      iter_offset_new,
-                                                      show_parafac_analytics)
-    non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new,
-                                            comp_tensor_shape,
-                                            show_parafac_analytics)
-    comp_sum_new = get_all_comp_sum(parafac_factors_new,
-                                    comp_tensor_shape,
-                                    show_parafac_analytics)
+        parafac(impure_peak, quali_comp_db, offset_init, show_parafac_analytics)
 
-    # check if it gets better in positive direction
-    if non_comp_sum_new < non_comp_sum_cur and comp_sum_new > comp_sum_cur:
-        iter_max = int(math.ceil(0.05 * parafac_factors_new[1].shape[0])) + iter_offset_cur
-        # find local minimum
-        while (non_comp_sum_new < non_comp_sum_cur and
-               comp_sum_new > comp_sum_cur and iter_offset_new < iter_max):
-            non_comp_sum_cur = non_comp_sum_new
-            comp_sum_cur = comp_sum_new
-            parafac_factors_cur = parafac_factors_new
-            boundaries_cur = boundaries_new
-            iter_offset_cur = iter_offset_new
-            iter_offset_new += 1
-            parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
-                                                              quali_comp_db,
-                                                              iter_offset_new,
-                                                              show_parafac_analytics)
-            non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new,
-                                                    comp_tensor_shape,
-                                                    show_parafac_analytics)
-            comp_sum_new = get_all_comp_sum(parafac_factors_new,
-                                            comp_tensor_shape,
-                                            show_parafac_analytics)
+    offset_opt = offset_init
+    impure_sum_opt = get_impure_integral_sum(parafac_factors_cur,
+                                             show_parafac_analytics)
     
-    # if positive was wrong direction, let's go negative
-    else:
-        iter_offset_new = iter_offset_cur - 1
-        parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
-                                                         quali_comp_db,
-                                                         iter_offset_new,
-                                                         show_parafac_analytics)
-        non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new,
-                                                comp_tensor_shape,
-                                                show_parafac_analytics)
-        comp_sum_new = get_all_comp_sum(parafac_factors_new,
-                                        comp_tensor_shape,
-                                        show_parafac_analytics)
-        
-        # check if it gets better in negative direction
-        if non_comp_sum_new < non_comp_sum_cur and comp_sum_new > comp_sum_cur:
-            iter_min = -int(math.floor(0.05 * parafac_factors_new[1].shape[0])) + iter_offset_cur
-            # find local minimum
-            while (non_comp_sum_new < non_comp_sum_cur and
-                   comp_sum_new > comp_sum_cur and iter_offset_new > iter_min):
-                non_comp_sum_cur = non_comp_sum_new
-                comp_sum_cur = comp_sum_new
+    neg_term_count = 0  # counts not improving iterations in negative dir
+    pos_term_count = 0  # counts not improving iterations in positive dir
+    offset = 0  # determines step size away from offset_init in both dirs
+    termination_criterion = False  # optimized when True
+    
+    while not termination_criterion:        
+        offset += 1
+        offset_neg = offset_init - offset
+        offset_pos = offset_init + offset
+        if neg_term_count < 3:
+            impure_sum_new, parafac_factors_new, boundaries_new =\
+                offset_opt_func(offset_neg, impure_peak, quali_comp_db,
+                                show_parafac_analytics)
+            if impure_sum_new > impure_sum_opt:
+                impure_sum_opt = impure_sum_new
+                offset_opt = offset_neg
                 parafac_factors_cur = parafac_factors_new
                 boundaries_cur = boundaries_new
-                iter_offset_cur = iter_offset_new
-                iter_offset_new -= 1
-                
-                parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
-                                                                 quali_comp_db,
-                                                                 iter_offset_new,
-                                                                 show_parafac_analytics)
-                non_comp_sum_new = get_all_non_comp_sum(parafac_factors_new,
-                                                        comp_tensor_shape,
-                                                        show_parafac_analytics)
-                comp_sum_new = get_all_comp_sum(parafac_factors_new,
-                                                comp_tensor_shape,
-                                                show_parafac_analytics)
+                neg_term_count = 0
+            else:
+                neg_term_count += 1
+        if pos_term_count < 3:
+            impure_sum_new, parafac_factors_new, boundaries_new =\
+                offset_opt_func(offset_pos, impure_peak, quali_comp_db,
+                                show_parafac_analytics)
+            if impure_sum_new > impure_sum_opt:
+                impure_sum_opt = impure_sum_new
+                offset_opt = offset_pos
+                parafac_factors_cur = parafac_factors_new
+                boundaries_cur = boundaries_new
+                pos_term_count = 0
+            else:
+                pos_term_count += 1
         
-        # if negative also does not give progress, start point is minimum
-    return parafac_factors_cur, boundaries_cur, iter_offset_cur, y_offset
+        # termination if three points in one direction without getting better
+        if neg_term_count >= 3 and pos_term_count >= 3:
+            termination_criterion = True
+        
+        # termination if algorithm runs to the constraints. Init value returned
+        if offset > relative_distance_thresh * len(impure_peak.dataset.time):
+            termination_criterion = True
+            parafac_factors_cur, boundaries_cur, comp_tensor_shape, y_offset =\
+                parafac(impure_peak, quali_comp_db, offset_init, show_parafac_analytics)
+
+            offset_opt = offset_init
+
+    return parafac_factors_cur, boundaries_cur, offset_opt, y_offset

@@ -38,6 +38,16 @@ def get_comp_peaks(relevant_comp):
     fac = len(created_from_peaks) // 5
     if fac > 0:
         created_from_peaks = created_from_peaks[::fac]
+    # duplicate peaks to have at least 5 peaks
+    elif len(created_from_peaks) < 5:
+        num_repeats = int(5 / len(created_from_peaks))
+        new_created_from_peaks = [val for val in created_from_peaks for
+                                  _ in range(num_repeats)]
+        i = 0
+        while len(new_created_from_peaks) < 5:
+            new_created_from_peaks.append(created_from_peaks[i])
+            i += 1
+        created_from_peaks = new_created_from_peaks
     return created_from_peaks
 
 

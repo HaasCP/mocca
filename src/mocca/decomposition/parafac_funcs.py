@@ -62,7 +62,11 @@ def parafac(impure_peak, quali_comp_db, iter_offset, show_parafac_analytics):
                            show_parafac_analytics)
 
     pca_n_comps = estimate_num_components_pca(data_tensor, impure_peak)
-    n_comps = max(len(relevant_comps) + 1, pca_n_comps)
+    if len(relevant_comps) > 1:
+        n_relevant_comps = len(relevant_comps)
+    else:
+        n_relevant_comps = len(relevant_comps) + 1
+    n_comps = max(n_relevant_comps, pca_n_comps)
     
     weights, factors = non_negative_parafac_hals(data_tensor, rank=n_comps,
                                                  init='svd', n_iter_max=1000,
