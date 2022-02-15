@@ -19,7 +19,7 @@ def preprocess_chromatogram(chromatogram, quali_comp_db,
                             spectrum_correl_thresh, relative_distance_thresh,
                             print_purity_check = False,
                             print_compound_prediction = False,
-                            print_parafac_analytics=False):
+                            print_parafac_analytics=True):
     """
     Preprocesses the chromatogram of picked peaks. It includes expanding,
     checking, integrating, correcting, resolving impures, and matching of the
@@ -41,7 +41,6 @@ def preprocess_chromatogram(chromatogram, quali_comp_db,
                                        absorbance_threshold,
                                        spectrum_correl_thresh, 
                                        relative_distance_thresh)
-    
     # 5. resolve impure
     impure_peaks = [peak for peak in chromatogram if not peak.pure]
     relevant_impure_peaks = [peak for peak in impure_peaks if

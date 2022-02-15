@@ -86,6 +86,10 @@ def create_chrom_page(chrom, index):
         spectrum_plots.append(plot)
 
     peaks_df = peaks_to_result_df(chrom.peaks)
+    if peaks_df.empty:
+        peaks_df.append(pd.Series([None] * len(peaks_df.columns),
+                                  index=peaks_df.columns), ignore_index=True)
+
     return dp.Page(
         title=str(index),
         blocks=[

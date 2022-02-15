@@ -14,7 +14,7 @@ from mocca.decomposition.utils import normalize_parafac_factors
 from mocca.decomposition.data_tensor import get_parafac_tensor
 
 
-def estimate_num_components_pca(data_tensor, impure_peak):
+def estimate_num_components_pca(data_tensor, impure_peak, show_parafac_analytics):
     """
     Returns an estimate of the number of components in the impure peak.
     """
@@ -23,25 +23,26 @@ def estimate_num_components_pca(data_tensor, impure_peak):
     pca = PCA(n_components=10)
     _ = pca.fit_transform(pca_data)
 
-    threshold = 0.999
+    threshold = 0.9995
     cum_sum = 0
     for idx in range(10):
         cum_sum += pca.explained_variance_ratio_[idx]
+        if show_parafac_analytics:
+            print(f"Cumulative variance after {idx + 1} PCA components: {cum_sum}")
         if cum_sum > threshold:
             return idx + 1
 
 
 def print_parafac_analytics(normalized_spectra, normalized_elution, normalized_concs,
-                      boundaries, relevant_comps):
+                      boundaries, relevant_comp):
     """
     Prints out PARAFAC decomposition model results. Used for debugging and dev.
     """
     print(f"PARAFAC data tensor has boundaries in the time axis of {boundaries}.")
     plt.plot(normalized_spectra)
-    for comp in relevant_comps:
-        print(f"Compound used for PARAFAC data tensor: {comp.compound_id}")
-        plt.plot([val / (max(comp.spectrum) / normalized_spectra.max()) 
-                  for val in comp.spectrum], "--")
+    print(f"Compound used for PARAFAC data tensor: {relevant_comp.compound_id}")
+    plt.plot([val / (max(relevant_comp.spectrum) / normalized_spectra.max()) 
+              for val in relevant_comp.spectrum], "--")
     plt.show()
     plt.plot(normalized_elution)
     plt.show()
@@ -57,16 +58,13 @@ def parafac(impure_peak, quali_comp_db, iter_offset, show_parafac_analytics):
     if show_parafac_analytics:
         print(f"----- new PARAFAC decomposition with iteration offset {iter_offset}"
               " -----")
-    data_tensor, boundaries, relevant_comps, comp_tensor_shape, y_offset =\
+    data_tensor, boundaries, relevant_comp, comp_tensor_shape, y_offset =\
         get_parafac_tensor(impure_peak, quali_comp_db, iter_offset,
                            show_parafac_analytics)
 
-    pca_n_comps = estimate_num_components_pca(data_tensor, impure_peak)
-    if len(relevant_comps) > 1:
-        n_relevant_comps = len(relevant_comps)
-    else:
-        n_relevant_comps = len(relevant_comps) + 1
-    n_comps = max(n_relevant_comps, pca_n_comps)
+    pca_n_comps = estimate_num_components_pca(data_tensor, impure_peak,
+                                              show_parafac_analytics)
+    n_comps = max(pca_n_comps, 2)
     
     weights, factors = non_negative_parafac_hals(data_tensor, rank=n_comps,
                                                  init='svd', n_iter_max=1000,
@@ -80,8 +78,9 @@ def parafac(impure_peak, quali_comp_db, iter_offset, show_parafac_analytics):
         normalize_parafac_factors(spectra, elutions, integrals)
 
     if show_parafac_analytics:
+        print(f"Estimated number of components is {n_comps}")
         print_parafac_analytics(normalized_spectra, normalized_elution,
-                                normalized_integrals, boundaries, relevant_comps)
+                                normalized_integrals, boundaries, relevant_comp)
         print(f"integral_array = {normalized_integrals}")
 
     parafac_factors = (normalized_spectra, normalized_elution, normalized_integrals)
