@@ -5,7 +5,6 @@ Created on Sun Jan 16 11:15:19 2022
 
 @author: haascp
 """
-import math
 from mocca.decomposition.parafac_funcs import parafac
 
 
@@ -95,16 +94,15 @@ def get_impure_integral_sum(parafac_factors, show_parafac_analytics):
     return sum_i
 
 
-def offset_opt_func(iter_offset_new, impure_peak, quali_comp_db,
+def offset_opt_func(offset, impure_peak, quali_comp_db,
                     show_parafac_analytics):
-    parafac_factors_new, boundaries_new, *_ = parafac(impure_peak,
-                                                      quali_comp_db,
-                                                      iter_offset_new,
-                                                      show_parafac_analytics)
+    parafac_factors_new, boundaries_new, comp_tensor_shape, y_offset =\
+        parafac(impure_peak, quali_comp_db, offset, show_parafac_analytics)
 
     impure_sum_new = get_impure_integral_sum(parafac_factors_new,
                                          show_parafac_analytics)
-    return impure_sum_new, parafac_factors_new, boundaries_new
+
+    return impure_sum_new, parafac_factors_new, boundaries_new, comp_tensor_shape, y_offset
 
 
 def iterative_parafac(impure_peak, quali_comp_db, relative_distance_thresh,
@@ -123,60 +121,23 @@ def iterative_parafac(impure_peak, quali_comp_db, relative_distance_thresh,
     both directions, the best offset is reached.
     """
     # start point is offset to have good initial guess
-    offset_init = -impure_peak.offset
-    # comp_tensor_shape should not change over iterative parafac runs
-    # initialize optimization problem
-    parafac_factors_cur, boundaries_cur, comp_tensor_shape, y_offset =\
-        parafac(impure_peak, quali_comp_db, offset_init, show_parafac_analytics)
-
-    offset_opt = offset_init
-    impure_sum_opt = get_impure_integral_sum(parafac_factors_cur,
-                                             show_parafac_analytics)
+    offset_seed = -impure_peak.offset
     
-    neg_term_count = 0  # counts not improving iterations in negative dir
-    pos_term_count = 0  # counts not improving iterations in positive dir
-    offset = 0  # determines step size away from offset_init in both dirs
-    termination_criterion = False  # optimized when True
-    
-    while not termination_criterion:        
-        offset += 1
-        offset_neg = offset_init - offset
-        offset_pos = offset_init + offset
-        if neg_term_count < 3:
-            impure_sum_new, parafac_factors_new, boundaries_new =\
-                offset_opt_func(offset_neg, impure_peak, quali_comp_db,
-                                show_parafac_analytics)
-            if impure_sum_new > impure_sum_opt:
-                impure_sum_opt = impure_sum_new
-                offset_opt = offset_neg
-                parafac_factors_cur = parafac_factors_new
-                boundaries_cur = boundaries_new
-                neg_term_count = 0
-            else:
-                neg_term_count += 1
-        if pos_term_count < 3:
-            impure_sum_new, parafac_factors_new, boundaries_new =\
-                offset_opt_func(offset_pos, impure_peak, quali_comp_db,
-                                show_parafac_analytics)
-            if impure_sum_new > impure_sum_opt:
-                impure_sum_opt = impure_sum_new
-                offset_opt = offset_pos
-                parafac_factors_cur = parafac_factors_new
-                boundaries_cur = boundaries_new
-                pos_term_count = 0
-            else:
-                pos_term_count += 1
-        
-        # termination if three points in one direction without getting better
-        if neg_term_count >= 3 and pos_term_count >= 3:
-            termination_criterion = True
-        
-        # termination if algorithm runs to the constraints. Init value returned
-        if offset > relative_distance_thresh * len(impure_peak.dataset.time):
-            termination_criterion = True
-            parafac_factors_cur, boundaries_cur, comp_tensor_shape, y_offset =\
-                parafac(impure_peak, quali_comp_db, offset_init, show_parafac_analytics)
+    len_iterator = int(relative_distance_thresh * len(impure_peak.dataset.time))
+    offset_iterator = [i + offset_seed - len_iterator for i in
+                       list(range(len_iterator * 2 + 1))]
 
-            offset_opt = offset_init
+    impure_sum_opt = 0
+    offset_opt = None
+
+    for offset in offset_iterator:
+        impure_sum_new, parafac_factors_new, boundaries_new, comp_tensor_shape, y_offset =\
+            offset_opt_func(offset, impure_peak, quali_comp_db,
+                            show_parafac_analytics)
+        if impure_sum_new > impure_sum_opt:
+            impure_sum_opt = impure_sum_new
+            offset_opt = offset
+            parafac_factors_cur = parafac_factors_new
+            boundaries_cur = boundaries_new
 
     return parafac_factors_cur, boundaries_cur, offset_opt, y_offset

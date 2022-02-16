@@ -24,7 +24,6 @@ def get_relevant_comp(impure_peak, quali_comp_db):
                            key=lambda comp: np.corrcoef(
                                impure_peak.dataset.data[:, impure_peak.maximum],
                                comp.spectrum)[0, 1])[-1]
-    print(relevant_comp)
     return relevant_comp
 
 

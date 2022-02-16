@@ -69,11 +69,14 @@ def check_peak_purity(peak, show_analytics, param=2.5):
     if test_agilent > 0.9:
         return True
     #  if pca big enough, then probably pure and PARAFAC cannot resolve anything
-    if test_pca > 0.995:
+    if test_pca > 0.9995:
         return True
     #  for pure peak, correlation array emperically expected to be unimodal
     if not test_unimodality:
         return False
+    #  if pca big enough, then probably pure
+    if test_pca > 0.995:
+        return True
     #  if any correlation is < 0.9, then probably impure somewhere
     if test_correls_1 < 0.9:
         return False
