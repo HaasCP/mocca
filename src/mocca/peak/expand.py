@@ -27,19 +27,22 @@ def expand_peak(picked_peak, absorbance_threshold):
     right = picked_peak.right
 
     prev_val = np.inf
-    while data[left] > expand_threshold and \
-            prev_val > data[left] and left >= 0:
+    while data[left] > expand_threshold and prev_val > data[left]:
         prev_val = data[left]
         left -= 1
+        if left == 0:
+            break
+            
 
     if prev_val != np.inf:  # if peak was expanded, fix boundary, else don't change
         left += 1
 
     prev_val = np.inf
-    while data[right] > expand_threshold and \
-            prev_val > data[right] and right <= len(data) - 1:
+    while data[right] > expand_threshold and prev_val > data[right]:
         prev_val = data[right]
         right += 1
+        if right == len(data):
+            break
 
     if prev_val != np.inf:  # if peak was expanded, fix boundary, else don't change
         right -= 1
