@@ -49,10 +49,7 @@ def get_correls(peak_data, max_loc):
     correls_to_max = [(np.corrcoef(peak_data[:, i],
                                    peak_data[:, max_loc])[0, 1])**2
                       for i in range(peak_data.shape[1])]
-    correls_to_left = [(np.corrcoef(peak_data[:, i],
-                                    peak_data[:, int(peak_data.shape[1] / 20)])[0, 1])**2  # noqa: E501
-                       for i in range(peak_data.shape[1])]
-    return [correls_to_max, correls_to_left]
+    return correls_to_max
 
 
 def get_agilent_thresholds(peak_data, max_loc, noise_variance, param=2.5):
@@ -72,7 +69,7 @@ def get_purity_value_agilent(peak_data, correls, agilent_thresholds):
     gives strictness of test (original was 0.5, which is more strict)
     """
     # check if > 90% of the points are greater than the modified agilent threshold.
-    agilent_test = np.sum(np.greater(correls[0],
+    agilent_test = np.sum(np.greater(correls,
                                      agilent_thresholds)) / peak_data.shape[1]
     return agilent_test
 
@@ -83,7 +80,7 @@ def predict_purity_unimodal(correls):
     on the correlation vector to the maximum
     https://stackoverflow.com/questions/14313510/how-to-calculate-rolling-moving-average-using-numpy-scipy
     """
-    return is_unimodal(np.convolve(correls[0], np.ones(3), 'valid') / 3, 0.99)
+    return is_unimodal(np.convolve(correls, np.ones(3), 'valid') / 3, 0.99)
 
 
 def get_pca_explained_variance(peak_data):
