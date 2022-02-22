@@ -99,6 +99,10 @@ def assign_unmatched_peaks_react(peaks, peak_db):
     for peak in peaks:
         if peak.matches is None:
             new_peak = process_peak(peak, Compound(None), is_compound=False)
+        elif peak.idx < 0:
+            new_peak = process_peak(peak,
+                                    Compound("unknown_parafac"),
+                                    False)
         else:
             new_peak = process_peak(peak,
                                     Compound(get_next_unknown_id(peak_db)),

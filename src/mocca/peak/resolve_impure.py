@@ -154,7 +154,7 @@ def create_parafac_peaks(impure_peak, parafac_factors, boundaries, iter_offset,
             if check_absorbance_thresh(parafac_peak, absorbance_threshold):
                 chrom_peaks.append(parafac_peak)
 
-        return chrom_peaks, (impure_peak, parafac_peaks)
+        return chrom_peaks, (impure_peak, parafac_peaks, parafac_factors)
 
 
 def get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
