@@ -10,7 +10,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 
-def plot_1D_data(df, xlabel='', ylabel='', title='', reduce_data=True):
+def plot_1D_data(df, xlabel='', ylabel='', title='', color=None, reduce_data=True):
     """
     Plots a set of 1D data.
     """
@@ -19,9 +19,13 @@ def plot_1D_data(df, xlabel='', ylabel='', title='', reduce_data=True):
         if fac > 0:
             df = df[::fac]
 
+    if color is None:
+        color="black"
+
     chart = alt.Chart(df, title=title).mark_line().encode(
         x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
-        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel))
+        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel)),
+        color=alt.value(color)
     ).configure_axis(
         grid=False,
         titleFontSize = 16,
@@ -29,6 +33,26 @@ def plot_1D_data(df, xlabel='', ylabel='', title='', reduce_data=True):
     ).configure_view(
         strokeWidth=0
     ).interactive()
+    return chart
+
+
+def plot_1D_layer(df, xlabel='', ylabel='', title='', color=None, reduce_data=True):
+    """
+    Plots a set of 1D data.
+    """
+    if reduce_data:
+        fac = df.shape[0] // 1000
+        if fac > 0:
+            df = df[::fac]
+
+    if color is None:
+        color="black"
+
+    chart = alt.Chart(df, title=title).mark_line().encode(
+        x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
+        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel)),
+        color=alt.value(color)
+    )
     return chart
 
 

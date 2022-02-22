@@ -11,8 +11,11 @@ import pandas as pd
 import datapane as dp
 
 from mocca.visualization.parafac_plots import (plot_impure_peak_spectra,
-                                               plot_parafac_peak_spec,
-                                               plot_retention)
+                                               plot_parafac_peaks_spec,
+                                               plot_retention,
+                                               plot_normalized_spectra,
+                                               plot_normalized_elution,
+                                               plot_normalized_integrals)
 
 
 def parafac_chroms_to_dict(chroms):
@@ -46,13 +49,20 @@ def create_parafac_pages(chrom, index):
     for parafac_data in chrom.parafac_report_data:
         impure_peak = parafac_data[0]
         parafac_peaks = parafac_data[1]
+        parafac_factors = parafac_data[2]
         
         impure_peak_spec_plot = plot_impure_peak_spectra(impure_peak)
-        parafac_spec_plots = [plot_parafac_peak_spec(peak) for peak in parafac_peaks]
+        parafac_spec_plots = plot_parafac_peaks_spec(parafac_peaks)
         
         spectra = [impure_peak_spec_plot] + parafac_spec_plots
         
         retention_plot = plot_retention(impure_peak, parafac_peaks)
+        
+        normalized_spectra, normalized_elution, normalized_integrals = parafac_factors
+        normalized_spectra_plot = plot_normalized_spectra(normalized_spectra)
+        normalized_elution_plot = plot_normalized_elution(normalized_elution)
+        normalized_integrals_plot = plot_normalized_integrals(normalized_integrals)
+        
 
         parafac_page = dp.Page(
             title=f"chrom {str(index)}, peak {impure_peak.idx}",
@@ -71,7 +81,13 @@ def create_parafac_pages(chrom, index):
                     ),
                 dp.Text("### Figure: Retention of impure peak overlayed with "
                         "calculated PARAFAC retention profiles."),
-                dp.Plot(retention_plot)
+                dp.Plot(retention_plot),
+                dp.Text("### Figure: PARAFAC model spectra of components."),
+                dp.Plot(normalized_spectra_plot),
+                dp.Text("### Figure: PARAFAC model elution profile of components."),
+                dp.Plot(normalized_elution_plot),
+                dp.Text("### Figure: RPARAFAC model integrals of components over runs."),
+                dp.Plot(normalized_integrals_plot)
                 ]
         )
         parafac_pages.append(parafac_page)
