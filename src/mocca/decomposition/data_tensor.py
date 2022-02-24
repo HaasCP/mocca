@@ -9,17 +9,20 @@ import numpy as np
 
 from mocca.peak.utils import get_peak_data
 from mocca.decomposition.utils import check_comp_overlap
+from mocca.decomposition.model import DataTensor
 
 
 def get_relevant_comp(impure_peak, quali_comp_db):
     """
-    Returns components which are not unknown or impurities (-> only components
+    Returns component which is not unknown or impurity (-> only components
     which were given by the user via compound) and which overlap with the impure
-    peak.
+    peak. If multiple components overlapping the component with the best
+    UV-Vis correlation coefficient is returned.
     """
-    relevant_comps = [comp for comp in quali_comp_db if (check_comp_overlap(impure_peak, comp)
-                                                         and (not 'unknown' in comp.compound_id
-                                                              and not 'impurity' in comp.compound_id))]
+    relevant_comps = [comp for comp in quali_comp_db if
+                      (check_comp_overlap(impure_peak, comp) and
+                       ('unknown' not in comp.compound_id and
+                        'impurity' not in comp.compound_id))]
     relevant_comp = sorted(relevant_comps,
                            key=lambda comp: np.corrcoef(
                                impure_peak.dataset.data[:, impure_peak.maximum],
@@ -29,14 +32,16 @@ def get_relevant_comp(impure_peak, quali_comp_db):
 
 def get_offset_peak_to_comp(created_from_peak, comp):
     """
-    Returns the time offset of the maxima of oeak and quali component
+    Returns the time offset of the maxima of oeak and quali component.
     """
     return created_from_peak.maximum - comp.maximum
 
 
 def get_comp_peaks(relevant_comp):
     """
-    Returns up to five peaks from which the given component was created.
+    Returns exactly five peaks from which the given component was created. If
+    less than 5 peaks were used to create the component, the peaks are
+    multiplied as long as five peaks are reached.
     """
     created_from_peaks = relevant_comp.created_from
     # take maximum 5 peaks
@@ -76,10 +81,8 @@ def get_tensor_boundaries(impure_peak, relevant_comp, iter_offset):
     left = min(left_boundaries)
     right = max(right_boundaries)
 
-    if iter_offset < 0:
-        right = right - iter_offset
-    elif iter_offset > 0:
-        right = right + iter_offset
+    right = right + abs(iter_offset)  # always extend to the right
+
     return (left, right)
 
 
@@ -127,11 +130,11 @@ def get_comp_peak_data_list(relevant_comp, boundaries, iter_offset):
     return ze_peaks, comp_tensor_shape
 
 
-def get_zero_extended_impure_peak_data(impure_peak, boundaries, iter_offset):
+def get_zero_ext_impure_peak_data(impure_peak, boundaries, iter_offset):
     """
     Returns zero-extended (to the boundaries) peak data of the impure peak.
     The location of the peak is corrected by the iteration offset in case
-    the iterative PARAFAC algorithm is used.
+    the iterative PARAFAC algorithm is applied.
     """
     peak_data = get_peak_data(impure_peak)
     if iter_offset > 0:
@@ -148,10 +151,26 @@ def get_zero_extended_impure_peak_data(impure_peak, boundaries, iter_offset):
         y_offset = 0
     return peak_data_ze, y_offset
 
-def get_parafac_data_list(impure_peak, quali_comp_db, iter_offset):
+
+def create_data_tensor(parafac_data):
     """
-    Returns a list of peak data which will be transferred into the PARAFAC
-    data tensor
+    Takes a list of peak data and returns a data tensor in the format used for
+    PARAFAC decomposition.
+    """
+    # add all data to data_flattened and create data tensor
+    data_flattened = []
+    for data in parafac_data:
+        data_flattened.append(data[:, :, np.newaxis])
+    data_tensor = np.concatenate(data_flattened, axis=2)
+    return data_tensor
+
+
+def get_parafac_tensor(impure_peak, quali_comp_db, iter_offset,
+                       show_parafac_analytics):
+    """
+    Processor function of the data tensor creation. Takes in the impure peak,
+    the qualitative component db and an iteration offset and returns a
+    DataTensor object which is used for PARAFAC decomposition.
     """
     relevant_comp = get_relevant_comp(impure_peak, quali_comp_db)
 
@@ -161,28 +180,15 @@ def get_parafac_data_list(impure_peak, quali_comp_db, iter_offset):
                                                             boundaries,
                                                             iter_offset)
 
-    impure_peak, y_offset = get_zero_extended_impure_peak_data(impure_peak,
-                                                               boundaries,
-                                                               iter_offset)
+    impure_peak, y_offset = get_zero_ext_impure_peak_data(impure_peak, boundaries,
+                                                          iter_offset)
 
-    return (comp_peaks + [impure_peak], boundaries, relevant_comp,
-            comp_tensor_shape, y_offset)
+    parafac_data = comp_peaks + [impure_peak]
+    data_tensor = create_data_tensor(parafac_data)
 
-
-def get_parafac_tensor(impure_peak, quali_comp_db, iter_offset,
-                       show_parafac_analytics):
-    """
-    Returns the data tensor used for subsequent PARAFAC decomposition.
-    """
-    parafac_data, boundaries, relevant_comp, comp_tensor_shape, y_offset = \
-        get_parafac_data_list(impure_peak, quali_comp_db, iter_offset)
-
-    # add all data to data_flattened and create data tensor
-    data_flattened = []
-    for data in parafac_data:
-        data_flattened.append(data[:, :, np.newaxis])
-    data_tensor = np.concatenate(data_flattened, axis=2)
     if show_parafac_analytics:
         print(f"new data tensor with boundaries {boundaries} and shape"
               f"{comp_tensor_shape} built from {relevant_comp}.")
-    return data_tensor, boundaries, relevant_comp, comp_tensor_shape, y_offset
+
+    return DataTensor(data_tensor, boundaries, relevant_comp,
+                      comp_tensor_shape, y_offset)

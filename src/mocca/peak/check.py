@@ -64,11 +64,12 @@ def check_peak_purity(peak, show_analytics, param=2.5):
               f"Minimum Correlation (True for >0.95): {test_correls_1} \n"
               f"Average Correlation (True for >0.98): {test_correls_2} \n")
 
-    # peak purity algorithm
+    #  peak purity algorithm
     #  if agilent threshold reached, then probably pure
     if test_agilent > 0.9:
         return True
     #  if pca big enough, then probably pure and PARAFAC cannot resolve anything
+    #  same thresh than in decomposition.parafac_funcs, estimate_num_components_pca
     if test_pca > 0.9995:
         return True
     #  for pure peak, correlation array emperically expected to be unimodal

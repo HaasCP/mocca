@@ -16,7 +16,7 @@ class Chromatogram():
         self.peaks = []
         self.warnings = []
         self.bad_data = False
-        self.parafac_report_data = []
+        self.parafac_models = []
 
     def __iter__(self):
         """Yields all items inside the database.
