@@ -80,7 +80,7 @@ def parafac(impure_peak, quali_comp_db, iter_offset, show_parafac_analytics):
                                                  verbose=False, tol=1e-9)
 
     parafac_model = ParafacModel(impure_peak, n_comps, pca_explained_variance,
-                                 weights, factors, data_tensor)
+                                 weights, factors, data_tensor, iter_offset)
 
     if show_parafac_analytics:
         print_parafac_analytics(parafac_model)

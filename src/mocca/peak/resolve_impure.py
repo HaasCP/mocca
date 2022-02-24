@@ -6,12 +6,9 @@ Created on Fri Jan 14 08:59:36 2022
 @author: haascp
 """
 import numpy as np
-import itertools
 
 from mocca.peak.models import CorrectedPeak, IntegratedPeak
 from mocca.dad_data.models import ParafacData
-from mocca.dad_data.utils import sum_absorbance_by_time
-from mocca.decomposition.iterative_parafac import iterative_parafac
 
 
 def create_pure_peak(impure_peak):
@@ -54,11 +51,11 @@ def get_parafac_data_shift(iter_offset):
     return shift
 
 
-def create_parafac_peak(comp_i, parafac_model, iter_offset):
+def create_parafac_peak(comp_i, parafac_model):
     """
     Return synthetic PARAFAC peaks created from the PARAFAC decomposition results.
     """
-    shift = get_parafac_data_shift(iter_offset)
+    shift = get_parafac_data_shift(parafac_model.iter_offset)
     parafac_comp_factors = (parafac_model.factors[0][:, comp_i],
                             parafac_model.factors[1][:, comp_i],
                             parafac_model.factors[2][:, comp_i])
@@ -111,71 +108,3 @@ def create_parafac_peak(comp_i, parafac_model, iter_offset):
                         "Only mocca IntegratedPeak and CorrectedPeak types "
                         "are allowed.")
     return parafac_peak
-
-
-def check_absorbance_thresh(parafac_peak, absorbance_threshold):
-    """
-    Checks if maximum absorbance in synthetically created PARAFAC peak dataset
-    exceeds absorbance threshold.
-    """
-    max_absorbance = np.max(sum_absorbance_by_time(parafac_peak.dataset.data))
-    return max_absorbance > absorbance_threshold
-
-
-def check_same_uvvis(parafac_model, spectrum_correl_coef_thresh):
-    """
-    Checks if any two parafac components share the same UV-Vis trace.
-    """
-    spectra = parafac_model.factors[0]
-    if all(np.corrcoef(spectra[:, i], spectra[:, j])[0, 1] > 
-           spectrum_correl_coef_thresh for i, j in 
-           itertools.combinations(list(range(parafac_model.n_comps)), 2)):
-        return True
-    else:
-        return False
-
-
-def create_parafac_peaks(parafac_model, iter_offset, absorbance_threshold,
-                         spectrum_correl_coef_thresh):
-    """
-    Takes an impure peak and its PARAFAC decomposition results and creates
-    new peaks in a readible form for the program. If two UV-Vis traces in the
-    PARAFAC components are too similar, the peak is set to pure. Else, new
-    PARAFAC peaks are created. Its dataset is created synthetically by using
-    Spectra, Elution, and Integral generated from PARAFAC and filling the rest
-    of the array up with zeros. PARAFAC peaks get an index of -impure_peak.idx
-    """
-
-    if check_same_uvvis(parafac_model, spectrum_correl_coef_thresh):
-        parafac_peak = create_pure_peak(parafac_model.impure_peak)
-        return [parafac_peak], None
-
-    else:
-        parafac_peaks = []
-        chrom_peaks = []
-        for i in range(parafac_model.n_comps):
-            #  get factors for one parafac comonent
-            parafac_peak = create_parafac_peak(i, parafac_model, iter_offset)
-            parafac_peaks.append(parafac_peak)
-
-            if check_absorbance_thresh(parafac_peak, absorbance_threshold):
-                chrom_peaks.append(parafac_peak)
-
-        return chrom_peaks, parafac_model
-
-
-def get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
-                      spectrum_correl_coef_thresh, relative_distance_thresh,
-                      show_parafac_analytics):
-    """
-    Runs PARAFAC decomposition function and returns the calculated peaks as well
-    as information required for the PARAFAC report.
-    """
-    parafac_model, iter_offset, iter_objective_func =\
-        iterative_parafac(impure_peak, quali_comp_db, relative_distance_thresh,
-                          show_parafac_analytics)
-
-    chrom_peaks, parafac_model =\
-        create_parafac_peaks(parafac_model, iter_offset, absorbance_threshold,
-                             spectrum_correl_coef_thresh)
-    return chrom_peaks, parafac_model, iter_offset, iter_objective_func

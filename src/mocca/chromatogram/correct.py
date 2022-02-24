@@ -10,8 +10,8 @@ import copy
 from mocca.peak.match import get_filtered_similarity_dicts
 from mocca.peak.correct import correct_offset
 from mocca.peak.models import IstdPeak
-from mocca.peak.resolve_impure import get_parafac_peaks
 from mocca.decomposition.utils import check_comp_overlap
+from mocca.decomposition.iterative_parafac import iterative_parafac
 
 
 def get_pure_istd_peak(chromatogram, istd_key, quali_component_db, 
@@ -50,12 +50,11 @@ def get_impure_istd_peak(chromatogram, istd_key, quali_comp_db, absorbance_thres
     istd_peak = None
     best_correl_coef = 0
     for impure_peak in impure_peak_targets:
-        parafac_peaks, *_ = get_parafac_peaks(impure_peak, quali_comp_db,
-                                              absorbance_threshold,
-                                              spectrum_correl_coef_thresh,
-                                              relative_distance_thresh,
-                                              show_parafac_analytics=False)
-        for peak in parafac_peaks:
+        parafac_model = iterative_parafac(impure_peak, quali_comp_db,
+                                          relative_distance_thresh,
+                                          spectrum_correl_coef_thresh,
+                                          show_parafac_analytics=False)
+        for peak in parafac_model.peaks:
             matches = get_filtered_similarity_dicts(peak, quali_comp_db, 
                                                     spectrum_correl_coef_thresh,
                                                     relative_distance_thresh)

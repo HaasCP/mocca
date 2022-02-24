@@ -10,9 +10,9 @@ from mocca.peak.expand import expand_peak
 from mocca.peak.check import check_peak
 from mocca.peak.integrate import integrate_peak
 from mocca.chromatogram.correct import correct_istd_offset
-from mocca.decomposition.utils import check_any_compound_overlap
+from mocca.decomposition.utils import check_any_compound_overlap, check_absorbance_thresh
+from mocca.decomposition.iterative_parafac import iterative_parafac
 from mocca.peak.match import match_peak
-from mocca.peak.resolve_impure import get_parafac_peaks
 
 def preprocess_chromatogram(chromatogram, quali_comp_db, 
                             absorbance_threshold, detector_limit, 
@@ -47,14 +47,16 @@ def preprocess_chromatogram(chromatogram, quali_comp_db,
                              check_any_compound_overlap(peak, quali_comp_db)]
 
     for impure_peak in relevant_impure_peaks:
-        parafac_peaks, parafac_model, iter_offset, iter_objective_func =\
-            get_parafac_peaks(impure_peak, quali_comp_db, absorbance_threshold,
-                              spectrum_correl_thresh, relative_distance_thresh,
-                              show_parafac_analytics=print_parafac_analytics)
-        if parafac_model:
-            chromatogram.parafac_models.append((parafac_model, iter_offset,
-                                                iter_objective_func))
-        chromatogram.peaks.extend(parafac_peaks)
+        parafac_model = iterative_parafac(impure_peak, quali_comp_db,
+                                          relative_distance_thresh,
+                                          spectrum_correl_thresh,
+                                          print_parafac_analytics)
+
+        chromatogram.parafac_models.append(parafac_model)
+
+        for parafac_peak in parafac_model.peaks:
+            if check_absorbance_thresh(parafac_peak, absorbance_threshold):
+                chromatogram.peaks.append(parafac_peak)
 
     # 6. match
     matched_peaks = []
