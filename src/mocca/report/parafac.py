@@ -10,15 +10,18 @@ import os
 import pandas as pd
 import datapane as dp
 
-from mocca.visualization.parafac_plots import (plot_impure_peak_spectra,
-                                               plot_parafac_peaks_spec,
-                                               plot_retention,
-                                               plot_normalized_spectra,
-                                               plot_normalized_elution,
-                                               plot_normalized_integrals)
+from mocca.visualization.parafac_plots import (plot_retention,
+                                               plot_impure_peak_spectra,
+                                               plot_uvvis_specs,
+                                               plot_aligned_tensor,
+                                               plot_normalized_integrals,
+                                               plot_objective_func)
 
 
 def parafac_chroms_to_dict(chroms):
+    """
+    Transfers relevant information from chromatograms components in a pandas df.
+    """
     chrom_dict = {'index': [],
                   'file': [],
                   'bad_data': [],
@@ -27,7 +30,7 @@ def parafac_chroms_to_dict(chroms):
                   'num_peaks': []}
 
     for i, chrom in enumerate(chroms):
-        if chrom.parafac_report_data:
+        if chrom.parafac_models:
             chrom_dict['index'].append(i + 1)
             chrom_dict['file'].append(os.path.basename(chrom.dataset.path))
             chrom_dict['bad_data'].append(chrom.bad_data)
@@ -46,48 +49,53 @@ def parafac_chroms_to_df(chroms):
 def create_parafac_pages(chrom, index):
     
     parafac_pages = []
-    for parafac_data in chrom.parafac_report_data:
-        impure_peak = parafac_data[0]
-        parafac_peaks = parafac_data[1]
-        parafac_factors = parafac_data[2]
+    report_models = [model for model in chrom.parafac_models if model.peaks]
+    for parafac_model in report_models:
+        retention_plot = plot_retention(parafac_model)
         
-        impure_peak_spec_plot = plot_impure_peak_spectra(impure_peak)
-        parafac_spec_plots = plot_parafac_peaks_spec(parafac_peaks)
+        impure_peak_spec_plot = plot_impure_peak_spectra(parafac_model.impure_peak)
+        spec_plot = plot_uvvis_specs(parafac_model)
         
-        spectra = [impure_peak_spec_plot] + parafac_spec_plots
+        aligned_retention_plot = plot_aligned_tensor(parafac_model)
         
-        retention_plot = plot_retention(impure_peak, parafac_peaks)
-        
-        normalized_spectra, normalized_elution, normalized_integrals = parafac_factors
-        normalized_spectra_plot = plot_normalized_spectra(normalized_spectra)
-        normalized_elution_plot = plot_normalized_elution(normalized_elution)
+        normalized_spectra, normalized_elution, normalized_integrals = parafac_model.factors
         normalized_integrals_plot = plot_normalized_integrals(normalized_integrals)
+        
+        obj_func_plot = plot_objective_func(parafac_model)
         
 
         parafac_page = dp.Page(
-            title=f"chrom {str(index)}, peak {impure_peak.idx}",
+            title=f"chrom {str(index)}, peak {parafac_model.impure_peak.idx}",
             blocks=[
                 dp.Group(
-                    dp.Text(f"## Details to chromatogram {index}"),
+                    dp.Text(f"## Details to chromatogram {index}, peak "
+                            f"{parafac_model.impure_peak.idx}"),
                     dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                     columns=2
                 ),
-                dp.Text("### Figures: 1st figure is spectra of impure peak at all "
-                        "time points. All other figures are spectra of parafac peaks "
-                        "at elution maximum."),
+                dp.Text("### Figure: UV-Vis spectra of the impure peak at every "
+                        "time point."),
+                dp.Plot(impure_peak_spec_plot),
+                dp.Text("### Figures: Modelled PARAFAC peaks after iterative alignment."),
                 dp.Group(
-                    *spectra,
+                    dp.Plot(retention_plot),
+                    dp.Plot(spec_plot),
                     columns=2
                     ),
-                dp.Text("### Figure: Retention of impure peak overlayed with "
-                        "calculated PARAFAC retention profiles."),
-                dp.Plot(retention_plot),
-                dp.Text("### Figure: PARAFAC model spectra of components."),
-                dp.Plot(normalized_spectra_plot),
-                dp.Text("### Figure: PARAFAC model elution profile of components."),
-                dp.Plot(normalized_elution_plot),
-                dp.Text("### Figure: RPARAFAC model integrals of components over runs."),
-                dp.Plot(normalized_integrals_plot)
+                dp.Text("### Figures: Visualization of the data tensor used for "
+                        "the PARAFAC model."),
+                dp.Group(
+                    dp.Plot(aligned_retention_plot),
+                    dp.Plot(normalized_integrals_plot),
+                    columns=2
+                    ),
+                dp.Text("### Figure: Iterative PARAFAC objective function vs the "
+                        "offset of the impure signal compared to the aligned pure "
+                        "signals in the data tensor. Currently, the objective "
+                        "function calculates the summed integral of all "
+                        "components in the impure peak slice of the PARAFAC "
+                        "model, which should be maximized."),
+                dp.Plot(obj_func_plot)
                 ]
         )
         parafac_pages.append(parafac_page)
@@ -112,9 +120,10 @@ def report_parafac(chroms, report_path):
     )
     parafac_pages = []
     for i, chrom in enumerate(chroms):
-        if chrom.parafac_report_data:
+        if chrom.parafac_models:
             pages = create_parafac_pages(chrom, i + 1)
-            parafac_pages.extend(pages)
+            if pages:
+                parafac_pages.extend(pages)
     r = dp.Report(
         summary_page,
         *parafac_pages

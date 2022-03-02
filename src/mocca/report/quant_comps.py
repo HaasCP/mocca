@@ -14,6 +14,9 @@ from mocca.report.peaks import peaks_to_df
 
 
 def get_max_score_version(comp):
+    """
+    Returns the version of the calibration which has maximum R-squared.
+    """
     max_score = 0
     max_version = 'absolute'
     for version, score in comp.calib_scores.items():
@@ -22,13 +25,17 @@ def get_max_score_version(comp):
             max_version = version
     return max_version
 
+
 def quant_comps_to_df(comps):
+    """
+    Transfers relevant information from quantitative components in a pandas df.
+    """
     quant_comp_dict = {'compound_id': [],
                        'version': [],
                        'calib_factor': [],
                        'R-squared': [],
                        'num_peaks': []}
-                       
+
     for comp in comps:
         max_version = get_max_score_version(comp)
         quant_comp_dict['compound_id'].append(comp.compound_id)
@@ -40,6 +47,9 @@ def quant_comps_to_df(comps):
 
 
 def create_quant_comp_page(comp):
+    """
+    Creates a report page for the given quantitative component.
+    """
     calibration_curves = plot_calibration_curves(comp)
 
     peaks_df = peaks_to_df(comp.created_from)
@@ -51,18 +61,22 @@ def create_quant_comp_page(comp):
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
                 ),
-            dp.Text(f"### Figures: Calibration curves of component {comp.compound_id}."),
+            dp.Text("### Figures: Calibration curves of component "
+                    f"{comp.compound_id}."),
             dp.Group(
                 *calibration_curves,
                 columns=2
                 ),
             dp.Text("### Table: Peaks from which the component was created."),
             dp.DataTable(peaks_df, label=f"peak_table_{comp.compound_id}")
-        ],        
+        ],
     )
 
 
 def report_quant_comps(quant_comp_db, report_path):
+    """
+    Creates html report for the quantitative component database.
+    """
     comps = quant_comp_db.items
     comp_df = quant_comps_to_df(comps)
     table_page = dp.Page(
@@ -76,7 +90,7 @@ def report_quant_comps(quant_comp_db, report_path):
             dp.Text("### Table: Components in the quantitative component database "
                     "of the campaign."),
             dp.DataTable(comp_df, label="comp_table")
-        ],        
+        ],
     )
     component_pages = []
     for comp in quant_comp_db:
@@ -87,4 +101,3 @@ def report_quant_comps(quant_comp_db, report_path):
         *component_pages
     )
     r.save(path=os.path.join(report_path, "report_quant_comp_db.html"), open=True)
-

@@ -15,6 +15,9 @@ from mocca.report.peaks import peaks_to_df
 
 
 def quali_comps_to_df(comps):
+    """
+    Transfers relevant information from qualitative components in a pandas df.
+    """
     quali_comp_dict = {'compound_id': [],
                        'retention_time': [],
                        'lambda_max': [],
@@ -34,6 +37,9 @@ def quali_comps_to_df(comps):
 
 
 def create_quali_comp_page(comp):
+    """
+    Creates a report page for the given qualitative component.
+    """
     wls = comp.created_from[0].dataset.wavelength
     times = comp.created_from[0].dataset.time
     max_abs = max(comp.spectrum)
@@ -63,11 +69,14 @@ def create_quali_comp_page(comp):
             dp.Text("### Table: Peaks from which the spectrum of the component "
                     "was created."),
             dp.DataTable(peaks_df, label=f"peak_table_{comp.compound_id}")
-        ],        
+        ],
     )
 
 
 def report_quali_comps(quali_comp_db, report_path):
+    """
+    Creates html report for the qualitative component database.
+    """
     comps = quali_comp_db.items
     comp_df = quali_comps_to_df(comps)
     table_page = dp.Page(
@@ -81,7 +90,7 @@ def report_quali_comps(quali_comp_db, report_path):
             dp.Text("### Table: Components in the qualitative component database "
                     "of the campaign."),
             dp.DataTable(comp_df, label="comp_table")
-        ],        
+        ],
     )
     component_pages = []
     for comp in quali_comp_db:
