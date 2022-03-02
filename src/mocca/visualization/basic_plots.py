@@ -56,7 +56,7 @@ def plot_1D_layer(df, xlabel='', ylabel='', title='', color=None, reduce_data=Tr
     return chart
 
 
-def plot_1D_scatter(df, xlabel='', ylabel='', title='', reduce_data=True):
+def plot_1D_scatter(df, xlabel='', ylabel='', title='', color=None, reduce_data=True):
     """
     Plots a set of 1D data.
     """
@@ -67,8 +67,9 @@ def plot_1D_scatter(df, xlabel='', ylabel='', title='', reduce_data=True):
 
     chart = alt.Chart(df, title=title).mark_circle(size=60).encode(
         x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
-        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel)),
-        tooltip=[df.columns[0], df.columns[1]]
+        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel), scale=alt.Scale(zero=False)),
+        tooltip=[df.columns[0], df.columns[1]],
+        color=alt.value(color)
     ).configure_axis(
         grid=False,
         titleFontSize = 16,
@@ -76,6 +77,25 @@ def plot_1D_scatter(df, xlabel='', ylabel='', title='', reduce_data=True):
     ).configure_view(
         strokeWidth=0
     ).interactive()
+    return chart
+
+
+def plot_1D_scatter_layer(df, xlabel='', ylabel='', title='', color=None,
+                          reduce_data=True):
+    """
+    Plots a set of 1D data.
+    """
+    if reduce_data:
+        fac = df.shape[0] // 1000
+        if fac > 0:
+            df = df[::fac]
+
+    chart = alt.Chart(df, title=title).mark_circle(size=60).encode(
+        x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel, tickMinStep=1)),
+        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel)),
+        tooltip=[df.columns[0], df.columns[1]],
+        color=alt.value(color)
+    )
     return chart
 
 
