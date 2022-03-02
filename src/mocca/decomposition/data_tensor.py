@@ -46,7 +46,7 @@ def get_comp_peaks(relevant_comp):
     created_from_peaks = relevant_comp.created_from
     # take maximum 5 peaks
     fac = len(created_from_peaks) // 5
-    if fac > 0:
+    if fac > 5:
         created_from_peaks = created_from_peaks[::fac]
     # duplicate peaks to have at least 5 peaks
     elif len(created_from_peaks) < 5:
@@ -152,6 +152,18 @@ def get_zero_ext_impure_peak_data(impure_peak, boundaries, iter_offset):
     return peak_data_ze, y_offset
 
 
+def normalize_peak_data(parafac_data):
+    """
+    Normalizes all slices to the maximum absorbance of the slice.
+    """
+    norm_val = parafac_data[-1].max()
+    data_normalized = []
+    for data in parafac_data[:-1]:
+        data_normalized.append(data / data.max() * norm_val / 5)
+    data_normalized.append(parafac_data[-1])
+    return data_normalized
+
+
 def create_data_tensor(parafac_data):
     """
     Takes a list of peak data and returns a data tensor in the format used for
@@ -184,7 +196,8 @@ def get_parafac_tensor(impure_peak, quali_comp_db, iter_offset,
                                                           iter_offset)
 
     parafac_data = comp_peaks + [impure_peak]
-    data_tensor = create_data_tensor(parafac_data)
+    normalized_data = normalize_peak_data(parafac_data)
+    data_tensor = create_data_tensor(normalized_data)
 
     if show_parafac_analytics:
         print(f"new data tensor with boundaries {boundaries} and shape"
