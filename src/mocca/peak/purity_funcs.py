@@ -80,7 +80,7 @@ def predict_purity_unimodal(correls):
     on the correlation vector to the maximum
     https://stackoverflow.com/questions/14313510/how-to-calculate-rolling-moving-average-using-numpy-scipy
     """
-    return is_unimodal(np.convolve(correls, np.ones(3), 'valid') / 3, 0.99)
+    return is_unimodal(np.convolve(correls, np.ones(3), 'valid') / 3, 0.999)
 
 
 def get_pca_explained_variance(peak_data):
