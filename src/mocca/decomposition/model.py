@@ -12,7 +12,7 @@ from typing import Union, List, Optional
 from mocca.components.models import QualiComponent
 from mocca.peak.models import CorrectedPeak, IntegratedPeak
 
-from mocca.decomposition.utils import check_same_uvvis
+from mocca.decomposition.utils import check_same_uvvis, check_comp_in_impure
 from mocca.peak.resolve_impure import create_pure_peak, create_parafac_peak
 
 
@@ -65,7 +65,8 @@ class ParafacModel():
         self.factors = [normalized_spectra, normalized_elution, normalized_integrals]
 
 
-    def create_parafac_peaks(self, spectrum_correl_coef_thresh):
+    def create_parafac_peaks(self, absorbance_threshold,
+                             spectrum_correl_coef_thresh):
         """
         If two UV-Vis traces in the PARAFAC components are too similar, no
         PARAFAC peaks are created. PARAFAC peaks' dataseta are created synthetically 
@@ -74,6 +75,8 @@ class ParafacModel():
         """
         if check_same_uvvis(self, spectrum_correl_coef_thresh):
             parafac_peaks = [create_pure_peak(self.impure_peak)]
+        elif not check_comp_in_impure(self, absorbance_threshold):
+            parafac_peaks = []
         else:
             parafac_peaks = []
             for i in range(self.n_comps):

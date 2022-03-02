@@ -34,8 +34,9 @@ def run_parafac_iter(offset, impure_peak, quali_comp_db, show_parafac_analytics)
     return impure_sum, parafac_model
 
 
-def iterative_parafac(impure_peak, quali_comp_db, relative_distance_thresh,
-                      spectrum_correl_coef_thresh, show_parafac_analytics):
+def iterative_parafac(impure_peak, quali_comp_db, absorbance_threshold,
+                      relative_distance_thresh, spectrum_correl_coef_thresh,
+                      show_parafac_analytics):
     """
     The trilinearity-breaking mode retention time requires iterative PARAFAC
     algorithm.
@@ -60,6 +61,7 @@ def iterative_parafac(impure_peak, quali_comp_db, relative_distance_thresh,
             parafac_model_opt = parafac_model
 
     parafac_model_opt.iter_objective_func = iter_objective_func
-    parafac_model_opt.create_parafac_peaks(spectrum_correl_coef_thresh)
+    parafac_model_opt.create_parafac_peaks(absorbance_threshold,
+                                           spectrum_correl_coef_thresh)
 
     return parafac_model_opt

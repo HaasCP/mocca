@@ -48,6 +48,7 @@ def preprocess_chromatogram(chromatogram, quali_comp_db,
 
     for impure_peak in relevant_impure_peaks:
         parafac_model = iterative_parafac(impure_peak, quali_comp_db,
+                                          absorbance_threshold,
                                           relative_distance_thresh,
                                           spectrum_correl_thresh,
                                           print_parafac_analytics)

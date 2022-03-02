@@ -40,6 +40,31 @@ def check_same_uvvis(parafac_model, spectrum_correl_coef_thresh):
         return False
 
 
+def check_comp_in_impure(parafac_model, absorbance_threshold):
+    """
+    Checks if the maximum absorbance of the known PARAFAC component in the impure
+    peak exceeds the absorbance threshold.
+    """
+    integrals = parafac_model.factors[2]
+    comp_idx = []
+    comp_integrals = []
+    for integral_slice in integrals[:-1]:
+        comp_integrals.append(integral_slice.max())
+        comp_idx.append(integral_slice.argmax())
+    if not all(idx == comp_idx[0] for idx in comp_idx):
+        return True
+    else:
+        comp_idx = comp_idx[0]
+    spectrum_max = parafac_model.factors[0][-1][comp_idx].max()
+    elution_max = parafac_model.factors[1][-1][comp_idx].max()
+    integral = integrals[-1][comp_idx].max()
+    abs_max_comp_in_impure = spectrum_max * elution_max * integral
+    if abs_max_comp_in_impure < absorbance_threshold:
+        return False
+    else: 
+        return True
+
+
 def check_absorbance_thresh(parafac_peak, absorbance_threshold):
     """
     Checks if maximum absorbance in synthetically created PARAFAC peak dataset

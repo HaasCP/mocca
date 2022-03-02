@@ -51,6 +51,7 @@ def get_impure_istd_peak(chromatogram, istd_key, quali_comp_db, absorbance_thres
     best_correl_coef = 0
     for impure_peak in impure_peak_targets:
         parafac_model = iterative_parafac(impure_peak, quali_comp_db,
+                                          absorbance_threshold,
                                           relative_distance_thresh,
                                           spectrum_correl_coef_thresh,
                                           show_parafac_analytics=False)
