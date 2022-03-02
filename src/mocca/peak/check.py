@@ -73,7 +73,7 @@ def check_peak_purity(peak, show_analytics, param=2.5):
         return True
     #  if pca big enough, then probably pure and PARAFAC cannot resolve anything
     #  same thresh than in decomposition.parafac_funcs, estimate_num_components_pca
-    if test_pca > 0.9995:
+    if test_pca > 0.995:
         return True
     #  if any correlation is < 0.9, then probably impure somewhere
     if test_correls_1 < 0.9:

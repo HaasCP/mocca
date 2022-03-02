@@ -24,7 +24,7 @@ def estimate_pca_n_comps(data_tensor, impure_peak, show_parafac_analytics):
     _ = pca.fit_transform(pca_data)
 
     #  same thresh than in peak.check, check_peak_purity
-    threshold = 0.9995
+    threshold = 0.995
     cum_sum = 0
     pca_explained_variance = []
     for idx in range(10):
