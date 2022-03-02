@@ -34,6 +34,7 @@ def plot_chrom_with_peaks(chrom):
 
     peaks = [peak for peak in chrom if peak.idx > 0]
     areas = []
+    borders = []
     for peak in peaks:
         # choose color
         if peak.pure and not peak.saturation:
@@ -58,6 +59,12 @@ def plot_chrom_with_peaks(chrom):
             y2=alt.value(300)  # pixels from top
         )
         areas.append(area)
+        
+        brdrs = pd.DataFrame({'peak_borders': [chrom.dataset.time[peak.left],
+                                               chrom.dataset.time[peak.right]]})
+        border = alt.Chart(brdrs).mark_rule(color=color).encode(
+          x='peak_borders')
+        borders.append(border)
     
     peak_tips = {'peak_max': []}
     for peak in chrom:
@@ -68,6 +75,8 @@ def plot_chrom_with_peaks(chrom):
     fig = chart + rules
     for area in areas:
         fig = fig + area
+    for border in borders:
+        fig = fig + border
         
     fig = fig.configure_axis(
         grid=False,
