@@ -55,10 +55,10 @@ def check_comp_in_impure(parafac_model, absorbance_threshold):
         return True
     else:
         comp_idx = comp_idx[0]
-    spectrum_max = parafac_model.factors[0][-1][comp_idx].max()
-    elution_max = parafac_model.factors[1][-1][comp_idx].max()
+    spectrum_sum = np.sum(parafac_model.factors[0][:, comp_idx])
+    elution_max = parafac_model.factors[1][:, comp_idx].max()
     integral = integrals[-1][comp_idx].max()
-    abs_max_comp_in_impure = spectrum_max * elution_max * integral
+    abs_max_comp_in_impure = spectrum_sum * elution_max * integral
     if abs_max_comp_in_impure < absorbance_threshold:
         return False
     else: 
