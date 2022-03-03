@@ -7,7 +7,11 @@ Created on Fri Jan  7 16:28:04 2022
 """
 import pandas as pd
 
+
 def settings_to_df(settings):
+    """
+    Transfers relevant information of Settings objects in a pandas df.
+    """
     settings_dict = {
         'hplc_system_tag': settings.hplc_system_tag,
         'detector_limit': settings.detector_limit,

@@ -18,9 +18,9 @@ from mocca.visualization.parafac_plots import (plot_retention,
                                                plot_objective_func)
 
 
-def parafac_chroms_to_dict(chroms):
+def parafac_chroms_to_df(chroms):
     """
-    Transfers relevant information from chromatograms components in a pandas df.
+    Transfers relevant information from chromatograms in a pandas df.
     """
     chrom_dict = {'index': [],
                   'file': [],
@@ -37,32 +37,30 @@ def parafac_chroms_to_dict(chroms):
             chrom_dict['compound_run'].append(chrom.experiment.compound is not None)
             chrom_dict['istd_added'].append(chrom.experiment.istd is not None)
             chrom_dict['num_peaks'].append(len(chrom.peaks))
-    return chrom_dict
-
-
-def parafac_chroms_to_df(chroms):
-    chrom_dict = parafac_chroms_to_dict(chroms)
     chrom_df = pd.DataFrame(chrom_dict)
     return chrom_df
 
 
 def create_parafac_pages(chrom, index):
-    
+    """
+    Creates a report page with details to the PARAFAC model of a given impure
+    peak. Only creates pages for models in which a known component was found.
+    """
     parafac_pages = []
     report_models = [model for model in chrom.parafac_models if model.peaks]
     for parafac_model in report_models:
         retention_plot = plot_retention(parafac_model)
-        
+
         impure_peak_spec_plot = plot_impure_peak_spectra(parafac_model.impure_peak)
         spec_plot = plot_uvvis_specs(parafac_model)
-        
+
         aligned_retention_plot = plot_aligned_tensor(parafac_model)
-        
-        normalized_spectra, normalized_elution, normalized_integrals = parafac_model.factors
+
+        normalized_spectra, normalized_elution, normalized_integrals =\
+            parafac_model.factors
         normalized_integrals_plot = plot_normalized_integrals(normalized_integrals)
-        
+
         obj_func_plot = plot_objective_func(parafac_model)
-        
 
         parafac_page = dp.Page(
             title=f"chrom {str(index)}, peak {parafac_model.impure_peak.idx}",
@@ -70,13 +68,15 @@ def create_parafac_pages(chrom, index):
                 dp.Group(
                     dp.Text(f"## Details to chromatogram {index}, peak "
                             f"{parafac_model.impure_peak.idx}"),
-                    dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                    dp.Text("## MOCCA (Multiway Online Chromatographic Chemical "
+                            "Analysis)"),
                     columns=2
                 ),
                 dp.Text("### Figure: UV-Vis spectra of the impure peak at every "
                         "time point."),
                 dp.Plot(impure_peak_spec_plot),
-                dp.Text("### Figures: Modelled PARAFAC peaks after iterative alignment."),
+                dp.Text("### Figures: Modelled PARAFAC peaks after iterative "
+                        "alignment."),
                 dp.Group(
                     dp.Plot(retention_plot),
                     dp.Plot(spec_plot),
@@ -103,6 +103,9 @@ def create_parafac_pages(chrom, index):
 
 
 def report_parafac(chroms, report_path):
+    """
+    Main PARAFAC report function.
+    """
     chrom_df = parafac_chroms_to_df(chroms)
     if chrom_df.empty:
         return
@@ -114,7 +117,8 @@ def report_parafac(chroms, report_path):
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
             ),
-            dp.Text("### Table: Chromatograms which triggered PARAFAC during the campaign."),
+            dp.Text("### Table: Chromatograms which triggered PARAFAC during "
+                    "the campaign."),
             dp.DataTable(chrom_df, label="chrom_table")
         ],
     )

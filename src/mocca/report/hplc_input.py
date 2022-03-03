@@ -12,6 +12,9 @@ import datapane as dp
 
 
 def exps_to_df(exps):
+    """
+    Transfers relevant information of HplcInput objects in a pandas df.
+    """
     exp_dict = {'index': [],
                 'file': [],
                 'compound_key': [],
@@ -49,6 +52,9 @@ def exps_to_df(exps):
 
 
 def report_hplc_input(exps, report_path):
+    """
+    Main HPLC input report function.
+    """
     exp_df = exps_to_df(exps)
     exp_page = dp.Page(
         title="Start page",
@@ -66,4 +72,3 @@ def report_hplc_input(exps, report_path):
         exp_page
     )
     r.save(path=os.path.join(report_path, "report_hplc_input.html"), open=True)
-

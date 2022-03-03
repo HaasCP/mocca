@@ -32,8 +32,8 @@ def check_same_uvvis(parafac_model, spectrum_correl_coef_thresh):
     Checks if any two parafac components share the same UV-Vis trace.
     """
     spectra = parafac_model.factors[0]
-    if all(np.corrcoef(spectra[:, i], spectra[:, j])[0, 1] > 
-           spectrum_correl_coef_thresh for i, j in 
+    if all(np.corrcoef(spectra[:, i], spectra[:, j])[0, 1] >
+           spectrum_correl_coef_thresh for i, j in
            itertools.combinations(list(range(parafac_model.n_comps)), 2)):
         return True
     else:
@@ -61,7 +61,7 @@ def check_comp_in_impure(parafac_model, absorbance_threshold):
     abs_max_comp_in_impure = spectrum_sum * elution_max * integral
     if abs_max_comp_in_impure < absorbance_threshold:
         return False
-    else: 
+    else:
         return True
 
 

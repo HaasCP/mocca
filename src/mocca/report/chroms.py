@@ -16,7 +16,10 @@ from mocca.report.hplc_input import exps_to_df
 from mocca.peak.utils import average_peak_spectrum
 
 
-def chroms_to_dict(chroms):
+def chroms_to_df(chroms):
+    """
+    Transfers relevant information from chromatograms in a pandas df.
+    """
     chrom_dict = {'index': [],
                   'file': [],
                   'bad_data': [],
@@ -31,16 +34,14 @@ def chroms_to_dict(chroms):
         chrom_dict['compound_run'].append(chrom.experiment.compound is not None)
         chrom_dict['istd_added'].append(chrom.experiment.istd is not None)
         chrom_dict['num_peaks'].append(len(chrom.peaks))
-    return chrom_dict
-
-
-def chroms_to_df(chroms):
-    chrom_dict = chroms_to_dict(chroms)
     chrom_df = pd.DataFrame(chrom_dict)
     return chrom_df
 
 
 def peaks_to_result_df(peaks):
+    """
+    Transfers relevant information from Peak objects in a pandas df.
+    """
     peaks_dict = {'peak_id': [],
                   'retention_time': [],
                   'compound_id': [],
@@ -61,19 +62,25 @@ def peaks_to_result_df(peaks):
         peaks_dict['is_compound'].append(peak.is_compound)
     return pd.DataFrame(peaks_dict)
 
+
 def create_chrom_page(chrom, index):
+    """
+    Creates a report page with details to a chromatogram. It contains a list of
+    processed peaks, a chromatogram plot with picked peaks etc.
+    """
     exp_df = exps_to_df([chrom.experiment])
-    
+
     chrom_plot = plot_chrom_with_peaks(chrom)
-    
+
     spectrum_plots = []
     for peak in chrom:
         spectrum = average_peak_spectrum(peak)
         wls = peak.dataset.wavelength
-        
+
         df = pd.DataFrame({'x': wls,
                            'y': spectrum})
-        title_base = f"UV-Vis spectrum of peak at {round(peak.dataset.time[peak.maximum +peak.offset], 3)} min"
+        title_base = "UV-Vis spectrum of peak at "
+        f"{round(peak.dataset.time[peak.maximum +peak.offset], 3)} min"
         if peak.compound_id:
             title = title_base + f' ({peak.compound_id})'
         elif not peak.pure:
@@ -109,11 +116,14 @@ def create_chrom_page(chrom, index):
                 *spectrum_plots,
                 columns=2
                 )
-        ],        
+        ],
     )
 
 
 def report_chroms(chroms, settings, report_path):
+    """
+    Main Chromatogram report function.
+    """
     chrom_df = chroms_to_df(chroms)
     summary_page = dp.Page(
         title="Start page",
@@ -123,7 +133,8 @@ def report_chroms(chroms, settings, report_path):
                 dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
                 columns=2
             ),
-            dp.Text("### Table: Settings and thresholds used to process chromatograms."),
+            dp.Text("### Table: Settings and thresholds used to process "
+                    "chromatograms."),
             dp.Table(settings_to_df(settings), label="settings_table"),
             dp.Text("### Table: Chromatograms processed during the campaign."),
             dp.DataTable(chrom_df, label="chrom_table")
