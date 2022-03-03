@@ -28,7 +28,9 @@ def sum_absorbance_by_time(data):
 
 
 def trim_data(data, time, length):
-    """Trims the 2D DADData in the time dimension to the length provided"""
+    """
+    Trims the 2D DADData in the time dimension to the length provided.
+    """
     if length < data.shape[1]:
         return data[:, :length], time[:length]
     else:
@@ -50,7 +52,7 @@ def absorbance_to_array(df):
     Returns
     -------
     absorbance_array : numpy.ndarray
-        Absorbance values with number of wavelengths in the first 
+        Absorbance values with number of wavelengths in the first
         and number of recorded times in the second dimension.
 
     """
@@ -82,14 +84,14 @@ def apply_filter(dataframe, wl_high_pass, wl_low_pass, reference_wl=True):
 
     df = dataframe.copy()
     df['absorbance'] = df.groupby('time')['absorbance']\
-        .rolling(window=5, center=True).mean().reset_index(0,drop=True)
-    df = df.dropna().reset_index(0,drop=True)
+        .rolling(window=5, center=True).mean().reset_index(0, drop=True)
+    df = df.dropna().reset_index(0, drop=True)
     if reference_wl:
         n_times = len(df.time.unique())
         wls = df.wavelength.unique()
         df['absorbance'] = df.absorbance - df[df['wavelength'] == wls.max()]\
             .absorbance.iloc[np.tile(np.arange(n_times), len(wls))]\
-            .reset_index(0,drop=True)
+            .reset_index(0, drop=True)
     if wl_high_pass:
         df = df[df.wavelength >= wl_high_pass]
     if wl_low_pass:

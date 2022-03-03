@@ -14,7 +14,7 @@ from mocca.decomposition.utils import check_comp_overlap
 from mocca.decomposition.iterative_parafac import iterative_parafac
 
 
-def get_pure_istd_peak(chromatogram, istd_key, quali_component_db, 
+def get_pure_istd_peak(chromatogram, istd_key, quali_component_db,
                        spectrum_correl_coef_thresh, relative_distance_thresh):
     """
     not doubled relative distance threshold
@@ -23,7 +23,7 @@ def get_pure_istd_peak(chromatogram, istd_key, quali_component_db,
     best_correl_coef = 0
     pure_peaks = [peak for peak in chromatogram if peak.pure]
     for peak in pure_peaks:
-        matches = get_filtered_similarity_dicts(peak, quali_component_db, 
+        matches = get_filtered_similarity_dicts(peak, quali_component_db,
                                                 spectrum_correl_coef_thresh,
                                                 relative_distance_thresh)
         if matches:
@@ -37,14 +37,14 @@ def get_pure_istd_peak(chromatogram, istd_key, quali_component_db,
 
 
 def get_impure_istd_peak(chromatogram, istd_key, quali_comp_db, absorbance_threshold,
-                       spectrum_correl_coef_thresh, relative_distance_thresh):
+                         spectrum_correl_coef_thresh, relative_distance_thresh):
     """
     not doubled relative distance threshold
     """
     istd_component = quali_comp_db[istd_key]
-    
-    impure_peak_targets = [peak for peak in chromatogram if 
-                           (not peak.pure and 
+
+    impure_peak_targets = [peak for peak in chromatogram if
+                           (not peak.pure and
                             check_comp_overlap(peak, istd_component))]
 
     istd_peak = None
@@ -56,7 +56,7 @@ def get_impure_istd_peak(chromatogram, istd_key, quali_comp_db, absorbance_thres
                                           spectrum_correl_coef_thresh,
                                           show_parafac_analytics=False)
         for peak in parafac_model.peaks:
-            matches = get_filtered_similarity_dicts(peak, quali_comp_db, 
+            matches = get_filtered_similarity_dicts(peak, quali_comp_db,
                                                     spectrum_correl_coef_thresh,
                                                     relative_distance_thresh)
             if matches:
@@ -74,12 +74,12 @@ def get_istd_peak(chromatogram, istd_key, quali_component_db, absorbance_thresho
     """
     Tries to find an istd peak in the chromatogram from both pure or impure peaks.
     """
-    if not istd_key in quali_component_db:
+    if istd_key not in quali_component_db:
         return None
     else:
         new_quali_component_db = copy.deepcopy(quali_component_db)
         new_quali_component_db.items = [new_quali_component_db[istd_key]]
-        istd_peak = get_pure_istd_peak(chromatogram, istd_key, new_quali_component_db, 
+        istd_peak = get_pure_istd_peak(chromatogram, istd_key, new_quali_component_db,
                                        spectrum_correl_coef_thresh,
                                        relative_distance_thresh)
         if istd_peak is None:

@@ -23,8 +23,8 @@ from mocca.campaign.utils import save_instance
 
 class HplcDadCampaign():
     """
-    Main parent class for HPLC-DAD experimental campaigns. We expect the gradient to stay
-    constant over the campaign.
+    Main parent class for HPLC-DAD experimental campaigns. We expect the
+    gradient to stay constant over the campaign.
     """
     def __init__(self, autosave_path=None):
         self.autosave_path = autosave_path
@@ -37,6 +37,10 @@ class HplcDadCampaign():
         self.warnings = []
 
     def _reset_campaign(self):
+        """
+        Resets the campaign to a state so that a full campaign data processing
+        can take place.
+        """
         self.peak_db = PeakDatabase()
         self.quali_comp_db = QualiComponentDatabase()
         self.quanti_comp_db = QuantComponentDatabase()
@@ -74,9 +78,9 @@ class HplcDadCampaign():
         """
         self.settings = settings
         self._reset_campaign()
-        
+
         process_gradients(self.hplc_runs, self.settings)
-        
+
         chroms = process_compound_experiments(
             self.hplc_runs,
             self.peak_db,
@@ -94,7 +98,5 @@ class HplcDadCampaign():
             self.settings
             )
         self.chroms.extend(chroms)
-    
-# TODO : process_unprocessed_experiments
 
-     
+# TODO : process_unprocessed_experiments

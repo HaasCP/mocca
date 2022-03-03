@@ -28,14 +28,14 @@ def create_pure_peak(impure_peak):
                                      istd=impure_peak.istd)
     elif type(impure_peak) == IntegratedPeak:
         parafac_peak = IntegratedPeak(left=impure_peak.left,
-                                     right=impure_peak.right,
-                                     maximum=impure_peak.maximum,
-                                     offset=impure_peak.offset,
-                                     dataset=impure_peak.dataset,
-                                     idx=-impure_peak.idx,
-                                     saturation=impure_peak.saturation,
-                                     pure=True,
-                                     integral=impure_peak.integral)
+                                      right=impure_peak.right,
+                                      maximum=impure_peak.maximum,
+                                      offset=impure_peak.offset,
+                                      dataset=impure_peak.dataset,
+                                      idx=-impure_peak.idx,
+                                      saturation=impure_peak.saturation,
+                                      pure=True,
+                                      integral=impure_peak.integral)
     else:
         raise TypeError(f"Given impure peak is of type {type(impure_peak)}. "
                         "Only mocca IntegratedPeak and CorrectedPeak types "
@@ -44,6 +44,12 @@ def create_pure_peak(impure_peak):
 
 
 def get_parafac_data_shift(iter_offset):
+    """
+    If the iteration offset is larger than zero, the impure peak was shifted
+    and must therefore be shifted back in the resulting PARAFAC data. If the
+    iteration shift was negative, the pure signals were shifted and nothing
+    has to be done.
+    """
     if iter_offset > 0:
         shift = iter_offset
     else:
@@ -82,27 +88,27 @@ def create_parafac_peak(comp_i, parafac_model):
                                      saturation=impure_peak.saturation,
                                      pure=True,
                                      # reaction run in last slice of data tensor
-                                     integral=parafac_comp_factors[2][-1] +\
-                                         integral_correction,
+                                     integral=(parafac_comp_factors[2][-1] +
+                                               integral_correction),
                                      istd=impure_peak.istd)
     elif type(impure_peak) == IntegratedPeak:
         parafac_peak = IntegratedPeak(left=left_bound,
-                                     right=right_bound,
-                                     maximum=(left_bound +
-                                              np.argmax(parafac_comp_factors[1]) -
-                                              shift),
-                                     offset=impure_peak.offset,
-                                     dataset=ParafacData(impure_peak,
-                                                         parafac_comp_factors,
-                                                         tensor.boundaries,
-                                                         shift,
-                                                         tensor.y_offset),
-                                     idx=-impure_peak.idx,
-                                     saturation=impure_peak.saturation,
-                                     pure=True,
-                                     # reaction run in last slice of data tensor
-                                     integral=parafac_comp_factors[2][-1] +\
-                                         integral_correction)
+                                      right=right_bound,
+                                      maximum=(left_bound +
+                                               np.argmax(parafac_comp_factors[1]) -
+                                               shift),
+                                      offset=impure_peak.offset,
+                                      dataset=ParafacData(impure_peak,
+                                                          parafac_comp_factors,
+                                                          tensor.boundaries,
+                                                          shift,
+                                                          tensor.y_offset),
+                                      idx=-impure_peak.idx,
+                                      saturation=impure_peak.saturation,
+                                      pure=True,
+                                      # reaction run in last slice of data tensor
+                                      integral=(parafac_comp_factors[2][-1] +
+                                                integral_correction))
     else:
         raise TypeError(f"Given impure peak is of type {type(impure_peak)}. "
                         "Only mocca IntegratedPeak and CorrectedPeak types "

@@ -19,6 +19,10 @@ def get_peak_data(peak):
 
 
 def get_retention_times(peak):
+    """
+    Returns left and right borders as well as maximum of a peak as retention
+    times.
+    """
     left = peak.dataset.time[peak.left]
     right = peak.dataset.time[peak.right]
     maximum = peak.dataset.time[peak.maximum]

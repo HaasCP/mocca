@@ -66,7 +66,10 @@ class BaseDatabase():
 
 
 class QualiComponentDatabase(BaseDatabase):
-
+    """
+    Database storing and processing qualitative components used for peak
+    assignment.
+    """
     def update(self, peak_database, peak_filter_function=None):
         """
         Creates components from the given peak database. Optionally, a condition
@@ -102,8 +105,17 @@ class QualiComponentDatabase(BaseDatabase):
             component = create_quali_component(compound_peaks)
             self.insert_item(component)
 
+
 class QuantComponentDatabase(BaseDatabase):
+    """
+    Database storing and processing quantitative components used for peak
+    quantification.
+    """
     def update(self, peak_database, peak_filter_function=None):
+        """
+        Creates components from the given peak database. Optionally, a condition
+        can be given to filter peaks.
+        """
         self.delete_all_items()
         compound_dict = get_quant_peaks_by_compound(peak_database,
                                                     peak_filter_function)

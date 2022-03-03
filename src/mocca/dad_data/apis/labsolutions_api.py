@@ -6,8 +6,6 @@ Created on Mon Aug 30 15:17:53 2021
 
 @author: haascp
 """
-
-# Data manipulation
 import pandas as pd
 
 

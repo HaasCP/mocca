@@ -10,15 +10,17 @@ from mocca.peak.expand import expand_peak
 from mocca.peak.check import check_peak
 from mocca.peak.integrate import integrate_peak
 from mocca.chromatogram.correct import correct_istd_offset
-from mocca.decomposition.utils import check_any_compound_overlap, check_absorbance_thresh
+from mocca.decomposition.utils import check_any_compound_overlap
+from mocca.decomposition.utils import check_absorbance_thresh
 from mocca.decomposition.iterative_parafac import iterative_parafac
 from mocca.peak.match import match_peak
 
-def preprocess_chromatogram(chromatogram, quali_comp_db, 
-                            absorbance_threshold, detector_limit, 
+
+def preprocess_chromatogram(chromatogram, quali_comp_db,
+                            absorbance_threshold, detector_limit,
                             spectrum_correl_thresh, relative_distance_thresh,
-                            print_purity_check = False,
-                            print_compound_prediction = False,
+                            print_purity_check=False,
+                            print_compound_prediction=False,
                             print_parafac_analytics=False):
     """
     Preprocesses the chromatogram of picked peaks. It includes expanding,
@@ -33,13 +35,13 @@ def preprocess_chromatogram(chromatogram, quali_comp_db,
                                   show_analytics=print_purity_check)
         integrated_peak = integrate_peak(checked_peak)
         integrated_peaks.append(integrated_peak)
-    
+
     chromatogram.peaks = integrated_peaks
-    
+
     # 4. correct
     chromatogram = correct_istd_offset(chromatogram, quali_comp_db,
                                        absorbance_threshold,
-                                       spectrum_correl_thresh, 
+                                       spectrum_correl_thresh,
                                        relative_distance_thresh)
     # 5. resolve impure
     impure_peaks = [peak for peak in chromatogram if not peak.pure]

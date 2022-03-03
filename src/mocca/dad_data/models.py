@@ -19,11 +19,11 @@ from mocca.dad_data.apis.labsolutions_api import read_txt_shimadzu
 import mocca.peak.models
 
 
-# TODO: Documentation of classes!
-
-
 @dataclass()
 class DadData():
+    """
+    Base class for HPLC-DAD data.
+    """
     hplc_system_tag : str
     experiment : InitVar["mocca.user_interaction.user_objects.HplcInput"]
     wl_high_pass : InitVar[float] = None
@@ -37,22 +37,36 @@ class DadData():
     warnings : List[str] = field(init=False)
 
     def __post_init__(self, experiment, wl_high_pass, wl_low_pass):
+        """
+        Process init variables to set attributes.
+        """
         self.warnings = []
         self._set_path(experiment)
         self._read_data(wl_high_pass, wl_low_pass)
         experiment.processed = True
 
     def __eq__(self, other):
+        """
+        Checks if two DAD data containers are equal by comparing its path and data.
+        """
         if not isinstance(other, type(self)):
             # don't attempt to compare against unrelated types
             return False
         return (self.path == other.path and
-                self.data.__array_interface__['data'] == other.data.__array_interface__['data'])
-    
+                (self.data.__array_interface__['data'] ==
+                 other.data.__array_interface__['data']))
+
     def _set_path(self, experiment):
+        """
+        Sets path to the data file.
+        """
         self.path = experiment.path
 
     def _read_data(self, wl_high_pass, wl_low_pass):
+        """
+        Read the data file, preprocess it and filter it in order to obtain
+        standardized data format for all HPLC systems.
+        """
         if self.hplc_system_tag == 'chemstation':
             df = read_csv_agilent(self.path)
             df = tidy_df_agilent(df)
@@ -68,8 +82,15 @@ class DadData():
 
 @dataclass(eq=False)
 class GradientData(DadData):
+    """
+    Data container for gradient HPLC-DAD data.
+    """
     original_data : np.ndarray = field(init=False)
+
     def __post_init__(self, experiment, wl_high_pass, wl_low_pass):
+        """
+        Process and baseline-correct given data.
+        """
         super().__post_init__(experiment, wl_high_pass, wl_low_pass)
         self.original_data = copy.deepcopy(self.data)
         self.data = bsl_als(self.data)
@@ -78,17 +99,19 @@ class GradientData(DadData):
 @dataclass(eq=False)
 class CompoundData(DadData):
     """
-    Parameter order: hplc_system_tag, experiment, gradient, wl_high_pass, wl_low_pass
+    Data container for HPLC-DAD data with peaks originating from compounds.
     """
-
     def __post_init__(self, experiment, wl_high_pass, wl_low_pass):
+        """
+        Baseline-corrects the given HPLC-DAD data.
+        """
         super().__post_init__(experiment, wl_high_pass, wl_low_pass)
         self._subtract_baseline(experiment.gradient.dataset)
 
     def _trim_data(self, length):
         """Trims the data in the time dimension to the length provided"""
         self.data, self.time = trim_data(data=self.data, time=self.time, length=length)
-    
+
     def _subtract_baseline(self, gradient):
         """Subtracts the baseline of the gradient numpy array from self.data."""
         self._trim_data(gradient.data.shape[1])
@@ -97,15 +120,22 @@ class CompoundData(DadData):
 
 @dataclass
 class ParafacData():
+    """
+    Data container for synthetic data generated from PARAFAC models.
+    """
     # https://www.python.org/dev/peps/pep-0484/#forward-references
     impure_peak : InitVar['mocca.peak.models.CorrectedPeak']
     parafac_comp_tensor : InitVar[tuple]
     boundaries : InitVar[tuple]
     shift : InitVar[int]
     y_offset : InitVar[float]
-    
+
     def __post_init__(self, impure_peak, parafac_comp_tensor, boundaries,
                       shift, y_offset):
+        """
+        Process init variables to set attributes and create a synthetic HPLC-DAD
+        dataset.
+        """
         # https://github.com/python/mypy/issues/9254
         self.hplc_system_tag = impure_peak.dataset.hplc_system_tag
         self.path = impure_peak.dataset.path
@@ -117,20 +147,29 @@ class ParafacData():
 
     def _make_data_from_parafac_peak(self, impure_peak, parafac_comp_tensor,
                                      boundaries, shift, y_offset):
+        """
+        Create a synthetic dataset generated from an impure peak and a
+        corresponding PARAFAC model.
+        """
         # make 2D data corresponding to parafac-generated spectra and elution
         spectrum = parafac_comp_tensor[0].reshape(len(self.wavelength), 1)
         retention = parafac_comp_tensor[1].reshape(1, boundaries[1] - boundaries[0] + 1)
-        integral = parafac_comp_tensor[2][-1] # reaction run is last in run dimension
+        integral = parafac_comp_tensor[2][-1]  # reaction run is last in run dimension
         parafac_peak_data = spectrum * retention * integral
-        
+
         # replace self data with parafac peak data
-        left = boundaries[0] - shift  # impure_peak.offset already included in 
+        left = boundaries[0] - shift  # impure_peak.offset already included in
         right = boundaries[1] - shift + 1
         self.data[:, left:right] = parafac_peak_data + y_offset
-    
+
     def __eq__(self, other):
+        """
+        Checks if two ParafacData objects are the same based on the path and the
+        data.
+        """
         if not isinstance(other, type(self)):
             # don't attempt to compare against unrelated types
             return False
         return (self.path == other.path and
-                self.data.__array_interface__['data'] == other.data.__array_interface__['data'])
+                (self.data.__array_interface__['data'] ==
+                 other.data.__array_interface__['data']))

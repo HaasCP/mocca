@@ -10,6 +10,19 @@ import numpy as np
 from mocca.peak.utils import average_peak_spectrum
 
 
+def check_peaks_compound_id(peaks):
+    """
+    Checks if all given peaks have the same compound_id and, if so, returns
+    this compound_id.
+    """
+    if all(peak.compound_id == peaks[0].compound_id for peak in peaks):
+        compound_id = peaks[0].compound_id
+        return compound_id
+    else:
+        raise AttributeError("All peaks have to have the same compound_id to "
+                             "create a component")
+
+
 def get_valid_peaks(peaks):
     """
     Returns a list of peaks from the database which are pure and unsaturated
@@ -92,9 +105,12 @@ def average_ret_times_over_peaks(peaks):
     """
     if peaks:
         num_peaks = len(peaks)
-        left = int(round(sum([peak.left - peak.offset for peak in peaks]) / num_peaks))
-        right = int(round(sum([peak.right - peak.offset for peak in peaks]) / num_peaks))
-        maximum = int(round(sum([peak.maximum - peak.offset for peak in peaks]) / num_peaks))
+        left = int(round(sum([peak.left - peak.offset for peak in peaks]) /
+                         num_peaks))
+        right = int(round(sum([peak.right - peak.offset for peak in peaks]) /
+                          num_peaks))
+        maximum = int(round(sum([peak.maximum - peak.offset for peak in peaks]) /
+                            num_peaks))
         offset = int(round(sum([peak.offset for peak in peaks]) / num_peaks))
         return left, right, maximum, offset
 

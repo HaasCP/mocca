@@ -27,8 +27,8 @@ def process_gradients(experiments, settings):
     """
     unprocessed_exps = get_unprocessed_experiments(experiments)
     for exp in unprocessed_exps:
-        gradient_dataset = next((e.gradient.dataset for e in unprocessed_exps 
-                                 if hasattr(e.gradient, 'dataset') and 
+        gradient_dataset = next((e.gradient.dataset for e in unprocessed_exps
+                                 if hasattr(e.gradient, 'dataset') and
                                  exp.gradient.path == e.gradient.path),
                                 None)
         if gradient_dataset is None:
@@ -37,7 +37,7 @@ def process_gradients(experiments, settings):
                                                 settings.wl_high_pass,
                                                 settings.wl_low_pass)
         else:
-            exp.gradient.dataset = gradient_dataset    
+            exp.gradient.dataset = gradient_dataset
 
 
 def preprocess_experiment(exp, quali_comp_db, settings):
@@ -49,13 +49,13 @@ def preprocess_experiment(exp, quali_comp_db, settings):
     compound_data = CompoundData(settings.hplc_system_tag, exp,
                                  wl_high_pass=settings.wl_high_pass,
                                  wl_low_pass=settings.wl_low_pass)
-    chromatogram = pick_peaks(compound_data, exp, settings.absorbance_threshold, 
+    chromatogram = pick_peaks(compound_data, exp, settings.absorbance_threshold,
                               settings.peaks_high_pass,
                               settings.peaks_low_pass)
     chromatogram.experiment = exp
-    chromatogram = preprocess_chromatogram(chromatogram, quali_comp_db, 
-                                           settings.absorbance_threshold, 
-                                           settings.detector_limit, 
+    chromatogram = preprocess_chromatogram(chromatogram, quali_comp_db,
+                                           settings.absorbance_threshold,
+                                           settings.detector_limit,
                                            settings.spectrum_correl_thresh,
                                            settings.relative_distance_thresh)
     return chromatogram
@@ -85,7 +85,7 @@ def process_compound_experiments(experiments, peak_db, quali_comp_db,
         chroms.append(chrom)
         if not chrom.bad_data:
             for peak in chrom:
-                if not 'impurity' in peak.compound_id:
+                if 'impurity' not in peak.compound_id:
                     peak_db.insert_peak(peak)
             quali_comp_db.update(peak_db)
 
@@ -94,7 +94,7 @@ def process_compound_experiments(experiments, peak_db, quali_comp_db,
                                     settings.spectrum_correl_thresh,
                                     settings.relative_distance_thresh)
         for peak in chrom:
-            if not peak in peak_db and peak.idx > 0:
+            if peak not in peak_db and peak.idx > 0:
                 peak_db.insert_peak(peak)
         quali_comp_db.update(peak_db)
 
@@ -119,6 +119,6 @@ def process_experiments(experiments, peak_db, quali_comp_db, quant_comp_db,
         chroms.append(chrom)
         if not chrom.bad_data:
             for peak in chrom:
-                    peak_db.insert_peak(peak)
+                peak_db.insert_peak(peak)
             quali_comp_db.update(peak_db)
     return chroms

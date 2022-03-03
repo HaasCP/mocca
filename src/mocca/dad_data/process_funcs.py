@@ -75,13 +75,18 @@ def merge_peaks(summed_data, peaks):
 
     new_peaks = sorted(new_peaks, key=lambda x: x[0])
     peak_list = [BasePeak(maximum=maximum, left=left, right=right, offset=0)
-            for maximum, left, right in new_peaks]
+                 for maximum, left, right in new_peaks]
 
+    # if merge does nothing, then return
     if peak_list == peaks:
-        return peak_list  # if merge does nothing, then return
-    elif len(merge_peaks(summed_data, peak_list)) < len(peak_list):  # else, if the merging results in fewer peaks, recurse
-        return merge_peaks(summed_data, peak_list)  # recursion takes care of some special cases of overlapping peaks, and merges the previous list if necessary
-    return peak_list  # otherwise, just return fully merged list
+        return peak_list
+    # else, if the merging results in fewer peaks, recurse
+    # recursion takes care of some special cases of overlapping peaks
+    # and merges the previous list if necessary
+    elif len(merge_peaks(summed_data, peak_list)) < len(peak_list):
+        return merge_peaks(summed_data, peak_list)
+    # otherwise, just return fully merged list
+    return peak_list
 
 
 def pick_peaks(compound_data, experiment, absorbance_threshold,
@@ -103,7 +108,7 @@ def pick_peaks(compound_data, experiment, absorbance_threshold,
     peaks_high_pass: float
         Time high pass filter only using peaks with a retention time
         greater than the here given value for data analysis
-    
+
     peaks_low_pass : float
         Time low pass filter only using peaks with a retention time lower
         than the here given value for data analysis
@@ -118,26 +123,25 @@ def pick_peaks(compound_data, experiment, absorbance_threshold,
     peaks : list
         List of all peaks, as a list of tuples (maximum, left, right)
     """
-
     summed_data = sum_absorbance_by_time(compound_data.data)
     new_data_thresh = summed_data.copy()
-    new_data_thresh[new_data_thresh < absorbance_threshold] = 0  # summed absorbance threshold
-    
+    new_data_thresh[new_data_thresh < absorbance_threshold] = 0
+
     peak_locs = get_peak_locs(new_data_thresh)
     merged_peaks = merge_peaks(summed_data, peak_locs)
-    
+
     if peaks_high_pass:
-        merged_peaks = [peak for peak in merged_peaks if 
+        merged_peaks = [peak for peak in merged_peaks if
                         compound_data.time[peak.maximum] >= peaks_high_pass]
     if peaks_low_pass:
-        merged_peaks = [peak for peak in merged_peaks if 
+        merged_peaks = [peak for peak in merged_peaks if
                         compound_data.time[peak.maximum] <= peaks_low_pass]
-    
+
     merged_peaks = sorted(merged_peaks, key=lambda peak: peak.maximum)
-    
+
     chromatogram = Chromatogram(experiment, compound_data)
     for idx, peak in enumerate(merged_peaks):
-        chromatogram.insert_peak(PickedPeak(left= peak.left,
+        chromatogram.insert_peak(PickedPeak(left=peak.left,
                                             right=peak.right,
                                             maximum=peak.maximum,
                                             offset=peak.offset,

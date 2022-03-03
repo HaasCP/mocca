@@ -11,6 +11,9 @@ import datapane as dp
 
 
 def peaks_to_df(peaks):
+    """
+    Transfers relevant information from Peak objects in a pandas df.
+    """
     peaks_dict = {'retention_time': [],
                   'offset': [],
                   'compound_id': [],
@@ -48,6 +51,9 @@ def peaks_to_df(peaks):
 
 
 def report_peaks(peak_db, report_path):
+    """
+    Main report function for the peak database.
+    """
     peaks = peak_db.peaks
     peak_df = peaks_to_df(peaks)
     peak_page = dp.Page(
@@ -66,4 +72,3 @@ def report_peaks(peak_db, report_path):
         peak_page
     )
     r.save(path=os.path.join(report_path, "report_peak_db.html"), open=True)
-

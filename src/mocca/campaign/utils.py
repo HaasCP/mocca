@@ -9,14 +9,17 @@ import dill
 
 
 def save_instance(campaign, path):
+    """
+    Saves a HplcCampaign object as pkl file.
+    """
     with open(path, 'wb') as file:
-    #for chromatogram in self.chromatograms:
-    #    for peak in chromatogram.peaks:
-    #        peak.dataset.data = []
         dill.dump(campaign, file)
 
 
 def load_instance(path):
+    """
+    Loads a pkl file containing an HplcCampaign object.
+    """
     with open(path, 'rb') as file:
         dill.load(file)
 

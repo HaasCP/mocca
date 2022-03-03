@@ -15,11 +15,11 @@ def get_sorted_compound_experiments(experiments):
     In these categories, experiments are sorted in the order the user has given.
     """
     compound_exps = [exp for exp in experiments if exp.compound]
-    
+
     solvent_exps = [exp for exp in compound_exps if exp.compound.is_solvent]
 
     istd_exps = [exp for exp in compound_exps if exp.compound.is_istd]
-    
+
     other_exps = [exp for exp in compound_exps if not
                   exp.compound.is_solvent and not exp.compound.is_istd]
 
@@ -29,6 +29,7 @@ def get_sorted_compound_experiments(experiments):
     non_conc_exps = [exp for exp in other_exps if not exp.compound.conc]
 
     return solvent_exps + istd_exps + sorted_conc_exps + non_conc_exps
+
 
 def get_unprocessed_experiments(experiments, quali_comp_db=None):
     """
@@ -43,7 +44,8 @@ def get_unprocessed_experiments(experiments, quali_comp_db=None):
             if exp.istd:
                 for istd in exp.istd:
                     if istd.key not in quali_comp_db:
-                        raise ValueError("Internal standard {} unknown in this campaign. "
-                                         "First add the internal standard as pure "
-                                         "compound in a separate run!".format(exp.istd.key))
+                        raise ValueError("Internal standard {} unknown in this "
+                                         "campaign. First add the internal "
+                                         "standard as pure compound in a "
+                                         "separate run!".format(exp.istd.key))
     return unprocessed_exps

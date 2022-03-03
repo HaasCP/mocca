@@ -15,13 +15,16 @@ from mocca.dad_data.models import GradientData
 
 @dataclass()
 class Gradient():
+    """
+    Data container to store user input regarding gradients.
+    """
     path : str
     dataset : GradientData = field(init=False)
-    
+
     def __post_init__(self):
         if not os.path.exists(self.path):
             raise ValueError(f"Given gradient path {self.path} does not exist.")
-    
+
     def __repr__(self):
         return f"Gradient({self.path})"
 
@@ -57,7 +60,7 @@ class HplcInput():
     compound: Optional[Compound] = None
     istd: Optional[List[InternalStandard]] = None
     processed: bool = False
-    
+
     def __post_init__(self):
         if not os.path.exists(self.path):
             raise ValueError(f"Given path {self.path} does not exist.")

@@ -5,9 +5,9 @@ Created on Tue Dec 21 14:57:25 2021
 
 @author: haascp
 """
-
 from dataclasses import dataclass
 from typing import Optional
+
 
 @dataclass()
 class Settings():
@@ -23,7 +23,7 @@ class Settings():
     peaks_low_pass : Optional[float] = None
     spectrum_correl_thresh : Optional[float] = 0.95  # Value between 0 and 1
     relative_distance_thresh : Optional[float] = 0.01  # Value between 0 and 1
-    
+
     def __post_init__(self):
         if self.detector_limit is None:
             if self.hplc_system_tag == 'chemstation':
@@ -31,4 +31,5 @@ class Settings():
             elif self.hplc_system_tag == 'labsolutions':
                 self.detector_limit = 2000
             else:
-                raise AttributeError("HPLC System Tag {} not supported!".format(self.hplc_system_tag))
+                raise AttributeError(f"HPLC System Tag {self.hplc_system_tag} n"
+                                     "ot supported!")

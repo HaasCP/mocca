@@ -8,7 +8,12 @@ Created on Tue Dec 14 15:30:29 2021
 
 from mocca.peak.models import CorrectedPeak
 
+
 def correct_offset(integrated_peak, istd_peaks, offset):
+    """
+    Creates a corrected peak using internal standard peaks to obtain a
+    retention time offset.
+    """
     return CorrectedPeak(left=integrated_peak.left,
                          right=integrated_peak.right,
                          maximum=integrated_peak.maximum,

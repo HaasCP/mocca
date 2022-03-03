@@ -101,7 +101,11 @@ def match_peak(corrected_peak, component_db, spectrum_correl_coef_thresh,
                             istd=corrected_peak.istd,
                             matches=matches)
 
+
 def update_matches(peak, new_matches):
+    """
+    Updates the matches of a given peak.
+    """
     return PreprocessedPeak(left=peak.left,
                             right=peak.right,
                             maximum=peak.maximum,

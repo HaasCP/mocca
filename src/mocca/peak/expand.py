@@ -32,7 +32,6 @@ def expand_peak(picked_peak, absorbance_threshold):
         left -= 1
         if left == 0:
             break
-            
 
     if prev_val != np.inf:  # if peak was expanded, fix boundary, else don't change
         left += 1

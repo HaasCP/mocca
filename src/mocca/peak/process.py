@@ -9,6 +9,9 @@ from mocca.peak.models import ProcessedPeak
 
 
 def process_peak(peak, compound, is_compound=False):
+    """
+    Creates a processed peak by addding compound information to it.
+    """
     return ProcessedPeak(left=peak.left,
                          right=peak.right,
                          maximum=peak.maximum,

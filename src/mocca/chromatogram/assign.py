@@ -39,7 +39,7 @@ def update_peaks_and_matches(sorted_peaks):
     compound_id = get_best_match_compound_id(sorted_peaks[0])
     peaks = sorted_peaks
     peaks.pop(0)
-    
+
     new_peaks = []
     if peaks:
         for peak in peaks:
@@ -60,7 +60,7 @@ def assign_best_match_peak(peaks):
     compound_id = get_best_match_compound_id(sorted_peaks[0])
     assigned_peak = process_peak(sorted_peaks[0], Compound(compound_id),
                                  is_compound=False)
-    
+
     new_peaks = update_peaks_and_matches(sorted_peaks)
     return assigned_peak, new_peaks
 
@@ -112,10 +112,16 @@ def assign_unmatched_peaks_react(peaks, peak_db):
 
 
 def get_matched_peaks(peaks):
+    """
+    Returns all peaks which have possible matches.
+    """
     return [peak for peak in peaks if peak.matches]
 
 
 def get_unmatched_peaks(peaks):
+    """
+    Returns all peaks which do not have possible matches.
+    """
     return [peak for peak in peaks if not peak.matches]
 
 
@@ -126,9 +132,9 @@ def assign_peaks_react(chromatogram, peak_db):
     """
     matched_peaks = get_matched_peaks(chromatogram.peaks)
     unmatched_peaks = get_unmatched_peaks(chromatogram.peaks)
-    
+
     assigned_peaks, unassigned_peaks = assign_matched_peaks(matched_peaks)
-    
+
     unknown_peaks = assign_unmatched_peaks_react(unmatched_peaks + unassigned_peaks,
                                                  peak_db)
     chromatogram.peaks = sorted(assigned_peaks + unknown_peaks,
@@ -137,6 +143,9 @@ def assign_peaks_react(chromatogram, peak_db):
 
 
 def get_unknown_impurity_peaks(assigned_peaks):
+    """
+    Returns all peaks which are a compound impurity or are unknown.
+    """
     return [peak for peak in assigned_peaks if
             "unknown" in peak.compound_id or "impurity" in peak.compound_id]
 
@@ -168,15 +177,13 @@ def assign_unmatched_peaks_compound(peaks, compound_id, impurity_counter=0):
 
 def assign_peaks_compound(chromatogram, compound):
     """
-    Assigns all matched peaks with compound_ids. If any compound_id of assigned
-    peak matches the compound key, compound attributes are assigned to the peak.
-    Else, the highest 
+    Assigns all matched peaks with compound_ids.
     """
     matched_peaks = get_matched_peaks(chromatogram.peaks)
     assigned_peaks, unassigned_peaks = assign_matched_peaks(matched_peaks)
     unmatched_peaks = get_unmatched_peaks(chromatogram.peaks)
     unmatched_peaks = unmatched_peaks + unassigned_peaks
-    
+
     if any([peak.compound_id == compound.key for peak in assigned_peaks]):
         for peak in assigned_peaks:
             if peak.compound_id == compound.key:
@@ -208,7 +215,6 @@ def assign_peaks_compound(chromatogram, compound):
     impurity_peaks = assign_unmatched_peaks_compound(unmatched_peaks,
                                                      compound.key)
 
-    
     if processed_peak.saturation:
         chromatogram.warnings.append("Compound was assigned to a peak possibly "
                                      "affected from saturation effect. User "
@@ -219,8 +225,9 @@ def assign_peaks_compound(chromatogram, compound):
     return chromatogram
 
 
-def reassign_impurities(chromatogram, peak_db, quali_comp_db, spectrum_correl_coef_thresh,
-                        relative_distance_thresh, print_similarity_dicts=False):
+def reassign_impurities(chromatogram, peak_db, quali_comp_db,
+                        spectrum_correl_coef_thresh, relative_distance_thresh,
+                        print_similarity_dicts=False):
     """
     This function is only allowed to be run in the process_all_experiments function
     which has to be run everytime a new compound should be added to quali_comp_db.
@@ -228,7 +235,7 @@ def reassign_impurities(chromatogram, peak_db, quali_comp_db, spectrum_correl_co
     impurity_peaks = [peak for peak in chromatogram if 'impurity' in peak.compound_id]
     compound_peaks = [peak for peak in chromatogram if peak not in impurity_peaks]
     compound_id = [peak for peak in compound_peaks if peak.is_compound][0].compound_id
-    
+
     # get impurity counter from peak db
     cur_count = 0
     for peak in peak_db:
@@ -244,7 +251,7 @@ def reassign_impurities(chromatogram, peak_db, quali_comp_db, spectrum_correl_co
         new_peaks.append(matched_peak)
     matched_peaks = get_matched_peaks(new_peaks)
     assigned_peaks, unassigned_peaks = assign_matched_peaks(matched_peaks)
-    
+
     unmatched_peaks = get_unmatched_peaks(new_peaks)
     unmatched_peaks = unmatched_peaks + unassigned_peaks
     impurity_peaks = assign_unmatched_peaks_compound(unmatched_peaks,

@@ -54,8 +54,8 @@ class PeakDatabase():
         cur_count = 0
         for peak in self:
             if (peak.compound_id is not None and
-                "parafac" not in peak.compound_id and
-                peak.compound_id.startswith("unknown_")):
+                    "parafac" not in peak.compound_id and
+                    peak.compound_id.startswith("unknown_")):
                 num = int(peak.compound_id[8:])
                 if num > cur_count:
                     cur_count = num

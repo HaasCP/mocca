@@ -5,17 +5,13 @@ Created on Wed Aug  4 15:28:24 2021
 
 @author: haascp
 """
-
-# Files and folders navigation
 import os
-
-# Data manipulation
 import pandas as pd
 
 
 def read_csv_agilent(path):
     """
-    Reads the UTF-16 encoded 3D data exported by the ChemStation macro.  
+    Reads the UTF-16 encoded 3D data exported by the ChemStation macro.
     Parameters
     ----------
     path : str
@@ -24,12 +20,13 @@ def read_csv_agilent(path):
     Returns
     -------
     df : pandas.DataFrame
-        First column is time, the following columns obtain the absorbance 
+        First column is time, the following columns obtain the absorbance
         values at the given detection wavelength in the column name.
     """
     with open(os.path.join(path, 'DAD1.CSV'), 'r', encoding='utf-16') as f:
         df = pd.read_csv(f)
     return df
+
 
 def tidy_df_agilent(dataframe, wl_high_pass=None, wl_low_pass=None):
     """
@@ -38,7 +35,7 @@ def tidy_df_agilent(dataframe, wl_high_pass=None, wl_low_pass=None):
     Parameters
     ----------
     dataframe : pandas.DataFrame
-        First column is time, the following columns obtain the absorbance 
+        First column is time, the following columns obtain the absorbance
         values at the given detection wavelength in the column name.
 
     Raises
@@ -54,15 +51,16 @@ def tidy_df_agilent(dataframe, wl_high_pass=None, wl_low_pass=None):
             wavelength: Detection wavelength
             absorbance: Absorbance value
     """
-
     df = dataframe.copy()
-    df.rename(columns={df.columns[0]: 'time'}, inplace=True) # names time column
-    
+    # name time column
+    df.rename(columns={df.columns[0]: 'time'}, inplace=True)
+
     acq_time = df.time.max() / len(df)
-    
-    time_series = pd.Series(range(1, (len(df) + 1))).astype(float) * acq_time # generates new time column
+
+    # generate new time column
+    time_series = pd.Series(range(1, (len(df) + 1))).astype(float) * acq_time
     df['time'] = time_series
-    df = pd.melt(df, id_vars='time', value_vars=df.columns[1:], 
+    df = pd.melt(df, id_vars='time', value_vars=df.columns[1:],
                  var_name='wavelength', value_name='absorbance')
     df['wavelength'] = df['wavelength'].astype(float)
     return df

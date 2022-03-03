@@ -30,7 +30,7 @@ class PickedPeak(BasePeak):
             raise ValueError("Both peaks must be of the same type!")
         return (self.maximum == other.maximum and
                 self.dataset == other.dataset)
-    
+
     def __repr__(self):
         kws = [f"{key}={value!r}" if key != "dataset" else
                f"{key}={type(value)!r}" for key, value in self.__dict__.items()]
@@ -110,7 +110,7 @@ class ProcessedPeak():
             raise ValueError("Both peaks must be of the same type!")
         return (self.maximum + self.offset == other.maximum + other.offset and
                 self.idx == other.idx and self.dataset == other.dataset)
-    
+
     def __repr__(self):
         kws = [f"{key}={value!r}" if key != "dataset" else
                f"{key}={type(value)!r}" for key, value in self.__dict__.items()]

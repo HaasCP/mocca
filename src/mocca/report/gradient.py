@@ -15,6 +15,9 @@ from mocca.visualization.basic_plots import plot_1D_data
 
 
 def gradients_to_df(gradients):
+    """
+    Transfers relevant information of Gradient objects in a pandas df.
+    """
     grad_dict = {'index': [],
                  'file': [],
                  'n_time_points': [],
@@ -34,6 +37,9 @@ def gradients_to_df(gradients):
 
 
 def create_gradient_pages(gradients):
+    """
+    Creates a report page for each gradient used in the given campaign.
+    """
     grad_pages = []
     for i, gradient in enumerate(gradients):
         gradient_df = pd.DataFrame({
@@ -72,6 +78,9 @@ def create_gradient_pages(gradients):
 
 
 def report_gradients(exps, report_path):
+    """
+    Main gradient report function.
+    """
     gradients = []
     for exp in exps:
         if exp.gradient.dataset not in gradients:

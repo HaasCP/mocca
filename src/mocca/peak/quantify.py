@@ -8,7 +8,12 @@ Created on Tue Jan  4 15:49:54 2022
 
 from mocca.peak.models import ProcessedPeak
 
+
 def quantify_peak(peak, quant_comp_db):
+    """
+    Takes a peak with an integral and quantifies it by calculating the corresponding
+    concentration if the compound is present in the quantification database.
+    """
     if peak.compound_id in quant_comp_db:
         quant_comp = quant_comp_db[peak.compound_id]
         if peak.istd and not any(istd_peak.compound_id == peak.compound_id for
@@ -25,7 +30,8 @@ def quantify_peak(peak, quant_comp_db):
                 concentration = (peak.integral /
                                  quant_comp.calib_factors['absolute'])
             else:
-                concentration = (peak.integral * istd_peak.concentration / istd_peak.integral /
+                concentration = (peak.integral * istd_peak.concentration /
+                                 istd_peak.integral /
                                  quant_comp.calib_factors[max_score_version])
 
         else:
@@ -33,7 +39,7 @@ def quantify_peak(peak, quant_comp_db):
                              quant_comp.calib_factors['absolute'])
     else:
         concentration = None
-    
+
     return ProcessedPeak(left=peak.left,
                          right=peak.right,
                          maximum=peak.maximum,
