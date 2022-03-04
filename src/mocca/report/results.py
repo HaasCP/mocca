@@ -111,13 +111,15 @@ def report_runs(chroms, quali_comp_db, quant_comp_db, report_path):
     """
     Main report function to follow concentrations and integrals over runs.
     """
+    this_dir, _ = os.path.split(__file__)
+    mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     chrom_df = chroms_to_results(chroms, quali_comp_db)
     summary_page = dp.Page(
         title="Start page",
         blocks=[
             dp.Group(
                 dp.Text("# Results of compounds over runs"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                dp.Media(file=mocca_icon_path),
                 columns=2
             ),
             dp.Text("### Table: Chromatograms processed during the campaign."),

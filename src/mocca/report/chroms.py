@@ -124,13 +124,15 @@ def report_chroms(chroms, settings, report_path):
     """
     Main Chromatogram report function.
     """
+    this_dir, _ = os.path.split(__file__)
+    mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     chrom_df = chroms_to_df(chroms)
     summary_page = dp.Page(
         title="Start page",
         blocks=[
             dp.Group(
                 dp.Text("# Results by chromatogram report"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                dp.Media(file=mocca_icon_path),
                 columns=2
             ),
             dp.Text("### Table: Settings and thresholds used to process "

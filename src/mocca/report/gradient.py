@@ -81,6 +81,8 @@ def report_gradients(exps, report_path):
     """
     Main gradient report function.
     """
+    this_dir, _ = os.path.split(__file__)
+    mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     gradients = []
     for exp in exps:
         if exp.gradient.dataset not in gradients:
@@ -93,7 +95,7 @@ def report_gradients(exps, report_path):
         blocks=[
             dp.Group(
                 dp.Text("# Gradient report"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                dp.Media(file=mocca_icon_path),
                 columns=2),
             dp.Text("### Table: Details to all gradients used in the campaign."),
             dp.Table(grad_df)

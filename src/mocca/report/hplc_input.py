@@ -55,13 +55,15 @@ def report_hplc_input(exps, report_path):
     """
     Main HPLC input report function.
     """
+    this_dir, _ = os.path.split(__file__)
+    mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     exp_df = exps_to_df(exps)
     exp_page = dp.Page(
         title="Start page",
         blocks=[
             dp.Group(
                 dp.Text("# HPLC input report"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                dp.Media(file=mocca_icon_path),
                 columns=2
             ),
             dp.Text("### Table: HPLC input as given by the user."),

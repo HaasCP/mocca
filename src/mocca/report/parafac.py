@@ -106,6 +106,8 @@ def report_parafac(chroms, report_path):
     """
     Main PARAFAC report function.
     """
+    this_dir, _ = os.path.split(__file__)
+    mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     chrom_df = parafac_chroms_to_df(chroms)
     if chrom_df.empty:
         return
@@ -114,7 +116,7 @@ def report_parafac(chroms, report_path):
         blocks=[
             dp.Group(
                 dp.Text("# PARAFAC report"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                dp.Media(file=mocca_icon_path),
                 columns=2
             ),
             dp.Text("### Table: Chromatograms which triggered PARAFAC during "

@@ -77,6 +77,8 @@ def report_quali_comps(quali_comp_db, report_path):
     """
     Creates html report for the qualitative component database.
     """
+    this_dir, _ = os.path.split(__file__)
+    mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     comps = quali_comp_db.items
     comp_df = quali_comps_to_df(comps)
     table_page = dp.Page(
@@ -84,7 +86,7 @@ def report_quali_comps(quali_comp_db, report_path):
         blocks=[
             dp.Group(
                 dp.Text("# Qualitative component database report"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                dp.Media(file=mocca_icon_path),
                 columns=2
             ),
             dp.Text("### Table: Components in the qualitative component database "

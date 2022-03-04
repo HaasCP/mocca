@@ -54,6 +54,8 @@ def report_peaks(peak_db, report_path):
     """
     Main report function for the peak database.
     """
+    this_dir, _ = os.path.split(__file__)
+    mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     peaks = peak_db.peaks
     peak_df = peaks_to_df(peaks)
     peak_page = dp.Page(
@@ -61,7 +63,7 @@ def report_peaks(peak_db, report_path):
         blocks=[
             dp.Group(
                 dp.Text("# Peak report"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+                dp.Media(file=mocca_icon_path),
                 columns=2
             ),
             dp.Text("### Table: Peaks in the peak database of the campaign."),
