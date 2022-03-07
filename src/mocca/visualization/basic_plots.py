@@ -20,7 +20,7 @@ def plot_1D_data(df, xlabel='', ylabel='', title='', color=None, reduce_data=Tru
             df = df[::fac]
 
     if color is None:
-        color="black"
+        color = "black"
 
     chart = alt.Chart(df, title=title).mark_line().encode(
         x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
@@ -28,7 +28,7 @@ def plot_1D_data(df, xlabel='', ylabel='', title='', color=None, reduce_data=Tru
         color=alt.value(color)
     ).configure_axis(
         grid=False,
-        titleFontSize = 16,
+        titleFontSize=16,
         titleFontWeight='normal'
     ).configure_view(
         strokeWidth=0
@@ -46,7 +46,7 @@ def plot_1D_layer(df, xlabel='', ylabel='', title='', color=None, reduce_data=Tr
             df = df[::fac]
 
     if color is None:
-        color="black"
+        color = "black"
 
     chart = alt.Chart(df, title=title).mark_line().encode(
         x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
@@ -67,12 +67,13 @@ def plot_1D_scatter(df, xlabel='', ylabel='', title='', color=None, reduce_data=
 
     chart = alt.Chart(df, title=title).mark_circle(size=60).encode(
         x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
-        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel), scale=alt.Scale(zero=False)),
+        y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel),
+                scale=alt.Scale(zero=False)),
         tooltip=[df.columns[0], df.columns[1]],
         color=alt.value(color)
     ).configure_axis(
         grid=False,
-        titleFontSize = 16,
+        titleFontSize=16,
         titleFontWeight='normal'
     ).configure_view(
         strokeWidth=0

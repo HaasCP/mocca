@@ -18,8 +18,6 @@ from mocca.campaign.process_funcs import process_experiments
 from mocca.campaign.process_funcs import process_gradients
 from mocca.campaign.utils import save_instance
 
-# TODO: Go through files and clean up uncommented functions + documentation
-
 
 class HplcDadCampaign():
     """

@@ -12,8 +12,7 @@ from mocca.dad_data.utils import sum_absorbance_by_time
 
 
 def plot_chrom_with_peaks(chrom):
-    """Plots summed absorbance vs time with highlighted picked peak zones."""  
-    #alt.data_transformers.disable_max_rows()
+    """Plots summed absorbance vs time with highlighted picked peak zones."""
 
     df = pd.DataFrame({
         'time': chrom.dataset.time,
@@ -23,9 +22,9 @@ def plot_chrom_with_peaks(chrom):
     if fac > 0:
         df = df[::fac]
 
-    xlabel='Time (min)'
-    ylabel='Summed absorbance (mAU)'
-    title=''
+    xlabel = 'Time (min)'
+    ylabel = 'Summed absorbance (mAU)'
+    title = ''
 
     chart = alt.Chart(df, title=title).mark_line().encode(
         x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
@@ -59,28 +58,28 @@ def plot_chrom_with_peaks(chrom):
             y2=alt.value(300)  # pixels from top
         )
         areas.append(area)
-        
+
         brdrs = pd.DataFrame({'peak_borders': [chrom.dataset.time[peak.left],
                                                chrom.dataset.time[peak.right]]})
         border = alt.Chart(brdrs).mark_rule(color=color).encode(
           x='peak_borders')
         borders.append(border)
-    
+
     peak_tips = {'peak_max': []}
     for peak in chrom:
-        peak_tips['peak_max'].append(chrom.dataset.time[peak.maximum])                             
-    rules = alt.Chart(pd.DataFrame(peak_tips)).mark_rule(strokeDash=[5,5]).encode(
+        peak_tips['peak_max'].append(chrom.dataset.time[peak.maximum])
+    rules = alt.Chart(pd.DataFrame(peak_tips)).mark_rule(strokeDash=[5, 5]).encode(
       x='peak_max')
-    
+
     fig = chart + rules
     for area in areas:
         fig = fig + area
     for border in borders:
         fig = fig + border
-        
+
     fig = fig.configure_axis(
         grid=False,
-        titleFontSize = 16,
+        titleFontSize=16,
         titleFontWeight='normal'
     ).configure_view(
         strokeWidth=0
