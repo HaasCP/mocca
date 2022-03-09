@@ -7,6 +7,7 @@ Created on Fri Jan 14 09:04:46 2022
 """
 import numpy as np
 
+from mocca.dad_data.utils import sum_absorbance_by_time
 from mocca.peak.utils import get_peak_data
 from mocca.decomposition.utils import check_comp_overlap
 from mocca.decomposition.model import DataTensor
@@ -44,17 +45,17 @@ def get_comp_peaks(relevant_comp):
     multiplied as long as five peaks are reached.
     """
     created_from_peaks = relevant_comp.created_from
-    # take maximum 5 peaks
-    fac = len(created_from_peaks) // 5
-    if fac > 5:
+    # take maximum 2 peaks
+    fac = len(created_from_peaks) // 2
+    if fac > 2:
         created_from_peaks = created_from_peaks[::fac]
-    # duplicate peaks to have at least 5 peaks
-    elif len(created_from_peaks) < 5:
-        num_repeats = int(5 / len(created_from_peaks))
+    # duplicate peaks to have at least 2 peaks
+    elif len(created_from_peaks) < 2:
+        num_repeats = int(2 / len(created_from_peaks))
         new_created_from_peaks = [val for val in created_from_peaks for
                                   _ in range(num_repeats)]
         i = 0
-        while len(new_created_from_peaks) < 5:
+        while len(new_created_from_peaks) < 2:
             new_created_from_peaks.append(created_from_peaks[i])
             i += 1
         created_from_peaks = new_created_from_peaks
@@ -156,10 +157,11 @@ def normalize_peak_data(parafac_data):
     """
     Normalizes all slices to the maximum absorbance of the slice.
     """
-    norm_val = parafac_data[-1].max()
+    max_impure = sum_absorbance_by_time(parafac_data[-1]).max()
     data_normalized = []
     for data in parafac_data[:-1]:
-        data_normalized.append(data / data.max() * norm_val / 5)
+        max_data = sum_absorbance_by_time(data).max()
+        data_normalized.append(data / max_data * max_impure / 2)
     data_normalized.append(parafac_data[-1])
     return data_normalized
 

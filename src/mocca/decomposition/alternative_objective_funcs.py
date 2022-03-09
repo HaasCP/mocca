@@ -97,3 +97,15 @@ def get_total_integral_sum(parafac_factors, show_parafac_analytics):
     if show_parafac_analytics:
         print(f"objective_total_sum = {total_sum}")
     return total_sum
+
+
+def get_impure_integral_sum(parafac_factors, show_parafac_analytics):
+    """
+    This objective function assumes that the PARAFAC model is best, when the
+    summed integral of all components in the impure peak slice is maximized.
+    """
+    integrals = parafac_factors[2][-1, :]
+    sum_i = sum(integrals)
+    if show_parafac_analytics:
+        print(f"impure_peak_sum = {sum_i}")
+    return sum_i
