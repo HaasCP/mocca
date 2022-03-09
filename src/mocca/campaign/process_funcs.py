@@ -26,7 +26,8 @@ def process_gradients(experiments, settings):
     Reads and processes gradient data for each experiment. Avoids double processing.
     """
     unprocessed_exps = get_unprocessed_experiments(experiments)
-    for exp in unprocessed_exps:
+    relevant_exps = [exp for exp in unprocessed_exps if exp.gradient]
+    for exp in relevant_exps:
         gradient_dataset = next((e.gradient.dataset for e in unprocessed_exps
                                  if hasattr(e.gradient, 'dataset') and
                                  exp.gradient.path == e.gradient.path),

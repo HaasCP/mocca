@@ -8,6 +8,8 @@ Created on Wed Aug  4 15:28:24 2021
 import os
 import pandas as pd
 
+from mocca.dad_data.utils import df_to_array, apply_filter
+
 
 def read_csv_agilent(path):
     """
@@ -64,3 +66,14 @@ def tidy_df_agilent(dataframe, wl_high_pass=None, wl_low_pass=None):
                  var_name='wavelength', value_name='absorbance')
     df['wavelength'] = df['wavelength'].astype(float)
     return df
+
+
+def read_chemstation(path, wl_high_pass=None, wl_low_pass=None):
+    """
+    Chemstation read and processing function.
+    """
+    df = read_csv_agilent(path)
+    df = tidy_df_agilent(df)
+    df = apply_filter(df, wl_high_pass, wl_low_pass)
+    data, time, wavelength = df_to_array(df)
+    return data, time, wavelength

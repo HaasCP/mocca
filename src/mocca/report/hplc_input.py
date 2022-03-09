@@ -46,7 +46,10 @@ def exps_to_df(exps):
         else:
             exp_dict['istd_keys'].append(None)
             exp_dict['istd_concs'].append(None)
-        exp_dict['gradient_file'].append(os.path.basename(exp.gradient.path))
+        if exp.gradient:
+            exp_dict['gradient_file'].append(os.path.basename(exp.gradient.path))
+        else:
+            exp_dict['gradient_file'].append(None)
         exp_dict['processed'].append(exp.processed)
     return pd.DataFrame(exp_dict)
 

@@ -88,7 +88,7 @@ class PreprocessedPeak(CorrectedPeak):
 @dataclass(frozen=True)
 class ProcessedPeak():
     """
-    Class of fully processed peaks ready to be put in the peak databse.
+    Class of fully processed peaks ready to be put in the peak database.
     """
     left : int
     right : int

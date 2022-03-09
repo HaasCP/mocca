@@ -11,10 +11,11 @@ from typing import List
 import numpy as np
 import copy
 
-from mocca.dad_data.utils import absorbance_to_array, apply_filter, trim_data
+from mocca.dad_data.utils import trim_data
 from mocca.dad_data.process_gradientdata import bsl_als
-from mocca.dad_data.apis.chemstation_api import read_csv_agilent, tidy_df_agilent
-from mocca.dad_data.apis.labsolutions_api import read_txt_shimadzu
+from mocca.dad_data.apis.chemstation import read_chemstation
+from mocca.dad_data.apis.labsolutions import read_labsolutions
+from mocca.dad_data.apis.custom import read_custom_data
 
 import mocca.peak.models
 
@@ -42,7 +43,7 @@ class DadData():
         """
         self.warnings = []
         self._set_path(experiment)
-        self._read_data(wl_high_pass, wl_low_pass)
+        self._read_data(wl_high_pass, wl_low_pass, experiment)
         experiment.processed = True
 
     def __eq__(self, other):
@@ -62,22 +63,25 @@ class DadData():
         """
         self.path = experiment.path
 
-    def _read_data(self, wl_high_pass, wl_low_pass):
+    def _read_data(self, wl_high_pass, wl_low_pass, experiment):
         """
         Read the data file, preprocess it and filter it in order to obtain
         standardized data format for all HPLC systems.
         """
         if self.hplc_system_tag == 'chemstation':
-            df = read_csv_agilent(self.path)
-            df = tidy_df_agilent(df)
-            df = apply_filter(df, wl_high_pass, wl_low_pass)
+            data, time, wavelength = read_chemstation(self.path, wl_high_pass,
+                                                      wl_low_pass)
         elif self.hplc_system_tag == 'labsolutions':
-            df = read_txt_shimadzu(self.path)
-            df = apply_filter(df, wl_high_pass, wl_low_pass)
-
-        self.data = absorbance_to_array(df)
-        self.time = df.time.unique()
-        self.wavelength = df.wavelength.unique()
+            data, time, wavelength = read_labsolutions(self.path, wl_high_pass,
+                                                       wl_low_pass)
+        elif self.hplc_system_tag == 'custom':
+            data, time, wavelength = read_custom_data(experiment)
+        else:
+            raise ValueError(f"Given hplc_system_tag  {self.hplc_system_tag} is "
+                             "not defined in MOCCA.")
+        self.data = data
+        self.time = time
+        self.wavelength = wavelength
 
 
 @dataclass(eq=False)
@@ -106,7 +110,8 @@ class CompoundData(DadData):
         Baseline-corrects the given HPLC-DAD data.
         """
         super().__post_init__(experiment, wl_high_pass, wl_low_pass)
-        self._subtract_baseline(experiment.gradient.dataset)
+        if experiment.gradient is not None:
+            self._subtract_baseline(experiment.gradient.dataset)
 
     def _trim_data(self, length):
         """Trims the data in the time dimension to the length provided"""

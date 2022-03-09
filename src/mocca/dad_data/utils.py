@@ -61,6 +61,18 @@ def absorbance_to_array(df):
     return absorbance_array
 
 
+def df_to_array(df):
+    """
+    Takes a tidy dataframe of HPLC-DAD data and returns a numpy array of "
+    absorbance values as well as a vector for the time domain and a vector for "
+    the wavelength domain.
+    """
+    data = absorbance_to_array(df)
+    time = df.time.unique()
+    wavelength = df.wavelength.unique()
+    return data, time, wavelength
+
+
 def apply_filter(dataframe, wl_high_pass, wl_low_pass, reference_wl=True):
     """
     Filters absorbance data of tidy 3D DAD dataframes to remove noise

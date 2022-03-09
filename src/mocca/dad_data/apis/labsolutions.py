@@ -8,6 +8,8 @@ Created on Mon Aug 30 15:17:53 2021
 """
 import pandas as pd
 
+from mocca.dad_data.utils import df_to_array, apply_filter
+
 
 def read_txt_shimadzu(path, wl_high_pass=None, wl_low_pass=None):
     """
@@ -56,3 +58,12 @@ def read_txt_shimadzu(path, wl_high_pass=None, wl_low_pass=None):
     df['absorbance'] = df['absorbance'] / 1000
     return df
 
+
+def read_labsolutions(path, wl_high_pass=None, wl_low_pass=None):
+    """
+    Labsolutions read and processing function.
+    """
+    df = read_txt_shimadzu(path)
+    df = apply_filter(df, wl_high_pass, wl_low_pass)
+    data, time, wavelength = df_to_array(df)
+    return data, time, wavelength

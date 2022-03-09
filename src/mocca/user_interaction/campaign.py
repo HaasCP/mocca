@@ -48,7 +48,8 @@ class HplcDadCampaign():
         self.warnings = []
         for hplc_input in self.hplc_runs:
             hplc_input.processed = False
-            hplc_input.gradient.dataset = None
+            if hplc_input.gradient:
+                hplc_input.gradient.dataset = None
 
     def add_hplc_input(self, hplc_input):
         """

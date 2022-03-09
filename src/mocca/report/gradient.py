@@ -81,6 +81,8 @@ def report_gradients(exps, report_path):
     """
     Main gradient report function.
     """
+    if not any(exp.gradient for exp in exps):
+        return
     this_dir, _ = os.path.split(__file__)
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     gradients = []

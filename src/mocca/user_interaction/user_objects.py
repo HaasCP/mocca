@@ -7,6 +7,7 @@ Created on Tue Jan 25 10:46:55 2022
 """
 
 import os
+import numpy as np
 from dataclasses import dataclass, field
 from typing import Optional, List
 
@@ -51,18 +52,39 @@ class InternalStandard():
 
 
 @dataclass()
+class CustomData():
+    """
+    Data container to store custom data like, e.g., from HPLC chromatogram
+    simulations.
+    """
+    data: np.ndarray
+    time: list
+    wavelength: list
+    
+    def __post_init__(self):
+        self._check_custom_data()
+        
+    def _check_custom_data(self):
+        if (self.data.shape[0] != len(self.wavelength) or
+            self.data.shape[1] != len(self.time)):
+            raise ValueError("Data must be given as a two-dimensional numpy ndarray "
+                             "with the shape (len(wavelenght), len(time))")
+
+
+@dataclass()
 class HplcInput():
     """
     Data container to store user input.
     """
     path : str
-    gradient : Gradient
+    gradient : Optional[Gradient]
     compound: Optional[Compound] = None
     istd: Optional[List[InternalStandard]] = None
     processed: bool = False
+    custom_data: CustomData = None
 
     def __post_init__(self):
-        if not os.path.exists(self.path):
+        if self.custom_data is None and not os.path.exists(self.path):
             raise ValueError(f"Given path {self.path} does not exist.")
         if self.istd is not None and type(self.istd) != list:
             self.istd = [self.istd]
