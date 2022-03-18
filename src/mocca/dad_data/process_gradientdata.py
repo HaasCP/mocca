@@ -10,7 +10,7 @@ from scipy import sparse
 from scipy.sparse.linalg import spsolve
 
 
-def bsl_als_alg(y, lam=1e6, p=0.01, niter=3):
+def bsl_als_alg(y, lam=1e5, p=0.01, niter=3):
     """
     Baseline correction algorithm: Optimized Python implementation of
     "Asymmetric Least Squares Smoothing" by P. Eilers and H. Boelens in 2005:
