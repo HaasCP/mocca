@@ -34,7 +34,7 @@ def plot_chrom_with_peaks(chrom):
     peaks = [peak for peak in chrom if peak.idx > 0]
     areas = []
     borders = []
-    for peak in peaks:
+    for peak in [p for p in peaks if p.idx > 0]:
         # choose color
         if peak.pure and not peak.saturation:
             color = 'green'

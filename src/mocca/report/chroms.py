@@ -9,6 +9,7 @@ import os
 import pandas as pd
 import datapane as dp
 
+from mocca.peak.models import ProcessedPeak
 from mocca.visualization.basic_plots import plot_1D_data
 from mocca.visualization.results_plot import plot_chrom_with_peaks
 from mocca.report.utils import settings_to_df
@@ -79,8 +80,8 @@ def create_chrom_page(chrom, index):
 
         df = pd.DataFrame({'x': wls,
                            'y': spectrum})
-        title_base = "UV-Vis spectrum of peak at "
-        f"{round(peak.dataset.time[peak.maximum +peak.offset], 3)} min"
+        title_base = "UV-Vis spectrum of peak at {} min".\
+            format(round(peak.dataset.time[peak.maximum + peak.offset], 3))
         if peak.compound_id:
             title = title_base + f' ({peak.compound_id})'
         elif not peak.pure:
@@ -144,8 +145,9 @@ def report_chroms(chroms, settings, report_path):
     )
     chrom_pages = []
     for i, chrom in enumerate(chroms):
-        page = create_chrom_page(chrom, i + 1)
-        chrom_pages.append(page)
+        if chrom.peaks and all(type(peak) == ProcessedPeak for peak in chrom.peaks):
+            page = create_chrom_page(chrom, i + 1)
+            chrom_pages.append(page)
     r = dp.Report(
         summary_page,
         *chrom_pages

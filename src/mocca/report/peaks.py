@@ -14,12 +14,12 @@ def peaks_to_df(peaks):
     """
     Transfers relevant information from Peak objects in a pandas df.
     """
-    peaks_dict = {'retention_time': [],
+    peaks_dict = {'file': [],
+                  'retention_time': [],
                   'offset': [],
                   'compound_id': [],
                   'integral': [],
                   'concentration': [],
-                  'file': [],
                   'peak_id': [],
                   'is_saturated': [],
                   'is_pure': [],
@@ -29,9 +29,9 @@ def peaks_to_df(peaks):
     for peak in peaks:
         times = peak.dataset.time
         offset_factor = times[1] - times[0]
+        peaks_dict['file'].append(os.path.basename(peak.dataset.path))
         peaks_dict['retention_time'].append(times[peak.maximum])
         peaks_dict['offset'].append(peak.offset * offset_factor)
-        peaks_dict['file'].append(os.path.basename(peak.dataset.path))
         peaks_dict['peak_id'].append(peak.idx)
         peaks_dict['is_saturated'].append(peak.saturation)
         peaks_dict['is_pure'].append(peak.pure)

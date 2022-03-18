@@ -65,8 +65,11 @@ def plot_1D_scatter(df, xlabel='', ylabel='', title='', color=None, reduce_data=
         if fac > 0:
             df = df[::fac]
 
+    if color is None:
+        color = "black"
+
     chart = alt.Chart(df, title=title).mark_circle(size=60).encode(
-        x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel)),
+        x=alt.X(df.columns[0], axis=alt.Axis(title=xlabel, tickMinStep=1)),
         y=alt.Y(df.columns[1], axis=alt.Axis(title=ylabel),
                 scale=alt.Scale(zero=False)),
         tooltip=[df.columns[0], df.columns[1]],
