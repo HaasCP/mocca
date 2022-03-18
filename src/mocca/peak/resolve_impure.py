@@ -69,9 +69,6 @@ def create_parafac_peak(comp_i, parafac_model):
     impure_peak = parafac_model.impure_peak
     left_bound = tensor.boundaries[0]
     right_bound = tensor.boundaries[1]
-    n_wls = len(parafac_model.impure_peak.dataset.wavelength)
-    # integral correction for y-shifted parafac data
-    integral_correction = tensor.y_offset * n_wls * (right_bound - left_bound)
 
     if type(impure_peak) == CorrectedPeak:
         parafac_peak = CorrectedPeak(left=left_bound,
@@ -88,8 +85,7 @@ def create_parafac_peak(comp_i, parafac_model):
                                      saturation=impure_peak.saturation,
                                      pure=True,
                                      # reaction run in last slice of data tensor
-                                     integral=(parafac_comp_factors[2][-1] +
-                                               integral_correction),
+                                     integral=(parafac_comp_factors[2][-1]),
                                      istd=impure_peak.istd)
     elif type(impure_peak) == IntegratedPeak:
         parafac_peak = IntegratedPeak(left=left_bound,
@@ -107,8 +103,7 @@ def create_parafac_peak(comp_i, parafac_model):
                                       saturation=impure_peak.saturation,
                                       pure=True,
                                       # reaction run in last slice of data tensor
-                                      integral=(parafac_comp_factors[2][-1] +
-                                                integral_correction))
+                                      integral=(parafac_comp_factors[2][-1]))
     else:
         raise TypeError(f"Given impure peak is of type {type(impure_peak)}. "
                         "Only mocca IntegratedPeak and CorrectedPeak types "

@@ -166,6 +166,7 @@ class ParafacData():
         left = boundaries[0] - shift  # impure_peak.offset already included in
         right = boundaries[1] - shift + 1
         self.data[:, left:right] = parafac_peak_data + y_offset
+        self.data[self.data < 0] = 0
 
     def __eq__(self, other):
         """
