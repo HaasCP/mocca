@@ -73,7 +73,7 @@ def create_parafac_peak(comp_i, parafac_model):
     if type(impure_peak) == CorrectedPeak:
         parafac_peak = CorrectedPeak(left=left_bound,
                                      right=right_bound,
-                                     maximum=(left_bound +
+                                     maximum=(left_bound - shift +
                                               np.argmax(parafac_comp_factors[1])),
                                      offset=impure_peak.offset,
                                      dataset=ParafacData(impure_peak,
@@ -90,7 +90,7 @@ def create_parafac_peak(comp_i, parafac_model):
     elif type(impure_peak) == IntegratedPeak:
         parafac_peak = IntegratedPeak(left=left_bound,
                                       right=right_bound,
-                                      maximum=(left_bound +
+                                      maximum=(left_bound - shift +
                                                np.argmax(parafac_comp_factors[1]) -
                                                shift),
                                       offset=impure_peak.offset,
