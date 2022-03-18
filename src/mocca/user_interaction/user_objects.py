@@ -60,15 +60,16 @@ class CustomData():
     data: np.ndarray
     time: list
     wavelength: list
-    
+
     def __post_init__(self):
         self._check_custom_data()
-        
+
     def _check_custom_data(self):
         if (self.data.shape[0] != len(self.wavelength) or
-            self.data.shape[1] != len(self.time)):
-            raise ValueError("Data must be given as a two-dimensional numpy ndarray "
-                             "with the shape (len(wavelenght), len(time))")
+                self.data.shape[1] != len(self.time)):
+            raise ValueError("Data must be given as a two-dimensional numpy "
+                             "ndarray with the shape (len(wavelenght), "
+                             "len(time))")
 
 
 @dataclass()
