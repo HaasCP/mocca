@@ -18,11 +18,13 @@ def get_max_score_version(comp):
     Returns the version of the calibration which has maximum R-squared.
     """
     max_score = 0
-    max_version = 'absolute'
+    max_version = ''
     for version, score in comp.calib_scores.items():
-        if score > max_score:
+        if score > max_score and version != 'absolute':
             max_score = score
             max_version = version
+    if not max_version:
+        max_version = 'absolute'
     return max_version
 
 

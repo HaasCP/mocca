@@ -19,20 +19,16 @@ def quantify_peak(peak, quant_comp_db):
         if peak.istd and not any(istd_peak.compound_id == peak.compound_id for
                                  istd_peak in peak.istd):
             scores = quant_comp.calib_scores
-            max_score_version = 'absolute'
-            max_score = scores['absolute']
+            max_score_version = ''
+            max_score = 0
             for istd_p in [peak for peak in peak.istd if peak.concentration]:
                 if scores[istd_p.compound_id] > max_score:
                     max_score_version = istd_p.compound_id
                     max_score = scores[istd_p.compound_id]
                     istd_peak = istd_p
-            if max_score_version == 'absolute':
-                concentration = (peak.integral /
-                                 quant_comp.calib_factors['absolute'])
-            else:
-                concentration = (peak.integral * istd_peak.concentration /
-                                 istd_peak.integral /
-                                 quant_comp.calib_factors[max_score_version])
+            concentration = (peak.integral * istd_peak.concentration /
+                             istd_peak.integral /
+                             quant_comp.calib_factors[max_score_version])
 
         else:
             concentration = (peak.integral /
