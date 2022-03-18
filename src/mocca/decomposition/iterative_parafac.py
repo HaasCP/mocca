@@ -8,20 +8,6 @@ Created on Sun Jan 16 11:15:19 2022
 from mocca.decomposition.parafac_funcs import parafac
 
 
-def run_parafac_iter(offset, impure_peak, quali_comp_db, show_parafac_analytics):
-    """
-    One iteration of the PARAFAC routine plus returning the result of the
-    objective function.
-    """
-    parafac_model = parafac(impure_peak, quali_comp_db, offset,
-                            show_parafac_analytics)
-
-    #impure_sum = get_impure_integral_sum(parafac_model.factors,
-    #                                     show_parafac_analytics)
-
-    #return impure_sum, parafac_model
-
-
 def iterative_parafac(impure_peak, quali_comp_db, absorbance_threshold,
                       relative_distance_thresh, spectrum_correl_coef_thresh,
                       show_parafac_analytics):
