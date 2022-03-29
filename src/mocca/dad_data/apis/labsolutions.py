@@ -11,7 +11,7 @@ import pandas as pd
 from mocca.dad_data.utils import df_to_array, apply_filter
 
 
-def read_txt_shimadzu(path, wl_high_pass=None, wl_low_pass=None):
+def read_txt_shimadzu(path):
     """
     Reads the 3D data exported by the LabSolutions software. 
     Parameters

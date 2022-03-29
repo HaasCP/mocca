@@ -15,6 +15,7 @@ from mocca.dad_data.utils import trim_data
 from mocca.dad_data.process_gradientdata import bsl_als
 from mocca.dad_data.apis.chemstation import read_chemstation
 from mocca.dad_data.apis.labsolutions import read_labsolutions
+from mocca.dad_data.apis.empower import read_empower
 from mocca.dad_data.apis.custom import read_custom_data
 
 import mocca.peak.models
@@ -74,6 +75,9 @@ class DadData():
         elif self.hplc_system_tag == 'labsolutions':
             data, time, wavelength = read_labsolutions(self.path, wl_high_pass,
                                                        wl_low_pass)
+        elif self.hplc_system_tag == 'empower':
+            data, time, wavelength = read_empower(self.path, wl_high_pass,
+                                                  wl_low_pass)
         elif self.hplc_system_tag == 'custom':
             data, time, wavelength = read_custom_data(experiment)
         else:

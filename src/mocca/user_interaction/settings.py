@@ -30,6 +30,8 @@ class Settings():
                 self.detector_limit = 2000
             elif self.hplc_system_tag == 'labsolutions':
                 self.detector_limit = 2000
+            elif self.hplc_system_tag == 'empower':
+                self.detector_limit = 2000
             elif self.hplc_system_tag == 'custom':
                 self.detector_limit = float("inf")
             else:
