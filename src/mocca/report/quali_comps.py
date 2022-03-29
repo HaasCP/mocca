@@ -29,7 +29,8 @@ def quali_comps_to_df(comps):
         quali_comp_dict['retention_time'].append(times[comp.maximum])
         wls = comp.created_from[0].dataset.wavelength
         spectrum_maxima, _ = find_peaks(comp.spectrum)
-        spectrum_maxima = [m for m in spectrum_maxima if comp.spectrum[m] > 1]
+        spectrum_maxima = [m for m in spectrum_maxima if comp.spectrum[m] > 0.01 * max(comp.spectrum)]
+        
         lambda_max = [wls[i] for i in spectrum_maxima]
         quali_comp_dict['lambda_max'].append(lambda_max)
         quali_comp_dict['num_peaks'].append(len(comp.created_from))
