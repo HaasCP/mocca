@@ -52,6 +52,10 @@ def bsl_als_alg(y, lam=1e5, p=0.01, niter=3):
     for i in range(niter):
         W.setdiag(w)  # Do not create a new matrix, just update diagonal values
         Z = W + D
+        # somehow necessary since matrix can get singular
+        # https://stackoverflow.com/questions/48370035/a-is-not-invertible-but-\
+        # a-1-00001-is
+        Z = Z * 1.00000000000001
         z = spsolve(Z, w*y)
         w = p * (y > z) + (1-p) * (y < z)
     return z
