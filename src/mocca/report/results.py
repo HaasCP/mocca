@@ -52,13 +52,21 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
     cmapaign. Includes plots of integral and concentration over all runs.
     """
     integral_dict = {comp.compound_id: [] for comp in quali_comp_db}
+    area_percent_dict = {comp.compound_id: [] for comp in quali_comp_db}
     conc_dict = {comp.compound_id: [] for comp in quant_comp_db}
     for chrom in chroms:
+        total_peak_sum = 0
+        for peak in chrom.peaks:
+            if peak.idx > 0:
+                total_peak_sum += peak.integral
         for key in integral_dict.keys():
             if key in chrom:
                 integral_dict[key].append(chrom[key].integral)
+                area_percent_dict[key].append(round(chrom[key].integral /
+                                                    total_peak_sum * 100, 1))
             else:
                 integral_dict[key].append(0)
+                area_percent_dict[key].append(0)
         for key in conc_dict.keys():
             if key in chrom:
                 conc_dict[key].append(chrom[key].concentration)
@@ -72,6 +80,12 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
                            key + '_integral': [round(i) for i in val]})
         comp_plot = plot_1D_scatter(df, xlabel='Chromatogram index',
                                     ylabel='Summed peak absorbance (mAU)',
+                                    title='', reduce_data=True)
+        
+        df = pd.DataFrame({'chromatogram_index': chrom_idxs,
+                           key + '_area_percent': area_percent_dict[key]})
+        area_plot = plot_1D_scatter(df, xlabel='Chromatogram index',
+                                    ylabel='Area percent (%)',
                                     title='', reduce_data=True)
 
         if key in conc_dict:
@@ -90,7 +104,9 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
                 columns=2
             ),
             dp.Text(f"### Figure: Integral of component {key} over runs."),
-            dp.Plot(comp_plot)
+            dp.Plot(comp_plot),
+            dp.Text(f"### Figure: Area percent of component {key} over runs."),
+            dp.Plot(area_plot)
         ]
 
         if conc_plot is not None:

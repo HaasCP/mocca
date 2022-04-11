@@ -43,11 +43,16 @@ def peaks_to_result_df(peaks):
     """
     Transfers relevant information from Peak objects in a pandas df.
     """
+    total_peak_sum = 0
+    for peak in peaks:
+        if peak.idx > 0:
+            total_peak_sum += peak.integral
     peaks_dict = {'peak_id': [],
                   'retention_time': [],
                   'compound_id': [],
                   'concentration': [],
                   'integral': [],
+                  'area_percent': [],
                   'is_pure': [],
                   'is_saturated': [],
                   'is_compound': []}
@@ -58,6 +63,8 @@ def peaks_to_result_df(peaks):
         peaks_dict['compound_id'].append(peak.compound_id)
         peaks_dict['concentration'].append(peak.concentration)
         peaks_dict['integral'].append(peak.integral)
+        peaks_dict['area_percent'].append(round(peak.integral /
+                                                total_peak_sum * 100, 1))
         peaks_dict['is_pure'].append(peak.pure)
         peaks_dict['is_saturated'].append(peak.saturation)
         peaks_dict['is_compound'].append(peak.is_compound)
