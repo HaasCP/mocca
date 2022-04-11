@@ -81,7 +81,7 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
         comp_plot = plot_1D_scatter(df, xlabel='Chromatogram index',
                                     ylabel='Summed peak absorbance (mAU)',
                                     title='', reduce_data=True)
-        
+
         df = pd.DataFrame({'chromatogram_index': chrom_idxs,
                            key + '_area_percent': area_percent_dict[key]})
         area_plot = plot_1D_scatter(df, xlabel='Chromatogram index',
@@ -127,6 +127,9 @@ def report_runs(chroms, quali_comp_db, quant_comp_db, report_path):
     """
     Main report function to follow concentrations and integrals over runs.
     """
+    if not chroms or all([chrom.bad_data for chrom in chroms]):
+        print("No chromatograms given or all chromatograms are bad data!")
+        return
     this_dir, _ = os.path.split(__file__)
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     chrom_df = chroms_to_results(chroms, quali_comp_db)

@@ -58,6 +58,9 @@ def report_hplc_input(exps, report_path):
     """
     Main HPLC input report function.
     """
+    if not exps:
+        print("No HPLC input was given!")
+        return
     this_dir, _ = os.path.split(__file__)
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     exp_df = exps_to_df(exps)

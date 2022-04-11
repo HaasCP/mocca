@@ -79,6 +79,9 @@ def report_quant_comps(quant_comp_db, report_path):
     """
     Creates html report for the quantitative component database.
     """
+    if not quant_comp_db.items:
+        print("No components in the quantitative component database!")
+        return
     this_dir, _ = os.path.split(__file__)
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     comps = quant_comp_db.items

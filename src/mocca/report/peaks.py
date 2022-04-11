@@ -54,6 +54,9 @@ def report_peaks(peak_db, report_path):
     """
     Main report function for the peak database.
     """
+    if not peak_db.peaks:
+        print("No peaks in the peak database!")
+        return
     this_dir, _ = os.path.split(__file__)
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     peaks = peak_db.peaks

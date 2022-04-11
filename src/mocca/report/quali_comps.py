@@ -79,6 +79,8 @@ def report_quali_comps(quali_comp_db, report_path):
     """
     Creates html report for the qualitative component database.
     """
+    if not quali_comp_db.items:
+        return
     this_dir, _ = os.path.split(__file__)
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     comps = quali_comp_db.items

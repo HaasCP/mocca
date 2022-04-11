@@ -132,6 +132,9 @@ def report_chroms(chroms, settings, report_path):
     """
     Main Chromatogram report function.
     """
+    if not chroms or all([chrom.bad_data for chrom in chroms]):
+        print("No chromatograms given or all chromatograms are bad data!")
+        return
     this_dir, _ = os.path.split(__file__)
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     chrom_df = chroms_to_df(chroms)

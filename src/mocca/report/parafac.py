@@ -110,6 +110,7 @@ def report_parafac(chroms, report_path):
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
     chrom_df = parafac_chroms_to_df(chroms)
     if chrom_df.empty:
+        print("No PARAFAC models were found in the given datasets.")
         return
     summary_page = dp.Page(
         title="Start page",
