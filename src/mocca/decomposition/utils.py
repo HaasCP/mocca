@@ -40,6 +40,30 @@ def check_same_uvvis(parafac_model, spectrum_correl_coef_thresh):
         return False
 
 
+def check_summed_factor_uvvis(parafac_model, spectrum_correl_thresh):
+    """
+    Checks if summed UV-Vis spectra of the PARAFAC factors add up to the pure
+    UV-Vis spectrum.
+    """
+    summed_parafac_spec = []
+    for i, spectrum in enumerate(list(zip(*parafac_model.factors[0]))):
+        quant_val = list(zip(*parafac_model.factors[2]))[i][-1]
+        new_spec = [val * quant_val for val in spectrum]
+        if not summed_parafac_spec:
+            summed_parafac_spec = new_spec
+        else:
+            summed_parafac_spec = [val_i + val_j for val_i, val_j in
+                                   zip(summed_parafac_spec, new_spec)]
+
+    comp_spec = parafac_model.data_tensor.relevant_comp.spectrum
+
+    if (np.corrcoef(summed_parafac_spec, comp_spec)[0, 1]**2 >  # like in check peak
+            spectrum_correl_thresh):
+        return True
+    else:
+        return False
+
+
 def check_comp_in_impure(parafac_model, absorbance_threshold):
     """
     Checks if the maximum absorbance of the known PARAFAC component in the impure

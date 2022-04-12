@@ -18,7 +18,7 @@ def iterative_parafac(impure_peak, quali_comp_db, absorbance_threshold,
     # set peak offset as middle point of the iterator
     offset_seed = -impure_peak.offset
 
-    len_iterator = int(relative_distance_thresh * len(impure_peak.dataset.time))
+    len_iterator = int(relative_distance_thresh / 2 * len(impure_peak.dataset.time))
     offset_iterator = [i + offset_seed - len_iterator for i in
                        list(range(len_iterator * 2 + 1))]
 

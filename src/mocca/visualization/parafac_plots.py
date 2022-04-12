@@ -86,6 +86,7 @@ def plot_uvvis_specs(parafac_model):
                                           f'{tensor.relevant_comp.compound_id} '
                                           '(black, dashed)',
                                           'and the computed PARAFAC peaks (colors)']})
+
     fig += p
 
     fig = fig.configure_axis(

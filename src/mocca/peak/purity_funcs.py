@@ -43,8 +43,7 @@ def get_noise_variance(peak):
 def get_correls(peak_data, max_loc):
     """
     Get a list with correlation coefficients of UV-Vis spectra at every
-    timepoint with reference to the UV-Vis spectrum at maximum absorbance
-    as well as at 5% of the peak width (on the left of the peak).
+    timepoint with reference to the UV-Vis spectrum at maximum absorbance.
     """
     correls_to_max = [(np.corrcoef(peak_data[:, i],
                                    peak_data[:, max_loc])[0, 1])**2
