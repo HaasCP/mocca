@@ -12,7 +12,11 @@ from mocca.components.models import QuantComponent
 from mocca.components.utils import check_peaks_compound_id
 
 
-def create_calibration_dict(peaks):
+def integrate_on_wl(integrate_wl_idx, bandwidth=2):
+    
+
+
+def create_calibration_dict(peaks, integrate_wl_idx):
     """
     Creates a dictionary with all data needed to create calibration curves.
     """
@@ -53,7 +57,7 @@ def create_linear_models(calib_data):
     return calib_factors, calib_scores
 
 
-def create_quant_component(peaks):
+def create_quant_component(peaks, quali_comp_db):
     """
     Creates a quantitative component object based on the given peaks
     """
@@ -61,11 +65,17 @@ def create_quant_component(peaks):
         return None
 
     compound_id = check_peaks_compound_id(peaks)
-    calib_data = create_calibration_dict(peaks)
+    if quali_comp_db['compound_id'].spectrum_max:
+        integrate_wl_idx = quali_comp_db['compound_id'].spectrum_max[0]
+    else:
+        integrate_wl_idx = 1  # minimum wavelength due to bandwidth of 2
+
+    calib_data = create_calibration_dict(peaks, integrate_wl_idx)
 
     calib_factors, calib_scores = create_linear_models(calib_data)
 
     return QuantComponent(compound_id=compound_id,
+                          integrate_wl_idx=integrate_wl_idx,
                           calib_factors=calib_factors,
                           calib_data=calib_data,
                           calib_scores=calib_scores,

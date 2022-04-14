@@ -111,7 +111,7 @@ class QuantComponentDatabase(BaseDatabase):
     Database storing and processing quantitative components used for peak
     quantification.
     """
-    def update(self, peak_database, peak_filter_function=None):
+    def update(self, peak_database, quali_comp_db, peak_filter_function=None):
         """
         Creates components from the given peak database. Optionally, a condition
         can be given to filter peaks.
@@ -121,5 +121,5 @@ class QuantComponentDatabase(BaseDatabase):
                                                     peak_filter_function)
         # create components out of compound dict
         for compound_id, peaks in compound_dict.items():
-            component = create_quant_component(peaks)
+            component = create_quant_component(peaks, quali_comp_db)
             self.insert_item(component)

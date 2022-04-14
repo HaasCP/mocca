@@ -8,7 +8,6 @@ Created on Thu Jan  6 17:29:16 2022
 import os
 import pandas as pd
 import datapane as dp
-from scipy.signal import find_peaks
 
 from mocca.visualization.basic_plots import plot_1D_data
 from mocca.report.peaks import peaks_to_df
@@ -28,11 +27,7 @@ def quali_comps_to_df(comps):
         quali_comp_dict['compound_id'].append(comp.compound_id)
         quali_comp_dict['retention_time'].append(times[comp.maximum])
         wls = comp.created_from[0].dataset.wavelength
-        spectrum_maxima, _ = find_peaks(comp.spectrum)
-        spectrum_maxima = [m for m in spectrum_maxima if comp.spectrum[m] >
-                           0.01 * max(comp.spectrum)]
-
-        lambda_max = [wls[i] for i in spectrum_maxima]
+        lambda_max = [wls[i] for i in comp.spectrum_max]
         quali_comp_dict['lambda_max'].append(lambda_max)
         quali_comp_dict['num_peaks'].append(len(comp.created_from))
     return pd.DataFrame(quali_comp_dict)

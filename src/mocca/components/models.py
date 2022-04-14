@@ -16,6 +16,7 @@ class QualiComponent():
     maximum : int
     offset : int
     spectrum : list
+    spectrum_max : list
     created_from : List[ProcessedPeak]
 
     def __repr__(self):
@@ -31,6 +32,7 @@ class QuantComponent():
     compound_id.
     """
     compound_id : str
+    integrate_wl_idx : int
     calib_factors : dict
     calib_data : dict
     calib_scores : dict

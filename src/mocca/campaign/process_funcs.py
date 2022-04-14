@@ -99,7 +99,7 @@ def process_compound_experiments(experiments, peak_db, quali_comp_db,
                 peak_db.insert_peak(peak)
         quali_comp_db.update(peak_db)
 
-    quant_comp_db.update(peak_db)
+    quant_comp_db.update(peak_db, quali_comp_db)
 
     return chroms
 
