@@ -46,18 +46,16 @@ def check_summed_factor_uvvis(parafac_model, spectrum_correl_thresh):
     UV-Vis spectrum.
     """
     summed_parafac_spec = []
-    for i, spectrum in enumerate(list(zip(*parafac_model.factors[0]))):
-        quant_val = list(zip(*parafac_model.factors[2]))[i][-1]
-        new_spec = [val * quant_val for val in spectrum]
+    for spectrum in list(zip(*parafac_model.factors[0])):
         if not summed_parafac_spec:
-            summed_parafac_spec = new_spec
+            summed_parafac_spec = spectrum
         else:
             summed_parafac_spec = [val_i + val_j for val_i, val_j in
-                                   zip(summed_parafac_spec, new_spec)]
+                                   zip(summed_parafac_spec, spectrum)]
 
     comp_spec = parafac_model.data_tensor.relevant_comp.spectrum
 
-    if (np.corrcoef(summed_parafac_spec, comp_spec)[0, 1]**2 >  # like in check peak
+    if (np.corrcoef(summed_parafac_spec, comp_spec)[0, 1] >
             spectrum_correl_thresh):
         return True
     else:
