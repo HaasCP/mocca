@@ -41,7 +41,7 @@ def create_quali_component(peaks):
         compound_peaks = peaks
     else:
         compound_peaks = [peak for peak in peaks if peak.is_compound]
-        
+
     return QualiComponent(compound_id=peaks[0].compound_id,
                           left=mean_left,
                           right=mean_right,

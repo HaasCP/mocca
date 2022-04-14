@@ -31,7 +31,7 @@ def quantify_peak(peak, quant_comp_db, quali_comp_db):
             istd_wl_idx = get_integrate_wl_index(istd_peak.compound_id,
                                                  quali_comp_db)
             istd_integral_wl = integrate_on_wl(istd_peak, istd_wl_idx)
-                                               
+
             concentration = (integral_wl * istd_peak.concentration /
                              istd_integral_wl /
                              quant_comp.calib_factors[max_score_version])

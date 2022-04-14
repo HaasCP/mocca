@@ -68,7 +68,7 @@ class HplcDadCampaign():
                 hplc_input.gradient.dataset.data = []
         with open(path, 'wb') as file:
             dill.dump(self.__dict__, file)
-    
+
     def load_campaign(self, path='hplc_dad_campaign.pkl'):
         """
         Loads campaign object which was saved as pkl file.
