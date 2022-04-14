@@ -6,6 +6,7 @@ Created on Mon Dec 13 09:05:19 2021
 @author: haascp
 """
 import logging
+import dill
 
 # init of campign instance
 from mocca.peak.database import PeakDatabase
@@ -50,6 +51,30 @@ class HplcDadCampaign():
             hplc_input.processed = False
             if hplc_input.gradient:
                 hplc_input.gradient.dataset = None
+
+    def save_campaign(self, path='hplc_dad_campaign.pkl', remove_raw_data=True):
+        """
+        Saves campaign object as pkl file. If remove_raw_data is True, all raw
+        data are removed before saving to reduce file sizes.
+        """
+        if remove_raw_data:
+            for chrom in self.chroms:
+                chrom.dataset.time = []
+                chrom.dataset.wavelength = []
+                chrom.dataset.data = []
+            for hplc_input in self.hplc_runs:
+                hplc_input.gradient.dataset.time = []
+                hplc_input.gradient.dataset.wavelength = []
+                hplc_input.gradient.dataset.data = []
+        with open(path, 'wb') as file:
+            dill.dump(self.__dict__, file)
+    
+    def load_campaign(self, path='hplc_dad_campaign.pkl'):
+        """
+        Loads campaign object which was saved as pkl file.
+        """
+        with open(path, 'rb') as file:
+            self.__dict__.update(dill.load(file))
 
     def add_hplc_input(self, hplc_input):
         """
