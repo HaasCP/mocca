@@ -66,7 +66,7 @@ def plot_chrom_with_peaks(chrom):
         borders.append(border)
 
     peak_tips = {'peak_max': []}
-    for peak in chrom:
+    for peak in [p for p in chrom if p.idx < 1]:
         peak_tips['peak_max'].append(chrom.dataset.time[peak.maximum])
     rules = alt.Chart(pd.DataFrame(peak_tips)).mark_rule(strokeDash=[5, 5]).encode(
       x='peak_max')
