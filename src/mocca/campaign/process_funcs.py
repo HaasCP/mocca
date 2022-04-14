@@ -115,7 +115,7 @@ def process_experiments(experiments, peak_db, quali_comp_db, quant_comp_db,
     for exp in unprocessed_exps:
         chrom = preprocess_experiment(exp, quali_comp_db, settings)
         chrom = assign_peaks_react(chrom, peak_db)
-        chrom = quantify_peaks(chrom, quant_comp_db)
+        chrom = quantify_peaks(chrom, quant_comp_db, quali_comp_db)
         chrom = check_istd(exp, chrom)
         chroms.append(chrom)
         if not chrom.bad_data:

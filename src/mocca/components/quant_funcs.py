@@ -8,31 +8,58 @@ Created on Mon Dec 20 17:20:35 2021
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
+from mocca.peak.utils import get_peak_data
 from mocca.components.models import QuantComponent
 from mocca.components.utils import check_peaks_compound_id
 
 
-def integrate_on_wl(integrate_wl_idx, bandwidth=2):
-    
+def get_integrate_wl_index(compound_id, quali_comp_db):
+    """
+    Returns index of the wavelength vector where spectrum of component has the
+    highest maximum.
+    """
+    if quali_comp_db[compound_id].spectrum_max:
+        integrate_wl_idx = quali_comp_db[compound_id].spectrum_max[0]
+    else:
+        integrate_wl_idx = 1  # minimum wavelength due to bandwidth of 2
+    return integrate_wl_idx
 
 
-def create_calibration_dict(peaks, integrate_wl_idx):
+def integrate_on_wl(peak, integrate_wl_idx, bandwidth=2):
+    """
+    Integrates signal of given peak on a given wavelength with a bandwidth of 2
+    (default) by summing all absorbances.
+    """
+    peak_data = get_peak_data(peak)
+    peak_data_wl = peak_data[integrate_wl_idx - 1:integrate_wl_idx + 2]
+    # correct baseline
+    peak_data_wl = peak_data_wl - peak_data_wl.min()
+
+    integral = np.sum(peak_data_wl).tolist()
+    return integral
+
+
+def create_calibration_dict(peaks, integrate_wl_idx, quali_comp_db):
     """
     Creates a dictionary with all data needed to create calibration curves.
     """
     calib_data = {}
     calib_data['absolute'] = []
     for peak in peaks:
-        calib_point = (peak.concentration, peak.integral)
+        integral_wl = integrate_on_wl(peak, integrate_wl_idx)
+        calib_point = (peak.concentration, integral_wl)
         calib_data['absolute'].append(calib_point)
-
         if peak.istd:
             for istd_peak in peak.istd:
+                istd_int_wl_index = get_integrate_wl_index(istd_peak.compound_id,
+                                                           quali_comp_db)
+                istd_int_wl = integrate_on_wl(istd_peak, istd_int_wl_index)
+
                 if istd_peak.compound_id not in calib_data:
                     calib_data[istd_peak.compound_id] = []
-                calib_point = (peak.concentration, (peak.integral *
+                calib_point = (peak.concentration, (integral_wl *
                                                     istd_peak.concentration /
-                                                    istd_peak.integral))
+                                                    istd_int_wl))
                 calib_data[istd_peak.compound_id].append(calib_point)
     return calib_data
 
@@ -65,12 +92,10 @@ def create_quant_component(peaks, quali_comp_db):
         return None
 
     compound_id = check_peaks_compound_id(peaks)
-    if quali_comp_db['compound_id'].spectrum_max:
-        integrate_wl_idx = quali_comp_db['compound_id'].spectrum_max[0]
-    else:
-        integrate_wl_idx = 1  # minimum wavelength due to bandwidth of 2
 
-    calib_data = create_calibration_dict(peaks, integrate_wl_idx)
+    integrate_wl_idx = get_integrate_wl_index(compound_id, quali_comp_db)
+
+    calib_data = create_calibration_dict(peaks, integrate_wl_idx, quali_comp_db)
 
     calib_factors, calib_scores = create_linear_models(calib_data)
 

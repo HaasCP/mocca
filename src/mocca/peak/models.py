@@ -59,7 +59,10 @@ class IstdPeak():
     """
     Class for istd peaks to be added to the peak classes below.
     """
+    left : int
+    right : int
     maximum : int
+    dataset : 'mocca.dad_data.models.CompoundData'  # DADData parent of peak
     integral : float
     offset : int
     compound_id : str

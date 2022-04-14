@@ -118,7 +118,10 @@ def correct_istd_offset(chromatogram, quali_component_db, absorbance_threshold,
                                    relative_distance_thresh)
             if istd_p:
                 istd_offset = get_istd_offset(istd_p, istd.key, quali_component_db)
-                istd_peak = IstdPeak(maximum=istd_p.maximum,
+                istd_peak = IstdPeak(left=istd_p.left,
+                                     right=istd_p.right,
+                                     maximum=istd_p.maximum,
+                                     dataset=istd_p.dataset,
                                      integral=istd_p.integral,
                                      offset=istd_offset,
                                      compound_id=istd.key,
