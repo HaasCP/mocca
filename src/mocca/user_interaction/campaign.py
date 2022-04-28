@@ -17,7 +17,6 @@ from mocca.components.databases import QuantComponentDatabase
 from mocca.campaign.process_funcs import process_compound_experiments
 from mocca.campaign.process_funcs import process_experiments
 from mocca.campaign.process_funcs import process_gradients
-from mocca.campaign.utils import save_instance
 
 
 class HplcDadCampaign():
@@ -93,7 +92,7 @@ class HplcDadCampaign():
         self.hplc_runs.append(hplc_input)
 
         if self.autosave_path:
-            save_instance(self, self.autosave_path)
+            self.save_campaign(path=self.autosave_path)
 
     def process_all_hplc_input(self, settings):
         """

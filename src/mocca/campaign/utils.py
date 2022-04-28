@@ -5,23 +5,6 @@ Created on Mon Dec 13 15:47:14 2021
 
 @author: haascp
 """
-import dill
-
-
-def save_instance(campaign, path):
-    """
-    Saves a HplcCampaign object as pkl file.
-    """
-    with open(path, 'wb') as file:
-        dill.dump(campaign, file)
-
-
-def load_instance(path):
-    """
-    Loads a pkl file containing an HplcCampaign object.
-    """
-    with open(path, 'rb') as file:
-        dill.load(file)
 
 
 def check_istd(exp, chrom):
