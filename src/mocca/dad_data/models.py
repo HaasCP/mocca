@@ -115,16 +115,18 @@ class CompoundData(DadData):
         """
         super().__post_init__(experiment, wl_high_pass, wl_low_pass)
         if experiment.gradient is not None:
-            self._subtract_baseline(experiment.gradient.dataset)
+            gradient_data = experiment.gradient.dataset
+            self._trim_data(gradient_data.data.shape[1])
+            self._subtract_baseline(gradient_data)
 
     def _trim_data(self, length):
         """Trims the data in the time dimension to the length provided"""
         self.data, self.time = trim_data(data=self.data, time=self.time, length=length)
 
-    def _subtract_baseline(self, gradient):
+    def _subtract_baseline(self, gradient_data):
         """Subtracts the baseline of the gradient numpy array from self.data."""
-        self._trim_data(gradient.data.shape[1])
-        self.data = self.data - gradient.data[:, :self.data.shape[1]]
+        grad_data = get_opt_grad_data(self, gradient_data)
+        self.data = self.data - grad_data
 
 
 @dataclass
