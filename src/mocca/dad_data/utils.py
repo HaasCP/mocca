@@ -7,6 +7,7 @@ Created on Fri Dec 10 13:31:37 2021
 """
 
 import numpy as np
+import pandas as pd
 
 
 def sum_absorbance_by_time(data):
@@ -73,7 +74,23 @@ def df_to_array(df):
     return data, time, wavelength
 
 
-def apply_filter(dataframe, wl_high_pass, wl_low_pass, reference_wl=True):
+def get_reference_signal(dataframe, bandwidth=5):
+    """
+    Returns the averaged signal over the last number of wavelengths as given by
+    the bandwidth.
+    """
+    df = dataframe.copy()
+    wls = df.wavelength.unique()[-bandwidth:]
+    signals = []
+    for wl in wls:
+        signal = list(df[df['wavelength'] == wl].absorbance)
+        signals.append(signal)
+    mean_signal = list(map(lambda x: sum(x)/len(x), zip(*signals)))
+    return pd.DataFrame({'absorbance': mean_signal})
+
+
+def apply_filter(dataframe, wl_high_pass, wl_low_pass, bandwidth=2,
+                 reference_wl=True):
     """
     Filters absorbance data of tidy 3D DAD dataframes to remove noise
     and background systematic error.
@@ -96,14 +113,16 @@ def apply_filter(dataframe, wl_high_pass, wl_low_pass, reference_wl=True):
 
     df = dataframe.copy()
     df['absorbance'] = df.groupby('time')['absorbance']\
-        .rolling(window=5, center=True).mean().reset_index(0, drop=True)
+        .rolling(window=bandwidth + 1, center=True).\
+            mean().reset_index(0, drop=True)
     df = df.dropna().reset_index(0, drop=True)
     if reference_wl:
         n_times = len(df.time.unique())
         wls = df.wavelength.unique()
-        df['absorbance'] = df.absorbance - df[df['wavelength'] == wls.max()]\
-            .absorbance.iloc[np.tile(np.arange(n_times), len(wls))]\
-            .reset_index(0, drop=True)
+        reference_df = get_reference_signal(df)
+        reference_series = reference_df.absorbance.\
+            iloc[np.tile(np.arange(n_times), len(wls))].reset_index(0, drop=True)
+        df['absorbance'] = df.absorbance - reference_series
     if wl_high_pass:
         df = df[df.wavelength >= wl_high_pass]
     if wl_low_pass:

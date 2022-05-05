@@ -31,7 +31,7 @@ def integrate_on_wl(peak, integrate_wl_idx, bandwidth=2):
     (default) by summing all absorbances.
     """
     peak_data = get_peak_data(peak)
-    peak_data_wl = peak_data[integrate_wl_idx - 1:integrate_wl_idx + 2]
+    peak_data_wl = peak_data[integrate_wl_idx]
     # correct baseline
     peak_data_wl = peak_data_wl - peak_data_wl.min()
 
