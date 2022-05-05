@@ -112,9 +112,9 @@ def apply_filter(dataframe, wl_high_pass, wl_low_pass, bandwidth=2,
     """
 
     df = dataframe.copy()
-    df['absorbance'] = df.groupby('time')['absorbance']\
-        .rolling(window=bandwidth + 1, center=True).\
-            mean().reset_index(0, drop=True)
+    df['absorbance'] = df.groupby('time')['absorbance'].\
+        rolling(window=bandwidth + 1, center=True).\
+        mean().reset_index(0, drop=True)
     df = df.dropna().reset_index(0, drop=True)
     if reference_wl:
         n_times = len(df.time.unique())
