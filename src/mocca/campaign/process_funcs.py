@@ -49,7 +49,10 @@ def preprocess_experiment(exp, quali_comp_db, settings):
     """
     compound_data = CompoundData(settings.hplc_system_tag, exp,
                                  wl_high_pass=settings.wl_high_pass,
-                                 wl_low_pass=settings.wl_low_pass)
+                                 wl_low_pass=settings.wl_low_pass,
+                                 peaks_high_pass=settings.peaks_high_pass,
+                                 peaks_low_pass=settings.peaks_low_pass,
+                                 relative_distance_thresh=settings.relative_distance_thresh)
     chromatogram = pick_peaks(compound_data, exp, settings.absorbance_threshold,
                               settings.peaks_high_pass,
                               settings.peaks_low_pass)

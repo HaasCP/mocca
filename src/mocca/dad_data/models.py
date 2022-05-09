@@ -13,6 +13,7 @@ import copy
 
 from mocca.dad_data.utils import trim_data
 from mocca.dad_data.process_gradientdata import bsl_als
+from mocca.dad_data.baseline_correction import get_opt_grad_data
 from mocca.dad_data.apis.chemstation import read_chemstation
 from mocca.dad_data.apis.labsolutions import read_labsolutions
 from mocca.dad_data.apis.empower import read_empower
@@ -109,7 +110,12 @@ class CompoundData(DadData):
     """
     Data container for HPLC-DAD data with peaks originating from compounds.
     """
-    def __post_init__(self, experiment, wl_high_pass, wl_low_pass):
+    peaks_high_pass : InitVar[float] = None
+    peaks_low_pass : InitVar[float] = None
+    relative_distance_thresh : InitVar[float] = None
+
+    def __post_init__(self, experiment, wl_high_pass, wl_low_pass, peaks_high_pass,
+                      peaks_low_pass, relative_distance_thresh):
         """
         Baseline-corrects the given HPLC-DAD data.
         """
@@ -117,15 +123,21 @@ class CompoundData(DadData):
         if experiment.gradient is not None:
             gradient_data = experiment.gradient.dataset
             self._trim_data(gradient_data.data.shape[1])
-            self._subtract_baseline(gradient_data)
+            self._subtract_baseline(gradient_data, peaks_high_pass, peaks_low_pass,
+                                    relative_distance_thresh)
 
     def _trim_data(self, length):
         """Trims the data in the time dimension to the length provided"""
         self.data, self.time = trim_data(data=self.data, time=self.time, length=length)
 
-    def _subtract_baseline(self, gradient_data):
+    def _subtract_baseline(self, gradient_data, peaks_high_pass, peaks_low_pass,
+                           relative_distance_thresh, opt_grad=True):
         """Subtracts the baseline of the gradient numpy array from self.data."""
-        grad_data = get_opt_grad_data(self, gradient_data)
+        if opt_grad:
+            grad_data = get_opt_grad_data(self, gradient_data, peaks_high_pass, 
+                                          peaks_low_pass, relative_distance_thresh)
+        else:
+            grad_data = gradient_data.data
         self.data = self.data - grad_data
 
 
