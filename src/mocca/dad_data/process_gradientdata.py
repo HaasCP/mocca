@@ -61,7 +61,7 @@ def bsl_als_alg(y, lam=1e5, p=0.01, niter=3):
     return z
 
 
-def bsl_als(absorbance_array):
+def bsl_als(absorbance_array, axis=1):
     """
     Applies the baseline als algorithm row-wise (for every wavelength) on an
     absorbance array
@@ -76,5 +76,5 @@ def bsl_als(absorbance_array):
     baseline_array : numpy 2D-array
         Baseline absorbance values
     """
-    baseline_array = np.apply_along_axis(bsl_als_alg, 1, absorbance_array)
+    baseline_array = np.apply_along_axis(bsl_als_alg, axis, absorbance_array)
     return baseline_array

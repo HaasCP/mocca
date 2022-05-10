@@ -19,7 +19,7 @@ from mocca.peak.match import match_peak
 def preprocess_chromatogram(chromatogram, quali_comp_db,
                             absorbance_threshold, detector_limit,
                             spectrum_correl_thresh, relative_distance_thresh,
-                            print_purity_check=False,
+                            print_purity_check=True,
                             print_compound_prediction=False,
                             print_parafac_analytics=False):
     """
