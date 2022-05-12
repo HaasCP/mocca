@@ -17,6 +17,7 @@ from mocca.components.databases import QuantComponentDatabase
 from mocca.campaign.process_funcs import process_compound_experiments
 from mocca.campaign.process_funcs import process_experiments
 from mocca.campaign.process_funcs import process_gradients
+from mocca.campaign.experiment_funcs import get_unprocessed_experiments
 
 
 class HplcDadCampaign():
@@ -26,7 +27,7 @@ class HplcDadCampaign():
     """
     def __init__(self, autosave_path=None):
         self.autosave_path = autosave_path
-        self.hplc_runs = []
+        self.hplc_inputs = []
         self.settings = None
         self.peak_db = PeakDatabase()
         self.quali_comp_db = QualiComponentDatabase()
@@ -46,7 +47,7 @@ class HplcDadCampaign():
         self.chroms = []
         self.bad_chroms = []
         self.warnings = []
-        for hplc_input in self.hplc_runs:
+        for hplc_input in self.hplc_inputs:
             hplc_input.processed = False
             if hplc_input.gradient:
                 hplc_input.gradient.dataset = None
@@ -61,7 +62,7 @@ class HplcDadCampaign():
                 chrom.dataset.time = []
                 chrom.dataset.wavelength = []
                 chrom.dataset.data = []
-            for hplc_input in self.hplc_runs:
+            for hplc_input in self.hplc_inputs:
                 hplc_input.gradient.dataset.time = []
                 hplc_input.gradient.dataset.wavelength = []
                 hplc_input.gradient.dataset.data = []
@@ -83,29 +84,31 @@ class HplcDadCampaign():
         If conc given: Add peak to quanti_component with same compound_id and update
         Store user input concs as negative conc in peak
         """
-        for i, exp in enumerate(self.hplc_runs):
+        for i, exp in enumerate(self.hplc_inputs):
             if exp.path == hplc_input.path:
-                del self.hplc_runs[i]
+                del self.hplc_inputs[i]
                 logging.warning("CampaignWarning: Path {} was already used for "
                                 "different HPLC input. New HPLC input replaces "
                                 "the old one.".format(hplc_input.path))
-        self.hplc_runs.append(hplc_input)
+        self.hplc_inputs.append(hplc_input)
 
         if self.autosave_path:
             self.save_campaign(path=self.autosave_path)
 
     def process_all_hplc_input(self, settings):
         """
+        This function sets all expeirments of the cmapaign to the unprocessed
+        state and processes all given hplc input. NOTE:
         This function has to be run if a new compound is added to the component
         database via compound experiment so that all peaks are assigned consistently
         """
         self.settings = settings
         self._reset_campaign()
 
-        process_gradients(self.hplc_runs, self.settings)
+        process_gradients(self.hplc_inputs, self.settings)
 
         chroms = process_compound_experiments(
-            self.hplc_runs,
+            self.hplc_inputs,
             self.peak_db,
             self.quali_comp_db,
             self.quant_comp_db,
@@ -114,7 +117,7 @@ class HplcDadCampaign():
         self.chroms.extend(chroms)
 
         chroms = process_experiments(
-            self.hplc_runs,
+            self.hplc_inputs,
             self.peak_db,
             self.quali_comp_db,
             self.quant_comp_db,
@@ -122,4 +125,17 @@ class HplcDadCampaign():
             )
         self.chroms.extend(chroms)
 
-# TODO : process_unprocessed_experiments
+    def process_new_hplc_input(self):
+        """
+        
+        """
+        process_gradients(self.hplc_inputs, self.settings)
+
+        chroms = process_experiments(
+            self.hplc_inputs,
+            self.peak_db,
+            self.quali_comp_db,
+            self.quant_comp_db,
+            self.settings
+            )
+        self.chroms.extend(chroms)
