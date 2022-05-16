@@ -7,7 +7,6 @@ Created on Thu May 12 09:10:57 2022
 
 import h5py
 import numpy as np
-import os
 import pandas as pd
 
 from mocca.dad_data.utils import df_to_array, apply_filter
@@ -27,7 +26,7 @@ def read_adf_datacube(path):
     absorbance_idx = measures[data_idx]
     absorbance = absorbance_idx[()]
     absorbance = np.swapaxes(absorbance, 0, 1)
-    
+
     scales = uvvis_data['scales']
     data_idx = list(scales.keys())[0]
     time_idx = scales[data_idx]
@@ -48,10 +47,11 @@ def read_adf_description(wavelength_vals=None):
         wavelength = list(np.linspace(start, stop, length))
     else:
         try:
-            import h5ld
+            import h5ld  # noqa: F401
             # to be developed with Laura di Rocco
         except AttributeError:
-            print("If the h5ld package cannot be installed on your machine, you have to give the wavelength values manually for adf data.")
+            print("If the h5ld package cannot be installed on your machine, "
+                  "you have to give the wavelength values manually for adf data.")
     return wavelength
 
 

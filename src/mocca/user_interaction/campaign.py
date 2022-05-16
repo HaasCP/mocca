@@ -17,7 +17,6 @@ from mocca.components.databases import QuantComponentDatabase
 from mocca.campaign.process_funcs import process_compound_experiments
 from mocca.campaign.process_funcs import process_experiments
 from mocca.campaign.process_funcs import process_gradients
-from mocca.campaign.experiment_funcs import get_unprocessed_experiments
 
 
 class HplcDadCampaign():
@@ -127,7 +126,8 @@ class HplcDadCampaign():
 
     def process_new_hplc_input(self):
         """
-        
+        Only unprocessed runs are analyzed. No compound runs are allowed. Settings
+        can only be changed via provess_all_hplc_input.
         """
         process_gradients(self.hplc_inputs, self.settings)
 
