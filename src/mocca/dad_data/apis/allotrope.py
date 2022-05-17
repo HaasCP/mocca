@@ -55,6 +55,18 @@ def read_adf_description(wavelength_vals=None):
     return wavelength
 
 
+def preprocess_df(df):
+    """
+    Preprocesses the df time column to be in line with the Chemstation API.
+    """
+    acq_time = df.time.max() / len(df)
+
+    # generate new time column
+    time_series = pd.Series(range(1, (len(df) + 1))).astype(float) * acq_time / 60
+    df['time'] = time_series
+    return df
+
+
 def read_adf(path, wl_high_pass=None, wl_low_pass=None, wl_start=200, wl_stop=550):
     """
     Reads adf files as exported by the Agilent ADF Adapter.
@@ -65,6 +77,8 @@ def read_adf(path, wl_high_pass=None, wl_low_pass=None, wl_start=200, wl_stop=55
 
     df = pd.DataFrame(np.swapaxes(absorbance, 0, 1), columns=wavelength)
     df.insert(0, "time", time)
+    df = preprocess_df(df)
+
     df = pd.melt(df, id_vars='time', value_vars=df.columns[1:],
                  var_name='wavelength', value_name='absorbance')
     df['wavelength'] = df['wavelength'].astype(float)
