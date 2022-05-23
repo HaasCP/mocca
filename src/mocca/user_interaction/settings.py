@@ -27,13 +27,13 @@ class Settings():
     def __post_init__(self):
         if self.detector_limit is None:
             if self.hplc_system_tag == 'chemstation':
-                self.detector_limit = 2000
+                self.detector_limit = float("inf")
             elif self.hplc_system_tag == 'labsolutions':
-                self.detector_limit = 2000
+                self.detector_limit = float("inf")
             elif self.hplc_system_tag == 'empower':
-                self.detector_limit = 2000
+                self.detector_limit = float("inf")
             elif self.hplc_system_tag == 'allotrope':
-                self.detector_limit = 2000
+                self.detector_limit = float("inf")
             elif self.hplc_system_tag == 'custom':
                 self.detector_limit = float("inf")
             else:

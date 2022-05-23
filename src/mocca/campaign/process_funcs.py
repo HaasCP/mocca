@@ -82,7 +82,8 @@ def process_compound_experiments(experiments, peak_db, quali_comp_db,
     chroms = []
     for exp in exps:
         chrom = process_compound_exp(exp, quali_comp_db, settings)
-        chrom = check_istd(exp, chrom)
+        if not chrom.bad_data:
+            chrom = check_istd(exp, chrom)
         chroms.append(chrom)
         if not chrom.bad_data:
             for peak in chrom:
