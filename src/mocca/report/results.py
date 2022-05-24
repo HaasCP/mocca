@@ -56,25 +56,26 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
     area_percent_dict = {comp.compound_id: [] for comp in quali_comp_db}
     conc_dict = {comp.compound_id: [] for comp in quant_comp_db}
     for chrom in chroms:
-        total_peak_sum = 0
-        for peak in chrom.peaks:
-            if peak.idx > 0:
-                total_peak_sum += peak.integral
-        for key in integral_dict.keys():
-            if key in chrom:
-                integral_dict[key].append(chrom[key].integral)
-                area_percent_dict[key].append(round(chrom[key].integral /
-                                                    total_peak_sum * 100, 1))
-            else:
-                integral_dict[key].append(0)
-                area_percent_dict[key].append(0)
-        for key in conc_dict.keys():
-            if key in chrom:
-                conc_dict[key].append(chrom[key].concentration)
-            else:
-                conc_dict[key].append(0)
+        if not chrom.bad_data:
+            total_peak_sum = 0
+            for peak in chrom.peaks:
+                if peak.idx > 0:
+                    total_peak_sum += peak.integral
+            for key in integral_dict.keys():
+                if key in chrom:
+                    integral_dict[key].append(chrom[key].integral)
+                    area_percent_dict[key].append(round(chrom[key].integral /
+                                                        total_peak_sum * 100, 1))
+                else:
+                    integral_dict[key].append(0)
+                    area_percent_dict[key].append(0)
+            for key in conc_dict.keys():
+                if key in chrom:
+                    conc_dict[key].append(chrom[key].concentration)
+                else:
+                    conc_dict[key].append(0)
 
-    chrom_idxs = [i + 1 for i in list(range(len(chroms)))]
+    chrom_idxs = [i + 1 for i in list(range(len(chroms))) if not chroms[i].bad_data]
     comp_pages = []
     for key, val in integral_dict.items():
         df = pd.DataFrame({'chromatogram_index': chrom_idxs,
