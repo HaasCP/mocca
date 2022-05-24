@@ -19,7 +19,7 @@ def read_adf_datacube(path):
     """
     f = h5py.File(path, 'r')
     data_cubes = f['data-cubes']
-    uvvis_id = [idx for idx in data_cubes.keys() if "DAD1UV" in idx][0]
+    uvvis_id = [idx for idx in data_cubes.keys() if "DAD1F" in idx][0]
     uvvis_data = data_cubes[uvvis_id]
     measures = uvvis_data['measures']
     data_idx = list(measures.keys())[0]

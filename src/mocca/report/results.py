@@ -31,18 +31,19 @@ def chroms_to_results(chroms, quali_comp_db):
                        'istd_added': []})
 
     for i, chrom in enumerate(chroms):
-        chrom_dict['index'].append(i + 1)
-        for comp in compound_comps:
-            if any(peak.compound_id == comp for peak in chrom):
-                chrom_dict["integral_" + comp].append(chrom[comp].integral)
-                chrom_dict["conc_" + comp].append(chrom[comp].concentration)
-            else:
-                chrom_dict["integral_" + comp].append(None)
-                chrom_dict["conc_" + comp].append(None)
-        chrom_dict['file'].append(os.path.basename(chrom.dataset.path))
-        chrom_dict['bad_data'].append(chrom.bad_data)
-        chrom_dict['compound_run'].append(chrom.experiment.compound is not None)
-        chrom_dict['istd_added'].append(chrom.experiment.istd is not None)
+        if not chrom.bad_data:
+            chrom_dict['index'].append(i + 1)
+            for comp in compound_comps:
+                if any(peak.compound_id == comp for peak in chrom):
+                    chrom_dict["integral_" + comp].append(chrom[comp].integral)
+                    chrom_dict["conc_" + comp].append(chrom[comp].concentration)
+                else:
+                    chrom_dict["integral_" + comp].append(None)
+                    chrom_dict["conc_" + comp].append(None)
+            chrom_dict['file'].append(os.path.basename(chrom.dataset.path))
+            chrom_dict['bad_data'].append(chrom.bad_data)
+            chrom_dict['compound_run'].append(chrom.experiment.compound is not None)
+            chrom_dict['istd_added'].append(chrom.experiment.istd is not None)
     return pd.DataFrame(chrom_dict)
 
 
