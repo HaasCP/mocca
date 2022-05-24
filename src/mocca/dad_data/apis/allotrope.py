@@ -102,7 +102,7 @@ def preprocess_df(df):
     return df
 
 
-def read_adf(path, wl_high_pass=None, wl_low_pass=None, wl_start=200, wl_stop=550):
+def read_adf(path, wl_high_pass=None, wl_low_pass=None, wl_start=190, wl_stop=400):
     """
     Reads adf files as exported by the Agilent ADF Adapter.
     """

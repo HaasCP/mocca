@@ -21,8 +21,9 @@ def quantify_peak(peak, quant_comp_db, quali_comp_db):
         if peak.istd and not any(istd_peak.compound_id == peak.compound_id for
                                  istd_peak in peak.istd):
             scores = quant_comp.calib_scores
-            max_score_version = ''
+            max_score_version = peak.istd[0].compound_id
             max_score = 0
+            istd_peak = peak.istd[0]
             for istd_p in [peak for peak in peak.istd if peak.concentration]:
                 if scores[istd_p.compound_id] > max_score:
                     max_score_version = istd_p.compound_id

@@ -20,7 +20,8 @@ def estimate_pca_n_comps(data_tensor, impure_peak, show_parafac_analytics):
     """
     pca_data = data_tensor.reshape(get_peak_data(impure_peak).shape[0], -1)
 
-    pca = PCA(n_components=10)
+    n_components = min(pca_data.shape[0], 10)
+    pca = PCA(n_components=n_components)
     _ = pca.fit_transform(pca_data)
 
     #  same thresh than in peak.check, check_peak_purity
