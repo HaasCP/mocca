@@ -12,7 +12,11 @@ from mocca.dad_data.utils import df_to_array, apply_filter
 
 
 def get_uvvis_dataset_name(path):
-    
+    """
+    Queries the data description layer of the adf file to find the name of the
+    dataset which is of the type 'three-dimensional ultraviolet spectrum' as
+    defined by the AFO.
+    """
     from h5ld import AllotropeDF
     import h5py
     import rdflib
@@ -26,7 +30,7 @@ def get_uvvis_dataset_name(path):
                                }'''
     qres = g.query(datasets_query)
 
-    datasets = list(map(lambda x: x[0] , qres))
+    datasets = [x[0] for x in qres]
     for d in datasets:
         subj = list(g.triples((None, None, d)))[1][0]
         dataset = list(
