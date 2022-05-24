@@ -61,8 +61,12 @@ class ParafacModel():
         spectral_norm_val = np.sum(spectra, axis=0)
         elution_norm_val = np.sum(elutions, axis=0)
 
-        normalized_spectra = spectra / spectral_norm_val
-        normalized_elution = elutions / elution_norm_val
+        normalized_spectra = np.divide(spectra, spectral_norm_val,
+                                       out=np.zeros_like(spectra),
+                                       where=spectral_norm_val!=0)
+        normalized_elution = np.divide(elutions, elution_norm_val,
+                                       out=np.zeros_like(elutions),
+                                       where=elution_norm_val!=0)
         normalized_integrals = integrals * spectral_norm_val * elution_norm_val
 
         self.factors = [normalized_spectra, normalized_elution, normalized_integrals]
