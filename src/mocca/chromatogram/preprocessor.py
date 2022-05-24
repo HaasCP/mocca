@@ -43,6 +43,7 @@ def preprocess_chromatogram(chromatogram, quali_comp_db,
                                        absorbance_threshold,
                                        spectrum_correl_thresh,
                                        relative_distance_thresh)
+
     # 5. resolve impure
     impure_peaks = [peak for peak in chromatogram if not peak.pure]
     relevant_impure_peaks = [peak for peak in impure_peaks if
