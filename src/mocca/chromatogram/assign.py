@@ -183,8 +183,6 @@ def assign_peaks_compound(chromatogram, compound):
     assigned_peaks, unassigned_peaks = assign_matched_peaks(matched_peaks)
     unmatched_peaks = get_unmatched_peaks(chromatogram.peaks)
     unmatched_peaks = unmatched_peaks + unassigned_peaks
-    print("new dataset")
-    print(unmatched_peaks)
 
     if any([peak.compound_id == compound.key for peak in assigned_peaks]):
         for peak in assigned_peaks:
