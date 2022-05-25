@@ -96,26 +96,30 @@ def create_chrom_page(chrom, index):
         peaks_df.append(pd.Series([None] * len(peaks_df.columns),
                                   index=peaks_df.columns), ignore_index=True)
 
+    blocks = [
+        dp.Group(
+            dp.Text(f"## Details to chromatogram {index}"),
+            dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
+            columns=2
+        ),
+        dp.Text("### Table: Experiment as given by the user."),
+        dp.Table(exp_df, label="experiment_table"),
+        dp.Text("### Figure: Chromatogram with highlighted peaks."),
+        dp.Plot(chrom_plot)]
+    if not peaks_df.empty:
+        blocks += [dp.Text("### Table: Peaks found in the chromatogram."),
+        dp.DataTable(peaks_df)]
+    blocks += [
+        dp.Text("### Figures: Averaged UV-Vis spectra over the picked peak."),
+        dp.Group(
+            *spectrum_plots,
+            columns=2
+            )
+    ]
+
     return dp.Page(
         title=str(index),
-        blocks=[
-            dp.Group(
-                dp.Text(f"## Details to chromatogram {index}"),
-                dp.Text("## MOCCA (Multiway Online Chromatographic Chemical Analysis)"),
-                columns=2
-            ),
-            dp.Text("### Table: Experiment as given by the user."),
-            dp.Table(exp_df, label="experiment_table"),
-            dp.Text("### Figure: Chromatogram with highlighted peaks."),
-            dp.Plot(chrom_plot),
-            dp.Text("### Table: Peaks found in the chromatogram."),
-            dp.DataTable(peaks_df),
-            dp.Text("### Figures: Averaged UV-Vis spectra over the picked peak."),
-            dp.Group(
-                *spectrum_plots,
-                columns=2
-                )
-        ],
+        blocks=blocks,
     )
 
 
@@ -145,8 +149,8 @@ def report_bad_chroms(chroms, settings, report_path):
         ],
     )
     chrom_pages = []
-    for i, chrom in enumerate([chrom for chrom in chroms if chrom.bad_data]):
-        if chrom.peaks:
+    for i, chrom in enumerate(chroms):
+        if chrom.bad_data:
             page = create_chrom_page(chrom, i + 1)
             chrom_pages.append(page)
     r = dp.Report(
