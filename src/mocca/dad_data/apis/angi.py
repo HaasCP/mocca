@@ -10,7 +10,7 @@ import pandas as pd
 from mocca.dad_data.utils import df_to_array, apply_filter
 
 
-def read_csv_agilent(path):
+def read_csv_angi(path):
     """
     Reads the UTF-16 encoded 3D data exported by the ChemStation macro.
     Parameters
@@ -67,11 +67,11 @@ def tidy_df_agilent(dataframe, wl_high_pass=None, wl_low_pass=None):
     return df
 
 
-def read_chemstation(path, wl_high_pass=None, wl_low_pass=None):
+def read_angi(path, wl_high_pass=None, wl_low_pass=None):
     """
     Chemstation read and processing function.
     """
-    df = read_csv_agilent(path)
+    df = read_csv_angi(path)
     df = tidy_df_agilent(df)
     df = apply_filter(df, wl_high_pass, wl_low_pass)
     data, time, wavelength = df_to_array(df)
