@@ -148,4 +148,3 @@ class HplcDadCampaign():
         Consolidates all report functions in one function.
         """
         report(self, path)
-        
