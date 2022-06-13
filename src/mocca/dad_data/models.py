@@ -70,7 +70,7 @@ class DadData():
         Read the data file, preprocess it and filter it in order to obtain
         standardized data format for all HPLC systems.
         """
-        if self.hplc_system_tag == 'chemstation':
+        if self.hplc_system_tag == 'chemstation' or self.hplc_system_tag == 'angi':
             data, time, wavelength = read_chemstation(self.path, wl_high_pass,
                                                       wl_low_pass)
         elif self.hplc_system_tag == 'labsolutions':
