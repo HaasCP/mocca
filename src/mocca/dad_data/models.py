@@ -76,7 +76,7 @@ class DadData():
                                                       wl_low_pass)
         elif self.hplc_system_tag == 'angi':
             data, time, wavelength = read_angi(self.path, wl_high_pass,
-                                                      wl_low_pass)
+                                               wl_low_pass)
         elif self.hplc_system_tag == 'labsolutions':
             data, time, wavelength = read_labsolutions(self.path, wl_high_pass,
                                                        wl_low_pass)
@@ -87,7 +87,7 @@ class DadData():
             data, time, wavelength = read_adf(self.path, wl_high_pass,
                                               wl_low_pass)
         elif self.hplc_system_tag == 'custom':
-            data, time, wavelength = read_custom_data(experiment)            
+            data, time, wavelength = read_custom_data(experiment)
         else:
             raise ValueError(f"Given hplc_system_tag  {self.hplc_system_tag} is "
                              "not defined in MOCCA.")
