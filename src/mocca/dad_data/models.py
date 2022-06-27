@@ -18,6 +18,7 @@ from mocca.dad_data.apis.labsolutions import read_labsolutions
 from mocca.dad_data.apis.empower import read_empower
 from mocca.dad_data.apis.allotrope import read_adf
 from mocca.dad_data.apis.custom import read_custom_data
+from mocca.dad_data.apis.angi import read_angi
 
 import mocca.peak.models
 
@@ -73,6 +74,9 @@ class DadData():
         if self.hplc_system_tag == 'chemstation':
             data, time, wavelength = read_chemstation(self.path, wl_high_pass,
                                                       wl_low_pass)
+        elif self.hplc_system_tag == 'angi':
+            data, time, wavelength = read_angi(self.path, wl_high_pass,
+                                               wl_low_pass)
         elif self.hplc_system_tag == 'labsolutions':
             data, time, wavelength = read_labsolutions(self.path, wl_high_pass,
                                                        wl_low_pass)

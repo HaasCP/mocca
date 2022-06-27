@@ -70,8 +70,7 @@ def plot_uvvis_specs(parafac_model):
             fig += p
 
     tensor = parafac_model.data_tensor
-    comp_spec = [val / (max(tensor.relevant_comp.spectrum) /
-                        parafac_model.factors[0].max())
+    comp_spec = [val / sum(tensor.relevant_comp.spectrum)
                  for val in tensor.relevant_comp.spectrum]
 
     df = pd.DataFrame({'x': wls,

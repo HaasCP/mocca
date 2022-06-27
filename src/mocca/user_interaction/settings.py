@@ -26,7 +26,8 @@ class Settings():
 
     def __post_init__(self):
         if self.detector_limit is None:
-            if self.hplc_system_tag == 'chemstation':
+            if (self.hplc_system_tag == 'chemstation' or
+                    self.hplc_system_tag == 'angi'):
                 self.detector_limit = float("inf")
             elif self.hplc_system_tag == 'labsolutions':
                 self.detector_limit = float("inf")

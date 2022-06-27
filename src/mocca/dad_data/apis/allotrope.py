@@ -20,10 +20,10 @@ def get_uvvis_dataset_name(path):
     from h5ld import AllotropeDF
     import h5py
     import rdflib
-    
+
     with h5py.File(path, mode="r") as f:
         g = AllotropeDF(f).get_ld()
-    
+
     datasets_query = '''SELECT ?s ?p ?o
                         WHERE { ?s ?p ?o .
                                FILTER regex(str(?o), "DataSet") .
@@ -34,9 +34,8 @@ def get_uvvis_dataset_name(path):
     for d in datasets:
         subj = list(g.triples((None, None, d)))[1][0]
         dataset = list(
-            g.triples(
-            (subj, None, rdflib.term.URIRef('http://purl.allotrope.org/ontologies/result#AFR_0001527'))
-            )
+            g.triples(subj, None,
+                      rdflib.term.URIRef('http://purl.allotrope.org/ontologies/result#AFR_0001527'))  # noqa: E501
         )
         if dataset:
             dataset_name = d
@@ -60,7 +59,7 @@ def read_adf_datacube(path):
         absorbance_idx = measures[data_idx]
         absorbance = absorbance_idx[()]
         absorbance = np.swapaxes(absorbance, 0, 1)
-    
+
         scales = uvvis_data['scales']
         data_idx = list(scales.keys())[0]
         time_idx = scales[data_idx]
@@ -71,7 +70,7 @@ def read_adf_datacube(path):
 def read_adf_description(wavelength_vals=None):
     """
     Queries the adf data description layer to extract the wavlength vector.
-    For this query, the h5ld package is required which can be installed by 
+    For this query, the h5ld package is required which can be installed by
     editable pip install from https://github.com/laura-dirocco/h5ld. In case there
     are problems with installation, the user can give start and stop values
     as set on the DAD manually.

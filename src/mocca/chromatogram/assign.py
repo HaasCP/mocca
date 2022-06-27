@@ -198,7 +198,8 @@ def assign_peaks_compound(chromatogram, compound):
                 chromatogram.warnings.append("An impure peak was found to be assigned "
                                              "in a pure compound experiment. Run is "
                                              "therefore dismissed.")
-                chromatogram.peaks = sorted(assigned_peaks + unmatched_peaks + [max_peak],
+                chromatogram.peaks = sorted((assigned_peaks + unmatched_peaks +
+                                             [max_peak]),
                                             key=lambda peak: peak.maximum)
                 return chromatogram
             else:
