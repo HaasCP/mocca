@@ -19,7 +19,7 @@ from mocca.campaign.process_funcs import process_experiments
 from mocca.campaign.process_funcs import process_gradients
 
 # reporting
-from mocca.report.main import report
+# from mocca.report.main import report
 
 class HplcDadCampaign():
     """
@@ -142,8 +142,8 @@ class HplcDadCampaign():
             )
         self.chroms.extend(chroms)
 
-    def generate_reports(self, path):
-        """
-        Consolidates all report functions in one function.
-        """
-        report(self, path)
+    #def generate_reports(self, path):
+    #    """
+    #    Consolidates all report functions in one function.
+    #    """
+    #    report(self, path)
