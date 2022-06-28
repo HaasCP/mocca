@@ -142,7 +142,7 @@ class HplcDadCampaign():
             )
         self.chroms.extend(chroms)
 
-    def generate_reports(self, path=''):
+    def generate_reports(self, path):
         """
         Consolidates all report functions in one function.
         """
