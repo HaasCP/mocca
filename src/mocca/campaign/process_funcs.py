@@ -53,6 +53,8 @@ def preprocess_experiment(exp, quali_comp_db, settings):
     chromatogram = pick_peaks(compound_data, exp, settings.absorbance_threshold,
                               settings.peaks_high_pass,
                               settings.peaks_low_pass)
+    if not chromatogram.peaks:
+        chromatogram.bad_data = True
     chromatogram.experiment = exp
     chromatogram = preprocess_chromatogram(chromatogram, quali_comp_db,
                                            settings.absorbance_threshold,
