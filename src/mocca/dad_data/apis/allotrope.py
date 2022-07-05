@@ -34,8 +34,8 @@ def get_uvvis_dataset_name(path):
     for d in datasets:
         subj = list(g.triples((None, None, d)))[1][0]
         dataset = list(
-            g.triples(subj, None,
-                      rdflib.term.URIRef('http://purl.allotrope.org/ontologies/result#AFR_0001527'))  # noqa: E501
+            g.triples((subj, None,
+                       rdflib.term.URIRef('http://purl.allotrope.org/ontologies/result#AFR_0001527')))  # noqa: E501
         )
         if dataset:
             dataset_name = d

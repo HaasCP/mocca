@@ -53,10 +53,10 @@ def plot_calibration_curves(comp):
                         scale=alt.Scale(domain=(0.9 * np.min(x), np.max(x) * 1.1))),
                 y=alt.Y(df_line.columns[1], scale=alt.Scale(
                     domain=(0.9 * min(np.min(y),
-                                      np.min([item / comp.calib_factors[version]
+                                      np.min([item * comp.calib_factors[version]
                                               for item in x])),
                             1.1 * max(np.max(y),
-                                      np.max([item / comp.calib_factors[version]
+                                      np.max([item * comp.calib_factors[version]
                                               for item in x])))))
             )
 
