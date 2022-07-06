@@ -55,7 +55,7 @@ def peaks_to_result_df(peaks):
     for peak in peaks:
         times = peak.dataset.time
         peaks_dict['peak_id'].append(peak.idx)
-        peaks_dict['retention_time'].append(times[peak.maximum + peak.offset])
+        peaks_dict['retention_time'].append(times[peak.maximum])
         peaks_dict['integral'].append(peak.integral)
         peaks_dict['area_percent'].append(round(peak.integral /
                                                 total_peak_sum * 100, 1))
@@ -81,7 +81,7 @@ def create_chrom_page(chrom, index):
         df = pd.DataFrame({'x': wls,
                            'y': spectrum})
         title_base = "UV-Vis spectrum of peak at {} min".\
-            format(round(peak.dataset.time[peak.maximum + peak.offset], 3))
+            format(round(peak.dataset.time[peak.maximum], 3))
         if not peak.pure:
             title = title_base + ' (impure)'
         else:
