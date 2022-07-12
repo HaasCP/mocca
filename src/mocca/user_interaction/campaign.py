@@ -54,7 +54,7 @@ class HplcDadCampaign():
             if hplc_input.gradient:
                 hplc_input.gradient.dataset = None
 
-    def save_campaign(self, path='hplc_dad_campaign.pkl', remove_raw_data=True):
+    def save_campaign(self, path='hplc_dad_campaign.pkl', remove_raw_data=False):
         """
         Saves campaign object as pkl file. If remove_raw_data is True, all raw
         data are removed before saving to reduce file sizes.
