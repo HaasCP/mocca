@@ -77,7 +77,7 @@ def parafac(impure_peak, quali_comp_db, iter_offset, show_parafac_analytics):
     n_comps = max(pca_n_comps, 2)
 
     weights, factors = non_negative_parafac_hals(data_tensor.tensor, rank=n_comps,
-                                                 init='svd', n_iter_max=1000,
+                                                 init='random', n_iter_max=1000,
                                                  verbose=False, tol=1e-9)
 
     parafac_model = ParafacModel(impure_peak, n_comps, pca_explained_variance,

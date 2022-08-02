@@ -177,6 +177,11 @@ class ParafacData():
         # replace self data with parafac peak data
         left = boundaries[0] - shift  # impure_peak.offset already included in
         right = boundaries[1] - shift + 1
+        
+        if left < 0:
+            parafac_peak_data = parafac_peak_data[:, -left:]
+            left = 0
+
         self.data[:, left:right] = parafac_peak_data + y_offset
         self.data[self.data < 0] = 0
 

@@ -28,15 +28,19 @@ def read_txt_shimadzu(path):
     with open(path) as file:
         lines = file.readlines()
         lines = [line.rstrip() for line in lines]
-    
-    #cut text file to the relevant data    
-    start_line = 0
+
+    #cut text file to the relevant data 
+    pda_line = 0
+    while "[PDA 3D]" not in lines[pda_line]:
+        pda_line += 1
+
+    start_line = pda_line
     while len(lines[start_line]) < 100:
         start_line += 1
     data = lines[start_line:]
-    
+
     #split data using comma as separator
-    data = [line.split(",") for line in data]
+    data = [line.split('\t') for line in data]
     
     #create dataframe and tidy data
     df = pd.DataFrame(data).dropna()
