@@ -67,7 +67,48 @@ def read_adf_datacube(path):
     return np.array(absorbance), list(time)
 
 
-def read_adf_description(wavelength_vals=None):
+def get_function_paramenters(path):
+    """
+    Reads the parameters of the linear function which describes the wavelength
+    vector out of the data description layer.
+    """
+    from h5ld import AllotropeDF
+    import h5py
+    import rdflib
+
+    with h5py.File(path, mode="r") as f:
+        g = AllotropeDF(f).get_ld()
+    dataset = get_uvvis_dataset_name(path)
+
+    # Step 1: Extract scaleMapping from a Dataset
+    scale_mapping_id = list(g.objects(list(g.triples((None, None, dataset)))[0][0],
+                                      rdflib.term.URIRef('http://purl.allotrope.org/ontologies/datacube-hdf-map#scaleMapping')))  # noqa: E501
+
+    # In case of error, i.e., there is no FunctionScaleMapping, it returns 0, 0
+    param1 = 0.0
+    param2 = 0.0
+    # Code based on the assumption that there is only one FunctionScaleMapping
+    for mapping in scale_mapping_id:
+        # Step 2: Looking for a Function Scale Mapping
+        mapping_function = list(g.triples((mapping,
+                                           rdflib.term.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),  # noqa: E501
+                                           rdflib.term.URIRef('http://purl.allotrope.org/ontologies/datacube-hdf-map#FunctionScaleMapping'))))  # noqa: E501
+        # Step 3: Check the Index Function (contains type of function and parameters)
+        # Step 4: Extract parameters
+        if(mapping_function):
+            param1 = float(list(g.objects(
+                list(g.objects(mapping,
+                               rdflib.term.URIRef('http://purl.allotrope.org/ontologies/datacube-hdf-map#indexFunction')))[0],  # noqa: E501
+                rdflib.term.URIRef('http://purl.allotrope.org/ontologies/datacube-hdf-map#parameter1')))[0])  # noqa: E501
+            param2 = float(list(g.objects(
+                list(g.objects(mapping,
+                               rdflib.term.URIRef('http://purl.allotrope.org/ontologies/datacube-hdf-map#indexFunction')))[0],  # noqa: E501
+                rdflib.term.URIRef('http://purl.allotrope.org/ontologies/datacube-hdf-map#parameter2')))[0])  # noqa: E501
+            return param1, param2
+    return param1, param2
+
+
+def read_adf_description(path, wl_len):
     """
     Queries the adf data description layer to extract the wavlength vector.
     For this query, the h5ld package is required which can be installed by
@@ -75,17 +116,16 @@ def read_adf_description(wavelength_vals=None):
     are problems with installation, the user can give start and stop values
     as set on the DAD manually.
     """
-    if wavelength_vals is not None:
-        start, stop, length = wavelength_vals
-        wavelength = list(np.linspace(start, stop, length))
-    else:
-        try:
-            pass
-            # noqa: F401
-            # to be developed with Laura di Rocco
-        except AttributeError:
-            print("If the h5ld package cannot be installed on your machine, "
-                  "you have to give the wavelength values manually for adf data.")
+    try:
+        wl_slope, wl_start = get_function_paramenters(path)
+        wl_stop = wl_start + wl_len * wl_slope
+    except AttributeError:
+        print("If the h5ld package cannot be installed on your machine, "
+              "you have to give the wavelength values manually for adf data.")
+    if wl_start == 0 and wl_slope == 0:
+        wl_start = 190
+        wl_stop = wl_start + wl_len
+    wavelength = list(np.linspace(wl_start, wl_stop, wl_len))
     return wavelength
 
 
@@ -101,13 +141,12 @@ def preprocess_df(df):
     return df
 
 
-def read_adf(path, wl_high_pass=None, wl_low_pass=None, wl_start=190, wl_stop=400):
+def read_adf(path, wl_high_pass=None, wl_low_pass=None):
     """
     Reads adf files as exported by the Agilent ADF Adapter.
     """
     absorbance, time = read_adf_datacube(path)
-    wavelength_vals = (wl_start, wl_stop, absorbance.shape[0])
-    wavelength = read_adf_description(wavelength_vals=wavelength_vals)
+    wavelength = read_adf_description(path, absorbance.shape[0])
 
     df = pd.DataFrame(np.swapaxes(absorbance, 0, 1), columns=wavelength)
     df.insert(0, "time", time)
