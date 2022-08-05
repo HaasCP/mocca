@@ -68,8 +68,8 @@ def create_parafac_pages(chrom, index):
                 dp.Group(
                     dp.Text(f"## Details to chromatogram {index}, peak "
                             f"{parafac_model.impure_peak.idx}"),
-                    dp.Text("## MOCCA (Multiway Online Chromatographic Chemical "
-                            "Analysis)"),
+                    dp.Text("## MOCCA (Multivariate Online Contextual "
+                            "Chromatographic Analysis)"),
                     columns=2
                 ),
                 dp.Text("### Figure: UV-Vis spectra of the impure peak at every "
