@@ -49,7 +49,7 @@ class PeakDatabase():
         """
         Updates the unknown counter which gives the highest trailing number in
         the peak database of a peak assigned with a compound_id starting with
-        'unknown_'.
+        the string literal 'unknown'.
         """
         cur_count = 0
         for peak in self:

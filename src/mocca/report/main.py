@@ -16,7 +16,7 @@ from mocca.report.quant_comps import report_quant_comps
 from mocca.report.parafac import report_parafac
 
 
-def report(camp, export_path=''):
+def report(camp, export_path):
     """
     Consolidated report function.
     """
