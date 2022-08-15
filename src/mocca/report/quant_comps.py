@@ -60,7 +60,8 @@ def create_quant_comp_page(comp):
         blocks=[
             dp.Group(
                 dp.Text(f"## Details to component {comp.compound_id}"),
-                dp.Text("## MOCCA (Multivariate Online Contextual Chromatographic Analysis)"),
+                dp.Text("## MOCCA (Multivariate Online Contextual "
+                        "Chromatographic Analysis)"),
                 columns=2
                 ),
             dp.Text("### Figures: Calibration curves of component "

@@ -102,7 +102,8 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
         blocks = [
             dp.Group(
                 dp.Text(f"## Component {key} over runs"),
-                dp.Text("## MOCCA (Multivariate Online Contextual Chromatographic Analysis)"),
+                dp.Text("## MOCCA (Multivariate Online Contextual "
+                        "Chromatographic Analysis)"),
                 columns=2
             ),
             dp.Text(f"### Figure: Integral of component {key} over runs."),

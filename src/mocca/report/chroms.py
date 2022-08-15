@@ -110,7 +110,8 @@ def create_chrom_page(chrom, index):
         blocks=[
             dp.Group(
                 dp.Text(f"## Details to chromatogram {index}"),
-                dp.Text("## MOCCA (Multivariate Online Contextual Chromatographic Analysis)"),
+                dp.Text("## MOCCA (Multivariate Online Contextual "
+                        "Chromatographic Analysis)"),
                 columns=2
             ),
             dp.Text("### Table: Experiment as given by the user."),
