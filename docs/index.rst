@@ -1,8 +1,8 @@
 =====
-mocca
+MOCCA
 =====
 
-This is the documentation of **mocca**.
+This is the documentation of **MOCCA** (Multivariate Online Contextual Chromatographic Analysis).
 
 .. note::
 
