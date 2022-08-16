@@ -29,7 +29,7 @@
 
 |
 
-.. image:: https://github.com/mocca/docs/mocca_icon.png
+.. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon.png?raw=true
 
 |
 
