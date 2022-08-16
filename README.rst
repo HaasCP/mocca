@@ -34,7 +34,7 @@ MOCCA
 =====
 
 
-    MOCCA (Multivariate Online Contextual Chromatographic Analysis) is an open-source Python project to analyze raw HPLC–DAD data.
+    MOCCA (Multivariate Online Contextual Chromatographic Analysis) is an open-source Python project to analyze HPLC–DAD raw data.
 
 .. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon_w.png?raw=true
 
@@ -47,23 +47,29 @@ Check out corresponding scientific publication:
 
 Installation
 ============
-Create isolated environment::
+#. We recommend creating an isolated conda environment 
+   to avoid any problems with your installed Python packages::
 
     conda create -n mocca python=3.9
     conda activate mocca
 
-Install ``mocca``::
+#. Install ``mocca``::
 
     pip install mocca
 
-If you want to use ``mocca`` using JupyterLab notebooks::
+#. If you want to use ``mocca``'s reporting functionality::
+
+    pip3 install -U datapane
+
+#. If you want to use Allotrope (adf) file format::
+
+    pip install h5py
+    pip install git+https://github.com/HDFGroup/h5ld@master
+
+#. If you want to use ``mocca`` using JupyterLab notebooks::
 
     pip install jupyterlab
     ipython kernel install --user --name=mocca
-
-If you want to use ``mocca``'s reporting functionality::
-
-    pip3 install -U datapane
 
 
 .. _pyscaffold-notes:
