@@ -29,16 +29,11 @@
 
 |
 
-=====
-MOCCA
-=====
+.. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon_w.png?raw=true
 
 
     MOCCA (Multivariate Online Contextual Chromatographic Analysis) is an open-source Python project to analyze HPLC–DAD raw data.
 
-.. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon_w.png?raw=true
-
-|
 
 Automation and digitalization in the field of small molecule synthesis remains a challenge due to the diversity and complexity of chemical reaction processes. Organic chemical reactions are typically developed in Design–Make–Test–Analyze (DMTA) cycles. While much emphasis is given in recent literature on experimental design algorithms (D) and automated reaction execution (M), the analytical side of the cycle, especially the analysis of analytical data (A), remains locked up in the hands of analytical instrument vendors. In this work, we present an open-source Python package called MOCCA (Multivariate Online Contextual Chromatographic Analysis) for the analysis of raw data obtained from high-performance liquid chromatography analysis with diode array detectors (HPLC–DAD), a standard analytical tool to analyze outcomes of small molecule reactions. We investigate the potential of moving HPLC–DAD data analysis into an open environment like Python while overcoming vendor specific proprietary file formats and analysis algorithms. With a focus on automated DMTA workflows, we develop data analysis features, including the checking peak purity and automated deconvolution of overlapping peaks.
 
