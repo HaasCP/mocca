@@ -31,6 +31,7 @@
 
 .. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon_w.png?raw=true
 
+|
 
     MOCCA (Multivariate Online Contextual Chromatographic Analysis) is an open-source Python project to analyze HPLC–DAD raw data.
 
