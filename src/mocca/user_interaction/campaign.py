@@ -21,8 +21,8 @@ from mocca.campaign.process_funcs import process_gradients
 
 class HplcDadCampaign():
     """
-    Main parent class for HPLC-DAD experimental campaigns. We expect the
-    gradient to stay constant over the campaign.
+    Main class for HPLC-DAD campaigns containing all user input as well as
+    results from the data analysis.
     """
     def __init__(self, autosave_path=None):
         self.autosave_path = autosave_path
