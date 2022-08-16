@@ -29,7 +29,7 @@
 
 |
 
-.. image:: mocca_icon.png
+.. image:: https://github.com/mocca/docs/mocca_icon.png
 
 |
 
