@@ -50,7 +50,7 @@ def peaks_to_df(peaks):
     return pd.DataFrame(peaks_dict)
 
 
-def report_peaks(peak_db, report_path):
+def report_peak_library(peak_db, report_path):
     """
     Main report function for the peak database.
     """
@@ -76,4 +76,4 @@ def report_peaks(peak_db, report_path):
     r = dp.Report(
         peak_page
     )
-    r.save(path=os.path.join(report_path, "report_peak_db.html"), open=True)
+    r.save(path=os.path.join(report_path, "peak_library.html"), open=True)

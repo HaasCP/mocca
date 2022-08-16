@@ -108,4 +108,4 @@ def report_gradients(exps, report_path):
         summary_page,
         *grad_pages
     )
-    r.save(path=os.path.join(report_path, "report_gradient.html"), open=True)
+    r.save(path=os.path.join(report_path, "gradient.html"), open=True)

@@ -126,7 +126,7 @@ def create_comp_pages(chroms, quali_comp_db, quant_comp_db):
     return comp_pages
 
 
-def report_runs(chroms, quali_comp_db, quant_comp_db, report_path):
+def report_comp_tracking(chroms, quali_comp_db, quant_comp_db, report_path):
     """
     Main report function to follow concentrations and integrals over runs.
     """
@@ -153,4 +153,4 @@ def report_runs(chroms, quali_comp_db, quant_comp_db, report_path):
         summary_page,
         *comp_pages
     )
-    r.save(path=os.path.join(report_path, "report_runs.html"), open=True)
+    r.save(path=os.path.join(report_path, "compound_tracking.html"), open=True)

@@ -1,15 +1,14 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jan  7 15:12:43 2022
+Created on Tue May 24 09:07:05 2022
 
-@author: haascp
+@author: HaasCP
 """
+
 import os
 import pandas as pd
 import datapane as dp
 
-from mocca.peak.models import ProcessedPeak
 from mocca.visualization.basic_plots import plot_1D_data
 from mocca.visualization.results_plot import plot_chrom_with_peaks
 from mocca.report.utils import settings_to_df
@@ -49,25 +48,19 @@ def peaks_to_result_df(peaks):
             total_peak_sum += peak.integral
     peaks_dict = {'peak_id': [],
                   'retention_time': [],
-                  'compound_id': [],
-                  'concentration': [],
                   'integral': [],
                   'area_percent': [],
                   'is_pure': [],
-                  'is_saturated': [],
-                  'is_compound': []}
+                  'is_saturated': []}
     for peak in peaks:
         times = peak.dataset.time
         peaks_dict['peak_id'].append(peak.idx)
         peaks_dict['retention_time'].append(times[peak.maximum])
-        peaks_dict['compound_id'].append(peak.compound_id)
-        peaks_dict['concentration'].append(peak.concentration)
         peaks_dict['integral'].append(peak.integral)
         peaks_dict['area_percent'].append(round(peak.integral /
                                                 total_peak_sum * 100, 1))
         peaks_dict['is_pure'].append(peak.pure)
         peaks_dict['is_saturated'].append(peak.saturation)
-        peaks_dict['is_compound'].append(peak.is_compound)
     return pd.DataFrame(peaks_dict)
 
 
@@ -89,9 +82,7 @@ def create_chrom_page(chrom, index):
                            'y': spectrum})
         title_base = "UV-Vis spectrum of peak at {} min".\
             format(round(peak.dataset.time[peak.maximum], 3))
-        if peak.compound_id:
-            title = title_base + f' ({peak.compound_id})'
-        elif not peak.pure:
+        if not peak.pure:
             title = title_base + ' (impure)'
         else:
             title = title_base
@@ -129,12 +120,12 @@ def create_chrom_page(chrom, index):
     )
 
 
-def report_chroms(chroms, settings, report_path):
+def report_bad_chroms(chroms, settings, report_path):
     """
     Main Chromatogram report function.
     """
-    if not chroms or all([chrom.bad_data for chrom in chroms]):
-        print("No chromatograms given or all chromatograms are bad data!")
+    if not chroms or not any([chrom.bad_data for chrom in chroms]):
+        print("No chromatograms given or all chromatograms are good data!")
         return
     this_dir, _ = os.path.split(__file__)
     mocca_icon_path = os.path.join(this_dir, "mocca_icon.png")
@@ -155,12 +146,12 @@ def report_chroms(chroms, settings, report_path):
         ],
     )
     chrom_pages = []
-    for i, chrom in enumerate(chroms):
-        if chrom.peaks and all(type(peak) == ProcessedPeak for peak in chrom.peaks):
+    for i, chrom in enumerate([chrom for chrom in chroms if chrom.bad_data]):
+        if chrom.peaks:
             page = create_chrom_page(chrom, i + 1)
             chrom_pages.append(page)
     r = dp.Report(
         summary_page,
         *chrom_pages
     )
-    r.save(path=os.path.join(report_path, "report_chroms.html"), open=True)
+    r.save(path=os.path.join(report_path, "bad_chromatograms.html"), open=True)

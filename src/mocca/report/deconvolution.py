@@ -102,7 +102,7 @@ def create_parafac_pages(chrom, index):
         return parafac_pages
 
 
-def report_parafac(chroms, report_path):
+def report_deconvolution(chroms, report_path):
     """
     Main PARAFAC report function.
     """
@@ -135,4 +135,4 @@ def report_parafac(chroms, report_path):
         summary_page,
         *parafac_pages
     )
-    r.save(path=os.path.join(report_path, "report_parafac.html"), open=True)
+    r.save(path=os.path.join(report_path, "deconvolution.html"), open=True)

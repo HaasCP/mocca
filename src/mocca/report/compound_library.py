@@ -10,7 +10,7 @@ import pandas as pd
 import datapane as dp
 
 from mocca.visualization.basic_plots import plot_1D_data
-from mocca.report.peaks import peaks_to_df
+from mocca.report.peak_library import peaks_to_df
 
 
 def quali_comps_to_df(comps):
@@ -71,7 +71,7 @@ def create_quali_comp_page(comp):
     )
 
 
-def report_quali_comps(quali_comp_db, report_path):
+def report_comp_library(quali_comp_db, report_path):
     """
     Creates html report for the qualitative component database.
     """
@@ -103,4 +103,4 @@ def report_quali_comps(quali_comp_db, report_path):
         table_page,
         *component_pages
     )
-    r.save(path=os.path.join(report_path, "report_quali_comp_db.html"), open=True)
+    r.save(path=os.path.join(report_path, "compound_library.html"), open=True)

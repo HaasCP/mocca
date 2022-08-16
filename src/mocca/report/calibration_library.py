@@ -10,7 +10,7 @@ import pandas as pd
 import datapane as dp
 
 from mocca.visualization.calibration_plots import plot_calibration_curves
-from mocca.report.peaks import peaks_to_df
+from mocca.report.peak_library import peaks_to_df
 
 
 def get_max_score_version(comp):
@@ -76,7 +76,7 @@ def create_quant_comp_page(comp):
     )
 
 
-def report_quant_comps(quant_comp_db, report_path):
+def report_calib_library(quant_comp_db, report_path):
     """
     Creates html report for the quantitative component database.
     """
@@ -108,4 +108,4 @@ def report_quant_comps(quant_comp_db, report_path):
         table_page,
         *component_pages
     )
-    r.save(path=os.path.join(report_path, "report_quant_comp_db.html"), open=True)
+    r.save(path=os.path.join(report_path, "calibration_library.html"), open=True)
