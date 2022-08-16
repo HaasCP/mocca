@@ -1,4 +1,4 @@
-.. image:: mocca_icon.png
+.. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon_w.png?raw=true
 
 |
 

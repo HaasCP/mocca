@@ -46,6 +46,26 @@ Automation and digitalization in the field of small molecule synthesis remains a
 Check out corresponding scientific publication:
 !!!
 
+Installation
+============
+Create isolated environment::
+
+    conda create -n mocca python=3.9
+    conda activate mocca
+
+Install ``mocca``::
+
+    pip install mocca
+
+If you want to use ``mocca`` using JupyterLab notebooks::
+
+    pip install jupyterlab
+    ipython kernel install --user --name=mocca
+
+If you want to use ``mocca``'s reporting functionality::
+
+    pip3 install -U datapane
+
 
 .. _pyscaffold-notes:
 
