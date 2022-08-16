@@ -79,4 +79,4 @@ def report_hplc_input(exps, report_path):
     r = dp.Report(
         exp_page
     )
-    r.save(path=os.path.join(report_path, "report_hplc_input.html"), open=True)
+    r.save(path=os.path.join(report_path, "hplc_input.html"), open=True)

@@ -41,21 +41,6 @@ def trim_data(data, time, length):
 def absorbance_to_array(df):
     """
     Generates a 2D absorbance array of the absorbance values.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Columns:
-            time: Chromatogram time
-            wavelength: Detection wavelength
-            absorbance: absorbance value.
-
-    Returns
-    -------
-    absorbance_array : numpy.ndarray
-        Absorbance values with number of wavelengths in the first
-        and number of recorded times in the second dimension.
-
     """
     absorbance_array = df.absorbance.to_numpy().\
         reshape(df.wavelength.nunique(), df.time.nunique())
@@ -94,21 +79,6 @@ def apply_filter(dataframe, wl_high_pass, wl_low_pass, bandwidth=2,
     """
     Filters absorbance data of tidy 3D DAD dataframes to remove noise
     and background systematic error.
-    Parameters
-    ----------
-    dataframe : pandas.DataFrame
-        Columns:
-            time: Chromatogram time
-            wavelength: Detection wavelength
-            absorbance: absorbance value.
-
-    Returns
-    -------
-    df : pandas.DataFrame
-        Columns:
-            time: Chromatogram time
-            wavelength: Detection wavelength
-            absorbance: absorbance value.
     """
 
     df = dataframe.copy()

@@ -1,28 +1,3 @@
-.. todo:: THIS IS SUPPOSED TO BE AN EXAMPLE. MODIFY IT ACCORDING TO YOUR NEEDS!
-
-   The document assumes you are using a source repository service that promotes a
-   contribution model similar to `GitHub's fork and pull request workflow`_.
-   While this is true for the majority of services (like GitHub, GitLab,
-   BitBucket), it might not be the case for private repositories (e.g., when
-   using Gerrit).
-
-   Also notice that the code examples might refer to GitHub URLs or the text
-   might use GitHub specific terminology (e.g., *Pull Request* instead of *Merge
-   Request*).
-
-   Please make sure to check the document having these assumptions in mind
-   and update things accordingly.
-
-.. todo:: Provide the correct links/replacements at the bottom of the document.
-
-.. todo:: You might want to have a look on `PyScaffold's contributor's guide`_,
-
-   especially if your project is open source. The text should be very similar to
-   this template, but there are a few extra contents that you might decide to
-   also include, like mentioning labels of your issue tracker or automated
-   releases.
-
-
 ============
 Contributing
 ============
@@ -76,21 +51,19 @@ that any documentation update is done in the same way was a code contribution.
 
     e.g.,  reStructuredText_ or CommonMark_ with MyST_ extensions.
 
-.. todo:: If your project is hosted on GitHub, you can also mention the following tip:
+.. tip::
+   Please notice that the `GitHub web interface`_ provides a quick way of
+   propose changes in ``mocca``'s files. While this mechanism can
+   be tricky for normal code contributions, it works perfectly fine for
+   contributing to the docs, and can be quite handy.
 
-   .. tip::
-      Please notice that the `GitHub web interface`_ provides a quick way of
-      propose changes in ``mocca``'s files. While this mechanism can
-      be tricky for normal code contributions, it works perfectly fine for
-      contributing to the docs, and can be quite handy.
-
-      If you are interested in trying this method out, please navigate to
-      the ``docs`` folder in the source repository_, find which file you
-      would like to propose changes and click in the little pencil icon at the
-      top, to open `GitHub's code editor`_. Once you finish editing the file,
-      please write a message in the form at the bottom of the page describing
-      which changes have you made and what are the motivations behind them and
-      submit your proposal.
+   If you are interested in trying this method out, please navigate to
+   the ``docs`` folder in the source repository_, find which file you
+   would like to propose changes and click in the little pencil icon at the
+   top, to open `GitHub's code editor`_. Once you finish editing the file,
+   please write a message in the form at the bottom of the page describing
+   which changes have you made and what are the motivations behind them and
+   submit your proposal.
 
 When working on documentation changes in your local machine, you can
 compile them using |tox|_::
@@ -124,7 +97,8 @@ Create an environment
 
 Before you start coding, we recommend creating an isolated `virtual
 environment`_ to avoid any problems with your installed Python packages.
-This can easily be done via either |virtualenv|_::
+A suggested procedure is described in the installation guide of ``mocca``
+or this can easily be done via either |virtualenv|_::
 
     virtualenv <PATH TO VENV>
     source <PATH TO VENV>/bin/activate
@@ -153,13 +127,15 @@ Clone the repository
 
    .. todo:: if you are not using pre-commit, please remove the following item:
 
-#. Install |pre-commit|_::
 
-    pip install pre-commit
-    pre-commit install
+.. 
+    #. Install |pre-commit|_::
+    
+        pip install pre-commit
+        pre-commit install
 
-   ``mocca`` comes with a lot of hooks configured to automatically help the
-   developer to check the code being written.
+       ``mocca`` comes with a lot of hooks configured to automatically help the
+       developer to check the code being written.
 
 Implement your changes
 ----------------------
@@ -278,11 +254,6 @@ Maintainer tasks
 Releases
 --------
 
-.. todo:: This section assumes you are using PyPI to publicly release your package.
-
-   If instead you are using a different/private package index, please update
-   the instructions accordingly.
-
 If you are part of the group of maintainers and have correct user permissions
 on PyPI_, the following steps can be used to release a new version for
 ``mocca``:
@@ -308,15 +279,11 @@ on PyPI_, the following steps can be used to release a new version for
    of environments, including private companies and proprietary code bases.
 
 
-.. <-- strart -->
-.. todo:: Please review and change the following definitions:
-
 .. |the repository service| replace:: GitHub
 .. |contribute button| replace:: "Create pull request"
 
-.. _repository: https://github.com/<USERNAME>/mocca
-.. _issue tracker: https://github.com/<USERNAME>/mocca/issues
-.. <-- end -->
+.. _repository: https://github.com/HaasCP/mocca
+.. _issue tracker: https://github.com/HaasCP/mocca/issues
 
 
 .. |virtualenv| replace:: ``virtualenv``

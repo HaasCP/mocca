@@ -13,27 +13,7 @@ import numpy as np
 def suggest_initialization_runs(n_calib_dict, max_conc_dict=None, istd_key=None,
                                 n_solvents=0):
     """Returns data frame of suggested runs for a standardized HPLC
-    initialization (initialization = calibration + database of analytes)
-
-    Parameters
-    ----------
-    n_calib_df : pd.DataFrame, optional
-        Number of calibration points for each analyte. Form:
-        pd.DataFrame([[n(A1), n(A2), n(A3)]],
-                         columns=self.analyte_keys)
-
-    max_conc_df : pd.DataFrame, optional
-        Dataframe of the maximum absolute concentrations to be used in the
-        calibration runs. Form:
-            pd.DataFrame([[c(A1), c(A2), c(ISTD)]],
-                         columns=self.analyte_keys + [self.istd_key])
-
-    n_solvents : int, optional
-        Number of UV-Vis active solvents used in the reaction campaign.
-        For each solvent, a blank solvent run is added.
-
-    export_path : str, optional
-        Full path of the csv file where suggested runs are exported
+    initialization (initialization = calibration + database of analytes).
     """
     if any(n_calib < 3 for n_calib in n_calib_dict.values()):
         logging.warning("Warning: Linear regression with less than three "

@@ -40,7 +40,7 @@ def read_txt_shimadzu(path):
     data = lines[start_line:]
 
     #split data using comma as separator
-    data = [line.split('\t') for line in data]
+    data = [line.split(',') for line in data]
     
     #create dataframe and tidy data
     df = pd.DataFrame(data).dropna()
