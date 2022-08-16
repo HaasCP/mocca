@@ -29,6 +29,10 @@
 
 |
 
+.. image:: mocca_icon.png
+
+|
+
 =====
 MOCCA
 =====
