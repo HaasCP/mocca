@@ -47,5 +47,5 @@ def get_unprocessed_experiments(experiments, quali_comp_db=None):
                         raise ValueError("Internal standard {} unknown in this "
                                          "campaign. First add the internal "
                                          "standard as pure compound in a "
-                                         "separate run!".format(exp.istd.key))
+                                         "separate run!".format(istd.key))
     return unprocessed_exps

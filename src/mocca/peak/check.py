@@ -58,7 +58,7 @@ def check_peak_purity(peak, show_analytics, param=2.5):
         plt.show()
         print(f"Peak at {peak.maximum} \n"
               f"Agilent Threshold (True for >0.9): {test_agilent} \n"
-              f"Unimodality Test (False for False): {test_unimodality} \n"
+              f"Unimodality Test (True or False): {test_unimodality} \n"
               f"PCA Variance Explained (True for >0.995): {test_pca} \n"
               f"Minimum Correlation (False for <0.9): {test_correls_1} \n"
               f"Minimum Correlation (True for >0.95): {test_correls_1} \n"
