@@ -29,16 +29,12 @@
 
 |
 
-=====
-MOCCA
-=====
-
-
-    MOCCA (Multivariate Online Contextual Chromatographic Analysis) is an open-source Python project to analyze raw HPLC–DAD data.
-
 .. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon_w.png?raw=true
 
 |
+
+    MOCCA (Multivariate Online Contextual Chromatographic Analysis) is an open-source Python project to analyze HPLC–DAD raw data.
+
 
 Automation and digitalization in the field of small molecule synthesis remains a challenge due to the diversity and complexity of chemical reaction processes. Organic chemical reactions are typically developed in Design–Make–Test–Analyze (DMTA) cycles. While much emphasis is given in recent literature on experimental design algorithms (D) and automated reaction execution (M), the analytical side of the cycle, especially the analysis of analytical data (A), remains locked up in the hands of analytical instrument vendors. In this work, we present an open-source Python package called MOCCA (Multivariate Online Contextual Chromatographic Analysis) for the analysis of raw data obtained from high-performance liquid chromatography analysis with diode array detectors (HPLC–DAD), a standard analytical tool to analyze outcomes of small molecule reactions. We investigate the potential of moving HPLC–DAD data analysis into an open environment like Python while overcoming vendor specific proprietary file formats and analysis algorithms. With a focus on automated DMTA workflows, we develop data analysis features, including the checking peak purity and automated deconvolution of overlapping peaks.
 
@@ -47,23 +43,29 @@ Check out corresponding scientific publication:
 
 Installation
 ============
-Create isolated environment::
+#. We recommend creating an isolated conda environment 
+   to avoid any problems with your installed Python packages::
 
     conda create -n mocca python=3.9
     conda activate mocca
 
-Install ``mocca``::
+#. Install ``mocca``::
 
     pip install mocca
 
-If you want to use ``mocca`` using JupyterLab notebooks::
+#. If you want to use ``mocca``'s reporting functionality::
+
+    pip3 install -U datapane
+
+#. If you want to use Allotrope (adf) file format::
+
+    pip install h5py
+    pip install git+https://github.com/HDFGroup/h5ld@master
+
+#. If you want to use ``mocca`` using JupyterLab notebooks::
 
     pip install jupyterlab
     ipython kernel install --user --name=mocca
-
-If you want to use ``mocca``'s reporting functionality::
-
-    pip3 install -U datapane
 
 
 .. _pyscaffold-notes:
