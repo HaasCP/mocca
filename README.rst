@@ -49,7 +49,7 @@ Installation
     conda create -n mocca python=3.9
     conda activate mocca
 
-#. Install ``mocca``::
+#. Install ``mocca`` and its dependencies::
 
     pip install mocca
 
