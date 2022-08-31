@@ -38,8 +38,9 @@
 
 Automation and digitalization solutions in the field of small molecule synthesis face new challenges for chemical reaction analysis, especially in the field of high-performance liquid chromatography (HPLC). Chromatographic data remains locked in vendors’ hardware and software components limiting their potential in automated workflows and contradicting to FAIR data principles (findability, accessibility, interoperability, reuse), which enable chemometrics and data science applications. In this work, we present an open-source Python project called MOCCA (Multivariate Online Contextual Chromatographic Analysis) for the analysis of open-format HPLC–DAD (photodiode array detector) raw data. MOCCA provides a comprehensive set of data analysis features including a peak deconvolution routine which allows for automated deconvolution of known signals even if overlapped with signals of unexpected impurities or side products. By publishing MOCCA as a Python package, we envision an open-source community project for chromatographic data analysis with the potential of further advancing its scope and capabilities.
 
-Check out corresponding scientific publication:
-!!!
+Documentation: https://mocca.readthedocs.io/en/latest/
+
+Check out corresponding scientific publication: !!!
 
 Installation
 ============
