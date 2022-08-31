@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mocca.visualization.parafac_plots &mdash; mocca 0.0.post1.dev148+g95c823c.d20220812 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> mocca
+          </a>
+              <div class="version">
+                0.0.post1.dev148+g95c823c.d20220812
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#note">Note</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributions &amp; Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">Module Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mocca</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>mocca.visualization.parafac_plots</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mocca.visualization.parafac_plots</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Fri Jan  7 18:05:10 2022</span>
+
+<span class="sd">@author: haascp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">altair</span> <span class="k">as</span> <span class="nn">alt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">mocca.peak.utils</span> <span class="kn">import</span> <span class="n">get_peak_data</span>
+<span class="kn">from</span> <span class="nn">mocca.visualization.basic_plots</span> <span class="kn">import</span> <span class="p">(</span><span class="n">plot_1D_layer</span><span class="p">,</span> <span class="n">plot_1D_scatter_layer</span><span class="p">,</span>
+                                             <span class="n">plot_1D_scatter</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mocca.dad_data.utils</span> <span class="kn">import</span> <span class="n">sum_absorbance_by_time</span>
+
+
+<span class="n">color_vals</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="s1">&#39;chartreuse&#39;</span><span class="p">,</span> <span class="s1">&#39;#F4D03F&#39;</span><span class="p">,</span> <span class="s1">&#39;#D35400&#39;</span><span class="p">,</span> <span class="s1">&#39;#7D3C98&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="plot_impure_peak_spectra"><a class="viewcode-back" href="../../../api/mocca.visualization.html#mocca.visualization.parafac_plots.plot_impure_peak_spectra">[docs]</a><span class="k">def</span> <span class="nf">plot_impure_peak_spectra</span><span class="p">(</span><span class="n">impure_peak</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates plot with UV-Vis spectra at every time point in the impure peak.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">peak_data</span> <span class="o">=</span> <span class="n">get_peak_data</span><span class="p">(</span><span class="n">impure_peak</span><span class="p">)</span>
+    <span class="n">wls</span> <span class="o">=</span> <span class="n">impure_peak</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">wavelength</span>
+
+    <span class="n">charts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">peak_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">wls</span><span class="p">,</span>
+                           <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">peak_data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span>
+                           <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">impure_peak</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">impure_peak</span><span class="o">.</span><span class="n">left</span> <span class="o">+</span> <span class="n">i</span><span class="p">]})</span>
+        <span class="n">chart</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Wavelength (nm)&#39;</span><span class="p">)),</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Absorbance (mAU)&#39;</span><span class="p">)),</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Color</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Time (min)&#39;</span><span class="p">,</span>
+                            <span class="n">scale</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)),</span>
+            <span class="n">strokeWidth</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="mf">0.5</span><span class="p">))</span>
+        <span class="n">charts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">charts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">charts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span> <span class="o">+</span> <span class="n">charts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">configure_axis</span><span class="p">(</span>
+        <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">titleFontSize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">titleFontWeight</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">configure_view</span><span class="p">(</span>
+        <span class="n">strokeWidth</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="plot_uvvis_specs"><a class="viewcode-back" href="../../../api/mocca.visualization.html#mocca.visualization.parafac_plots.plot_uvvis_specs">[docs]</a><span class="k">def</span> <span class="nf">plot_uvvis_specs</span><span class="p">(</span><span class="n">parafac_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates plot of the UV-Vis traces of the PARAFAC component together with</span>
+<span class="sd">    the UV-Vis spectrum of the known compound used for the data tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wls</span> <span class="o">=</span> <span class="n">parafac_model</span><span class="o">.</span><span class="n">impure_peak</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">wavelength</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">parafac_model</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]))):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">wls</span><span class="p">,</span>
+                           <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">spectrum</span><span class="p">})</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">plot_1D_layer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Wavelength (nm)&#39;</span><span class="p">,</span>
+                          <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Absorbance (mAU)&#39;</span><span class="p">,</span>
+                          <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">reduce_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">+=</span> <span class="n">p</span>
+
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">parafac_model</span><span class="o">.</span><span class="n">data_tensor</span>
+    <span class="n">comp_spec</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">relevant_comp</span><span class="o">.</span><span class="n">spectrum</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">tensor</span><span class="o">.</span><span class="n">relevant_comp</span><span class="o">.</span><span class="n">spectrum</span><span class="p">]</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">wls</span><span class="p">,</span>
+                       <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">comp_spec</span><span class="p">})</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">(</span><span class="n">strokeDash</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                      <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Wavelength (nm)&#39;</span><span class="p">)),</span>
+                      <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Absorbance (mAU)&#39;</span><span class="p">)),</span>
+                      <span class="n">color</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+                      <span class="p">)</span><span class="o">.</span><span class="n">properties</span><span class="p">(</span>
+                          <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;UV-Vis spectrum of component &#39;</span>
+                                          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tensor</span><span class="o">.</span><span class="n">relevant_comp</span><span class="o">.</span><span class="n">compound_id</span><span class="si">}</span><span class="s1"> &#39;</span>
+                                          <span class="s1">&#39;(black, dashed)&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;and the computed PARAFAC peaks (colors)&#39;</span><span class="p">]})</span>
+
+    <span class="n">fig</span> <span class="o">+=</span> <span class="n">p</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">configure_axis</span><span class="p">(</span>
+        <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">titleFontSize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">titleFontWeight</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">configure_view</span><span class="p">(</span>
+        <span class="n">strokeWidth</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="plot_retention"><a class="viewcode-back" href="../../../api/mocca.visualization.html#mocca.visualization.parafac_plots.plot_retention">[docs]</a><span class="k">def</span> <span class="nf">plot_retention</span><span class="p">(</span><span class="n">parafac_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots normalized retention profiles of the PARAFAC components as well as of</span>
+<span class="sd">    the impure peak.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">impure_peak</span> <span class="o">=</span> <span class="n">parafac_model</span><span class="o">.</span><span class="n">impure_peak</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">impure_peak</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">time</span>
+
+    <span class="n">peak_data</span> <span class="o">=</span> <span class="n">get_peak_data</span><span class="p">(</span><span class="n">impure_peak</span><span class="p">)</span>
+    <span class="n">summed_peak_data</span> <span class="o">=</span> <span class="n">sum_absorbance_by_time</span><span class="p">(</span><span class="n">peak_data</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">times</span><span class="p">[</span><span class="n">impure_peak</span><span class="o">.</span><span class="n">left</span><span class="p">:</span><span class="n">impure_peak</span><span class="o">.</span><span class="n">right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                       <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">summed_peak_data</span><span class="p">})</span>
+
+    <span class="n">impure_chart</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                                 <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                         <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Time (min)&#39;</span><span class="p">)),</span>
+                                 <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                         <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Absorbance (mAU)&#39;</span><span class="p">)),</span>
+                                 <span class="n">color</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">properties</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Retention profiles of impure signal (black)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;and of the computed PARAFAC peaks (colors)&#39;</span><span class="p">]})</span>
+
+    <span class="n">parafac_peaks</span> <span class="o">=</span> <span class="n">parafac_model</span><span class="o">.</span><span class="n">peaks</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">parafac_peaks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">left</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">parafac_peaks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">right</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">charts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">peak</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parafac_peaks</span><span class="p">):</span>
+        <span class="n">peak_data</span> <span class="o">=</span> <span class="n">get_peak_data</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
+        <span class="n">summed_peak_data</span> <span class="o">=</span> <span class="n">sum_absorbance_by_time</span><span class="p">(</span><span class="n">peak_data</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">times</span><span class="p">[</span><span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">],</span>
+                           <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">summed_peak_data</span><span class="p">})</span>
+        <span class="n">chart</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Time (min)&#39;</span><span class="p">)),</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Absorbance (mAU)&#39;</span><span class="p">)),</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">color_vals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">charts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">impure_chart</span>
+    <span class="k">for</span> <span class="n">chart</span> <span class="ow">in</span> <span class="n">charts</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span> <span class="o">+</span> <span class="n">chart</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">configure_axis</span><span class="p">(</span>
+        <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">titleFontSize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">titleFontWeight</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">configure_view</span><span class="p">(</span>
+        <span class="n">strokeWidth</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="plot_aligned_tensor"><a class="viewcode-back" href="../../../api/mocca.visualization.html#mocca.visualization.parafac_plots.plot_aligned_tensor">[docs]</a><span class="k">def</span> <span class="nf">plot_aligned_tensor</span><span class="p">(</span><span class="n">parafac_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots retention profiles (summed absorbance over all wavelengths) of all</span>
+<span class="sd">    slices in the data tensor on the optimized iteration shift.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">n_slices</span> <span class="o">=</span> <span class="n">parafac_model</span><span class="o">.</span><span class="n">data_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">peak_tips</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;peak_max&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_slices</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">n_slices</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;grey&#39;</span>
+        <span class="n">summed_retention</span> <span class="o">=</span> <span class="n">parafac_model</span><span class="o">.</span><span class="n">data_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">peak_tips</span><span class="p">[</span><span class="s1">&#39;peak_max&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summed_retention</span><span class="o">.</span><span class="n">argmax</span><span class="p">())</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">summed_retention</span><span class="p">))),</span>
+                           <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">summed_retention</span><span class="p">})</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">plot_1D_layer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Time points (</span><span class="se">\u2013</span><span class="s1">)&#39;</span><span class="p">,</span>
+                          <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Absorbance (mAU)&#39;</span><span class="p">,</span>
+                          <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">reduce_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">+=</span> <span class="n">p</span>
+
+    <span class="n">rules</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">peak_tips</span><span class="p">))</span><span class="o">.</span><span class="n">mark_rule</span><span class="p">(</span><span class="n">strokeDash</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+      <span class="n">x</span><span class="o">=</span><span class="s1">&#39;peak_max&#39;</span><span class="p">)</span>
+    <span class="n">fig</span> <span class="o">+=</span> <span class="n">rules</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">properties</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Aligned retention profiles of impure signal (black)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;and of the pure peaks (grey) composing the data tensor&#39;</span><span class="p">]})</span><span class="o">.</span>\
+        <span class="n">configure_axis</span><span class="p">(</span>
+            <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">titleFontSize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">titleFontWeight</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">configure_view</span><span class="p">(</span>
+                <span class="n">strokeWidth</span><span class="o">=</span><span class="mi">0</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="plot_normalized_integrals"><a class="viewcode-back" href="../../../api/mocca.visualization.html#mocca.visualization.parafac_plots.plot_normalized_integrals">[docs]</a><span class="k">def</span> <span class="nf">plot_normalized_integrals</span><span class="p">(</span><span class="n">normalized_integrals</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots integrals of all PARAFAC components over all slices of the tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">integral</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">normalized_integrals</span><span class="p">))):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">integral</span><span class="p">))),</span>
+                           <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">integral</span><span class="p">})</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">plot_1D_scatter_layer</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Data tensor slice (</span><span class="se">\u2013</span><span class="s1">)&#39;</span><span class="p">,</span>
+                                  <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Normalized integral (</span><span class="se">\u2013</span><span class="s1">)&#39;</span><span class="p">,</span>
+                                  <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_vals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">reduce_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">+=</span> <span class="n">p</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">properties</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Integral values of the PARAFAC components over the &#39;</span>
+                        <span class="s1">&#39;layers of the data tensor&#39;</span><span class="p">]})</span><span class="o">.</span>\
+        <span class="n">configure_axis</span><span class="p">(</span>
+            <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">titleFontSize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">titleFontWeight</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">configure_view</span><span class="p">(</span>
+                <span class="n">strokeWidth</span><span class="o">=</span><span class="mi">0</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="plot_objective_func"><a class="viewcode-back" href="../../../api/mocca.visualization.html#mocca.visualization.parafac_plots.plot_objective_func">[docs]</a><span class="k">def</span> <span class="nf">plot_objective_func</span><span class="p">(</span><span class="n">parafac_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots objective function outcome vs iteration offset when using the iterative</span>
+<span class="sd">    PARAFAC approach.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">parafac_model</span><span class="o">.</span><span class="n">iter_objective_func</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span>
+                       <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">parafac_model</span><span class="o">.</span><span class="n">iter_objective_func</span><span class="p">))[</span><span class="mi">1</span><span class="p">]})</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_1D_scatter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Offset in time series points (</span><span class="se">\u2013</span><span class="s1">)&#39;</span><span class="p">,</span>
+                          <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Normalized integral (</span><span class="se">\u2013</span><span class="s1">)&#39;</span><span class="p">,</span>
+                          <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">reduce_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, HaasCP.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

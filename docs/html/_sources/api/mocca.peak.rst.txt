@@ -1,0 +1,109 @@
+mocca.peak package
+==================
+
+Submodules
+----------
+
+mocca.peak.check module
+-----------------------
+
+.. automodule:: mocca.peak.check
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.correct module
+-------------------------
+
+.. automodule:: mocca.peak.correct
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.database module
+--------------------------
+
+.. automodule:: mocca.peak.database
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.expand module
+------------------------
+
+.. automodule:: mocca.peak.expand
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.integrate module
+---------------------------
+
+.. automodule:: mocca.peak.integrate
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.match module
+-----------------------
+
+.. automodule:: mocca.peak.match
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.models module
+------------------------
+
+.. automodule:: mocca.peak.models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.process module
+-------------------------
+
+.. automodule:: mocca.peak.process
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.purity\_funcs module
+-------------------------------
+
+.. automodule:: mocca.peak.purity_funcs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.quantify module
+--------------------------
+
+.. automodule:: mocca.peak.quantify
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.resolve\_impure module
+---------------------------------
+
+.. automodule:: mocca.peak.resolve_impure
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.peak.utils module
+-----------------------
+
+.. automodule:: mocca.peak.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mocca.peak
+   :members:
+   :undoc-members:
+   :show-inheritance:

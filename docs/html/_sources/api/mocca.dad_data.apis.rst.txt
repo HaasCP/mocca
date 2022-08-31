@@ -1,0 +1,61 @@
+mocca.dad\_data.apis package
+============================
+
+Submodules
+----------
+
+mocca.dad\_data.apis.allotrope module
+-------------------------------------
+
+.. automodule:: mocca.dad_data.apis.allotrope
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.dad\_data.apis.angi module
+--------------------------------
+
+.. automodule:: mocca.dad_data.apis.angi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.dad\_data.apis.chemstation module
+---------------------------------------
+
+.. automodule:: mocca.dad_data.apis.chemstation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.dad\_data.apis.custom module
+----------------------------------
+
+.. automodule:: mocca.dad_data.apis.custom
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.dad\_data.apis.empower module
+-----------------------------------
+
+.. automodule:: mocca.dad_data.apis.empower
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.dad\_data.apis.labsolutions module
+----------------------------------------
+
+.. automodule:: mocca.dad_data.apis.labsolutions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mocca.dad_data.apis
+   :members:
+   :undoc-members:
+   :show-inheritance:

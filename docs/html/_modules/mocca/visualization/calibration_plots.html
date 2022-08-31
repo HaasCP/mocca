@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mocca.visualization.calibration_plots &mdash; mocca 0.0.post1.dev148+g95c823c.d20220812 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> mocca
+          </a>
+              <div class="version">
+                0.0.post1.dev148+g95c823c.d20220812
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#note">Note</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributions &amp; Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">Module Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mocca</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>mocca.visualization.calibration_plots</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mocca.visualization.calibration_plots</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Fri Jan  7 14:15:20 2022</span>
+
+<span class="sd">@author: haascp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">altair</span> <span class="k">as</span> <span class="nn">alt</span>
+
+<span class="kn">from</span> <span class="nn">mocca.visualization.utils</span> <span class="kn">import</span> <span class="n">round_to_n</span>
+
+
+<div class="viewcode-block" id="plot_calibration_curves"><a class="viewcode-back" href="../../../api/mocca.visualization.html#mocca.visualization.calibration_plots.plot_calibration_curves">[docs]</a><span class="k">def</span> <span class="nf">plot_calibration_curves</span><span class="p">(</span><span class="n">comp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function for the visualization of the calibration curves.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">calibration_curves</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">comp</span><span class="o">.</span><span class="n">calib_factors</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="c1"># visualization</span>
+        <span class="n">curve_annotation_formula</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;y = </span><span class="si">{</span><span class="n">round_to_n</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">calib_factors</span><span class="p">[</span><span class="n">version</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2"> x&quot;</span>
+        <span class="n">curve_annotation_accuracy</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;R</span><span class="se">\u00B2</span><span class="s2"> = </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">calib_scores</span><span class="p">[</span><span class="n">version</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;Concentration (M)&#39;</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">!=</span> <span class="s1">&#39;absolute&#39;</span><span class="p">:</span>
+            <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Relative area * </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> concentration (M)&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Summed peak absorbance (mAU)&#39;</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">comp</span><span class="o">.</span><span class="n">calib_data</span><span class="p">[</span><span class="n">version</span><span class="p">])</span>
+
+        <span class="n">df_scatter</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+            <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y</span>
+        <span class="p">})</span>
+        <span class="n">df_line</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+            <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">item</span> <span class="o">*</span> <span class="n">comp</span><span class="o">.</span><span class="n">calib_factors</span><span class="p">[</span><span class="n">version</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+        <span class="p">})</span>
+
+        <span class="n">scatter</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span><span class="o">.</span>\
+            <span class="n">mark_circle</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">xlabel</span><span class="p">)),</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">ylabel</span><span class="p">)),</span>
+                <span class="n">tooltip</span><span class="o">=</span><span class="p">[</span><span class="n">alt</span><span class="o">.</span><span class="n">Tooltip</span><span class="p">(</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">xlabel</span><span class="p">),</span>
+                         <span class="n">alt</span><span class="o">.</span><span class="n">Tooltip</span><span class="p">(</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">ylabel</span><span class="p">)]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+
+        <span class="n">chart</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df_line</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="n">df_line</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="n">scale</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">))),</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="n">df_line</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span>
+                    <span class="n">domain</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">item</span> <span class="o">*</span> <span class="n">comp</span><span class="o">.</span><span class="n">calib_factors</span><span class="p">[</span><span class="n">version</span><span class="p">]</span>
+                                              <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])),</span>
+                            <span class="mf">1.1</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">item</span> <span class="o">*</span> <span class="n">comp</span><span class="o">.</span><span class="n">calib_factors</span><span class="p">[</span><span class="n">version</span><span class="p">]</span>
+                                              <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])))))</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">annotation_x_loc</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">+</span>
+                                <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span>
+                                     <span class="nb">min</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
+                                 <span class="o">*</span> <span class="mf">0.1</span><span class="p">))</span>
+            <span class="n">annotation_y_loc_1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="o">+</span>
+                                  <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">-</span>
+                                       <span class="nb">min</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]]))</span>
+                                   <span class="o">*</span> <span class="mf">0.95</span><span class="p">))</span>
+            <span class="n">annotation_y_loc_2</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="o">+</span>
+                                  <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">-</span>
+                                       <span class="nb">min</span><span class="p">(</span><span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]]))</span>
+                                   <span class="o">*</span> <span class="mf">0.75</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">annotation_x_loc</span> <span class="o">=</span> <span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.98</span>
+            <span class="n">annotation_y_loc_1</span> <span class="o">=</span> <span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.95</span>
+            <span class="n">annotation_y_loc_2</span> <span class="o">=</span> <span class="n">df_scatter</span><span class="p">[</span><span class="n">df_scatter</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.9</span>
+
+        <span class="n">annotation_formula</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">({</span><span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">annotation_x_loc</span><span class="p">,</span>
+                                                    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">annotation_y_loc_1</span><span class="p">}]})</span><span class="o">.</span>\
+            <span class="n">mark_text</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">curve_annotation_formula</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span><span class="o">.</span>\
+            <span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;x:Q&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;y:Q&#39;</span><span class="p">)</span>
+
+        <span class="n">annotation_accuracy</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">({</span><span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">annotation_x_loc</span><span class="p">,</span>
+                                                     <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">annotation_y_loc_2</span><span class="p">}]})</span><span class="o">.</span>\
+            <span class="n">mark_text</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">curve_annotation_accuracy</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span><span class="o">.</span>\
+            <span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;x:Q&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;y:Q&#39;</span><span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">chart</span> <span class="o">+</span> <span class="n">scatter</span> <span class="o">+</span> <span class="n">annotation_formula</span> <span class="o">+</span> <span class="n">annotation_accuracy</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">configure_axis</span><span class="p">(</span>
+                <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">titleFontSize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                <span class="n">titleFontWeight</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">configure_view</span><span class="p">(</span>
+                <span class="n">strokeWidth</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">)</span>
+        <span class="n">calibration_curves</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">calibration_curves</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, HaasCP.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

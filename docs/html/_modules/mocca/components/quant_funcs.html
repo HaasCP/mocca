@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mocca.components.quant_funcs &mdash; mocca 0.0.post1.dev148+g95c823c.d20220812 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> mocca
+          </a>
+              <div class="version">
+                0.0.post1.dev148+g95c823c.d20220812
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#note">Note</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributions &amp; Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">Module Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mocca</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>mocca.components.quant_funcs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mocca.components.quant_funcs</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon Dec 20 17:20:35 2021</span>
+
+<span class="sd">@author: haascp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+
+<span class="kn">from</span> <span class="nn">mocca.peak.utils</span> <span class="kn">import</span> <span class="n">get_peak_data</span>
+<span class="kn">from</span> <span class="nn">mocca.components.models</span> <span class="kn">import</span> <span class="n">QuantComponent</span>
+<span class="kn">from</span> <span class="nn">mocca.components.utils</span> <span class="kn">import</span> <span class="n">check_peaks_compound_id</span>
+
+
+<div class="viewcode-block" id="get_integrate_wl_index"><a class="viewcode-back" href="../../../api/mocca.components.html#mocca.components.quant_funcs.get_integrate_wl_index">[docs]</a><span class="k">def</span> <span class="nf">get_integrate_wl_index</span><span class="p">(</span><span class="n">compound_id</span><span class="p">,</span> <span class="n">quali_comp_db</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns index of the wavelength vector where spectrum of component has the</span>
+<span class="sd">    highest maximum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">quali_comp_db</span><span class="p">[</span><span class="n">compound_id</span><span class="p">]</span><span class="o">.</span><span class="n">spectrum_max</span><span class="p">:</span>
+        <span class="n">integrate_wl_idx</span> <span class="o">=</span> <span class="n">quali_comp_db</span><span class="p">[</span><span class="n">compound_id</span><span class="p">]</span><span class="o">.</span><span class="n">spectrum_max</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">integrate_wl_idx</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># minimum wavelength due to bandwidth of 2</span>
+    <span class="k">return</span> <span class="n">integrate_wl_idx</span></div>
+
+
+<div class="viewcode-block" id="integrate_on_wl"><a class="viewcode-back" href="../../../api/mocca.components.html#mocca.components.quant_funcs.integrate_on_wl">[docs]</a><span class="k">def</span> <span class="nf">integrate_on_wl</span><span class="p">(</span><span class="n">peak</span><span class="p">,</span> <span class="n">integrate_wl_idx</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Integrates signal of given peak on a given wavelength with a bandwidth of 2</span>
+<span class="sd">    (default) by summing all absorbances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">peak_data</span> <span class="o">=</span> <span class="n">get_peak_data</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
+    <span class="n">peak_data_wl</span> <span class="o">=</span> <span class="n">peak_data</span><span class="p">[</span><span class="n">integrate_wl_idx</span><span class="p">]</span>
+    <span class="c1"># correct baseline</span>
+    <span class="n">peak_data_wl</span> <span class="o">=</span> <span class="n">peak_data_wl</span> <span class="o">-</span> <span class="n">peak_data_wl</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+
+    <span class="n">integral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">peak_data_wl</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">integral</span></div>
+
+
+<div class="viewcode-block" id="create_calibration_dict"><a class="viewcode-back" href="../../../api/mocca.components.html#mocca.components.quant_funcs.create_calibration_dict">[docs]</a><span class="k">def</span> <span class="nf">create_calibration_dict</span><span class="p">(</span><span class="n">peaks</span><span class="p">,</span> <span class="n">integrate_wl_idx</span><span class="p">,</span> <span class="n">quali_comp_db</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a dictionary with all data needed to create calibration curves.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">calib_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">calib_data</span><span class="p">[</span><span class="s1">&#39;absolute&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">peak</span> <span class="ow">in</span> <span class="n">peaks</span><span class="p">:</span>
+        <span class="n">integral_wl</span> <span class="o">=</span> <span class="n">integrate_on_wl</span><span class="p">(</span><span class="n">peak</span><span class="p">,</span> <span class="n">integrate_wl_idx</span><span class="p">)</span>
+        <span class="n">calib_point</span> <span class="o">=</span> <span class="p">(</span><span class="n">peak</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span> <span class="n">integral_wl</span><span class="p">)</span>
+        <span class="n">calib_data</span><span class="p">[</span><span class="s1">&#39;absolute&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calib_point</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">peak</span><span class="o">.</span><span class="n">istd</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">istd_peak</span> <span class="ow">in</span> <span class="n">peak</span><span class="o">.</span><span class="n">istd</span><span class="p">:</span>
+                <span class="n">istd_int_wl_index</span> <span class="o">=</span> <span class="n">get_integrate_wl_index</span><span class="p">(</span><span class="n">istd_peak</span><span class="o">.</span><span class="n">compound_id</span><span class="p">,</span>
+                                                           <span class="n">quali_comp_db</span><span class="p">)</span>
+                <span class="n">istd_int_wl</span> <span class="o">=</span> <span class="n">integrate_on_wl</span><span class="p">(</span><span class="n">istd_peak</span><span class="p">,</span> <span class="n">istd_int_wl_index</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">istd_peak</span><span class="o">.</span><span class="n">compound_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">calib_data</span><span class="p">:</span>
+                    <span class="n">calib_data</span><span class="p">[</span><span class="n">istd_peak</span><span class="o">.</span><span class="n">compound_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">calib_point</span> <span class="o">=</span> <span class="p">(</span><span class="n">peak</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span> <span class="p">(</span><span class="n">integral_wl</span> <span class="o">*</span>
+                                                    <span class="n">istd_peak</span><span class="o">.</span><span class="n">concentration</span> <span class="o">/</span>
+                                                    <span class="n">istd_int_wl</span><span class="p">))</span>
+                <span class="n">calib_data</span><span class="p">[</span><span class="n">istd_peak</span><span class="o">.</span><span class="n">compound_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calib_point</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">calib_data</span></div>
+
+
+<div class="viewcode-block" id="create_linear_models"><a class="viewcode-back" href="../../../api/mocca.components.html#mocca.components.quant_funcs.create_linear_models">[docs]</a><span class="k">def</span> <span class="nf">create_linear_models</span><span class="p">(</span><span class="n">calib_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates linear models out of the given data and returns a list of linear</span>
+<span class="sd">    calibration factors (calibration curve is forced through origin) and a list</span>
+<span class="sd">    of corresponing R-squared values of the regression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">calib_factors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">calib_scores</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">version</span><span class="p">,</span> <span class="n">calibration_data</span> <span class="ow">in</span> <span class="n">calib_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">calibration_curve</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">calibration_data</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">calibration_curve</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">calibration_curve</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="n">calib_factors</span><span class="p">[</span><span class="n">version</span><span class="p">]</span> <span class="o">=</span> <span class="n">calibration_curve</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">calib_scores</span><span class="p">[</span><span class="n">version</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+    <span class="k">return</span> <span class="n">calib_factors</span><span class="p">,</span> <span class="n">calib_scores</span></div>
+
+
+<div class="viewcode-block" id="create_quant_component"><a class="viewcode-back" href="../../../api/mocca.components.html#mocca.components.quant_funcs.create_quant_component">[docs]</a><span class="k">def</span> <span class="nf">create_quant_component</span><span class="p">(</span><span class="n">peaks</span><span class="p">,</span> <span class="n">quali_comp_db</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a quantitative component object based on the given peaks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">peaks</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">compound_id</span> <span class="o">=</span> <span class="n">check_peaks_compound_id</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span>
+
+    <span class="n">integrate_wl_idx</span> <span class="o">=</span> <span class="n">get_integrate_wl_index</span><span class="p">(</span><span class="n">compound_id</span><span class="p">,</span> <span class="n">quali_comp_db</span><span class="p">)</span>
+
+    <span class="n">calib_data</span> <span class="o">=</span> <span class="n">create_calibration_dict</span><span class="p">(</span><span class="n">peaks</span><span class="p">,</span> <span class="n">integrate_wl_idx</span><span class="p">,</span> <span class="n">quali_comp_db</span><span class="p">)</span>
+
+    <span class="n">calib_factors</span><span class="p">,</span> <span class="n">calib_scores</span> <span class="o">=</span> <span class="n">create_linear_models</span><span class="p">(</span><span class="n">calib_data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">QuantComponent</span><span class="p">(</span><span class="n">compound_id</span><span class="o">=</span><span class="n">compound_id</span><span class="p">,</span>
+                          <span class="n">integrate_wl_idx</span><span class="o">=</span><span class="n">integrate_wl_idx</span><span class="p">,</span>
+                          <span class="n">calib_factors</span><span class="o">=</span><span class="n">calib_factors</span><span class="p">,</span>
+                          <span class="n">calib_data</span><span class="o">=</span><span class="n">calib_data</span><span class="p">,</span>
+                          <span class="n">calib_scores</span><span class="o">=</span><span class="n">calib_scores</span><span class="p">,</span>
+                          <span class="n">created_from</span><span class="o">=</span><span class="n">peaks</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, HaasCP.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

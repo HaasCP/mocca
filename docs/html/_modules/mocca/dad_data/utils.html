@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mocca.dad_data.utils &mdash; mocca 0.0.post1.dev148+g95c823c.d20220812 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> mocca
+          </a>
+              <div class="version">
+                0.0.post1.dev148+g95c823c.d20220812
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#note">Note</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributions &amp; Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">Module Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mocca</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>mocca.dad_data.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mocca.dad_data.utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Fri Dec 10 13:31:37 2021</span>
+
+<span class="sd">@author: haascp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<div class="viewcode-block" id="sum_absorbance_by_time"><a class="viewcode-back" href="../../../api/mocca.dad_data.html#mocca.dad_data.utils.sum_absorbance_by_time">[docs]</a><span class="k">def</span> <span class="nf">sum_absorbance_by_time</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sums the absorbances for each time point over all wavelengths</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : numpy.ndarray</span>
+<span class="sd">        Actual experimental data with shape [# of wavelengths] x [timepoints].</span>
+<span class="sd">        Generated from dataframe with absorbance_to_array function</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        A 1D array containing the sum of wavelengths at each time point</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="trim_data"><a class="viewcode-back" href="../../../api/mocca.dad_data.html#mocca.dad_data.utils.trim_data">[docs]</a><span class="k">def</span> <span class="nf">trim_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Trims the 2D DADData in the time dimension to the length provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="n">length</span><span class="p">],</span> <span class="n">time</span><span class="p">[:</span><span class="n">length</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">time</span></div>
+
+
+<div class="viewcode-block" id="absorbance_to_array"><a class="viewcode-back" href="../../../api/mocca.dad_data.html#mocca.dad_data.utils.absorbance_to_array">[docs]</a><span class="k">def</span> <span class="nf">absorbance_to_array</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a 2D absorbance array of the absorbance values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">absorbance_array</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">absorbance</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span>\
+        <span class="n">reshape</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">nunique</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">nunique</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">absorbance_array</span></div>
+
+
+<div class="viewcode-block" id="df_to_array"><a class="viewcode-back" href="../../../api/mocca.dad_data.html#mocca.dad_data.utils.df_to_array">[docs]</a><span class="k">def</span> <span class="nf">df_to_array</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes a tidy dataframe of HPLC-DAD data and returns a numpy array of &quot;</span>
+<span class="sd">    absorbance values as well as a vector for the time domain and a vector for &quot;</span>
+<span class="sd">    the wavelength domain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">absorbance_to_array</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">wavelength</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">wavelength</span></div>
+
+
+<div class="viewcode-block" id="get_reference_signal"><a class="viewcode-back" href="../../../api/mocca.dad_data.html#mocca.dad_data.utils.get_reference_signal">[docs]</a><span class="k">def</span> <span class="nf">get_reference_signal</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the averaged signal over the last number of wavelengths as given by</span>
+<span class="sd">    the bandwidth.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">wls</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">unique</span><span class="p">()[</span><span class="o">-</span><span class="n">bandwidth</span><span class="p">:]</span>
+    <span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">wl</span> <span class="ow">in</span> <span class="n">wls</span><span class="p">:</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;wavelength&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">wl</span><span class="p">]</span><span class="o">.</span><span class="n">absorbance</span><span class="p">)</span>
+        <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+    <span class="n">mean_signal</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">signals</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;absorbance&#39;</span><span class="p">:</span> <span class="n">mean_signal</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="apply_filter"><a class="viewcode-back" href="../../../api/mocca.dad_data.html#mocca.dad_data.utils.apply_filter">[docs]</a><span class="k">def</span> <span class="nf">apply_filter</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">wl_high_pass</span><span class="p">,</span> <span class="n">wl_low_pass</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                 <span class="n">reference_wl</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filters absorbance data of tidy 3D DAD dataframes to remove noise</span>
+<span class="sd">    and background systematic error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;absorbance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)[</span><span class="s1">&#39;absorbance&#39;</span><span class="p">]</span><span class="o">.</span>\
+        <span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">bandwidth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span>\
+        <span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">reference_wl</span><span class="p">:</span>
+        <span class="n">n_times</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">wls</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="n">reference_df</span> <span class="o">=</span> <span class="n">get_reference_signal</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">reference_series</span> <span class="o">=</span> <span class="n">reference_df</span><span class="o">.</span><span class="n">absorbance</span><span class="o">.</span>\
+            <span class="n">iloc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_times</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">wls</span><span class="p">))]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;absorbance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">absorbance</span> <span class="o">-</span> <span class="n">reference_series</span>
+    <span class="k">if</span> <span class="n">wl_high_pass</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">wavelength</span> <span class="o">&gt;=</span> <span class="n">wl_high_pass</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">wl_low_pass</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">wavelength</span> <span class="o">&lt;=</span> <span class="n">wl_low_pass</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, HaasCP.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

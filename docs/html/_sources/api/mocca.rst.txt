@@ -1,0 +1,26 @@
+mocca package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mocca.campaign
+   mocca.chromatogram
+   mocca.components
+   mocca.dad_data
+   mocca.decomposition
+   mocca.peak
+   mocca.report
+   mocca.user_interaction
+   mocca.visualization
+
+Module contents
+---------------
+
+.. automodule:: mocca
+   :members:
+   :undoc-members:
+   :show-inheritance:

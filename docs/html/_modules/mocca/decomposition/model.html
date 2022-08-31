@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mocca.decomposition.model &mdash; mocca 0.0.post1.dev148+g95c823c.d20220812 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> mocca
+          </a>
+              <div class="version">
+                0.0.post1.dev148+g95c823c.d20220812
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#note">Note</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributions &amp; Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">Module Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mocca</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>mocca.decomposition.model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mocca.decomposition.model</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Feb 22 11:15:42 2022</span>
+
+<span class="sd">@author: haascp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">mocca.components.models</span> <span class="kn">import</span> <span class="n">QualiComponent</span>
+<span class="kn">from</span> <span class="nn">mocca.peak.models</span> <span class="kn">import</span> <span class="n">CorrectedPeak</span><span class="p">,</span> <span class="n">IntegratedPeak</span>
+
+<span class="kn">from</span> <span class="nn">mocca.decomposition.utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_same_uvvis</span><span class="p">,</span> <span class="n">check_summed_factor_uvvis</span><span class="p">,</span>
+                                       <span class="n">check_comp_in_impure</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mocca.peak.resolve_impure</span> <span class="kn">import</span> <span class="n">create_pure_peak</span><span class="p">,</span> <span class="n">create_parafac_peak</span>
+
+
+<div class="viewcode-block" id="DataTensor"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.model.DataTensor">[docs]</a><span class="nd">@dataclass</span><span class="p">()</span>
+<span class="k">class</span> <span class="nc">DataTensor</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model of data tensors used as input for the PARAFAC decomposition algorithm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tensor</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">boundaries</span> <span class="p">:</span> <span class="nb">tuple</span>
+    <span class="n">relevant_comp</span> <span class="p">:</span> <span class="n">QualiComponent</span>
+    <span class="n">comp_tensor_shape</span> <span class="p">:</span> <span class="nb">tuple</span>
+    <span class="n">y_offset</span> <span class="p">:</span> <span class="nb">float</span></div>
+
+
+<div class="viewcode-block" id="ParafacModel"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.model.ParafacModel">[docs]</a><span class="nd">@dataclass</span><span class="p">()</span>
+<span class="k">class</span> <span class="nc">ParafacModel</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores all relevant information of a PARAFAC model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">impure_peak</span> <span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">CorrectedPeak</span><span class="p">,</span> <span class="n">IntegratedPeak</span><span class="p">]</span>
+    <span class="n">n_comps</span> <span class="p">:</span> <span class="nb">int</span>
+    <span class="n">pca_explained_variance</span> <span class="p">:</span> <span class="nb">list</span>
+    <span class="n">weights</span> <span class="p">:</span> <span class="nb">list</span>
+    <span class="n">factors</span> <span class="p">:</span> <span class="nb">list</span>
+    <span class="n">data_tensor</span> <span class="p">:</span> <span class="n">DataTensor</span>
+    <span class="n">iter_offset</span> <span class="p">:</span> <span class="nb">int</span>
+    <span class="n">iter_objective_func</span> <span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">peaks</span> <span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">CorrectedPeak</span><span class="p">,</span> <span class="n">IntegratedPeak</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">impure_mse</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_factors</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_impure_mse</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_normalize_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Normalizes the calculated PARAFAC factors to bring them in the format of</span>
+<span class="sd">        the original data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">spectra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">elutions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">integrals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">spectral_norm_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spectra</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">elution_norm_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">elutions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">normalized_spectra</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">spectra</span><span class="p">,</span> <span class="n">spectral_norm_val</span><span class="p">,</span>
+                                       <span class="n">out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">spectra</span><span class="p">),</span>
+                                       <span class="n">where</span><span class="o">=</span><span class="n">spectral_norm_val</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">normalized_elution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">elutions</span><span class="p">,</span> <span class="n">elution_norm_val</span><span class="p">,</span>
+                                       <span class="n">out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">elutions</span><span class="p">),</span>
+                                       <span class="n">where</span><span class="o">=</span><span class="n">elution_norm_val</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">normalized_integrals</span> <span class="o">=</span> <span class="n">integrals</span> <span class="o">*</span> <span class="n">spectral_norm_val</span> <span class="o">*</span> <span class="n">elution_norm_val</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">normalized_elution</span><span class="p">,</span> <span class="n">normalized_integrals</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_impure_mse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the mean square error of the summed PARAFAC components for the</span>
+<span class="sd">        impure peak slice and the actual impure peak.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">impure_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">parafac_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">impure_data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">comp_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_comps</span><span class="p">):</span>
+            <span class="n">n_wls</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">0</span><span class="p">][:,</span> <span class="n">comp_i</span><span class="p">])</span>
+            <span class="n">comp_wl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">0</span><span class="p">][:,</span> <span class="n">comp_i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_wls</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">comp_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">1</span><span class="p">][:,</span> <span class="n">comp_i</span><span class="p">]</span>
+            <span class="n">comp_integral</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">2</span><span class="p">][:,</span> <span class="n">comp_i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">comp_data</span> <span class="o">=</span> <span class="n">comp_wl</span> <span class="o">*</span> <span class="n">comp_time</span> <span class="o">*</span> <span class="n">comp_integral</span>
+            <span class="n">parafac_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">parafac_data</span><span class="p">,</span> <span class="n">comp_data</span><span class="p">)</span>
+        <span class="n">difference_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">impure_data</span><span class="p">,</span> <span class="n">parafac_data</span><span class="p">)</span>
+        <span class="n">squared_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">difference_array</span><span class="p">)</span>
+        <span class="n">mse</span> <span class="o">=</span> <span class="n">squared_array</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">impure_mse</span> <span class="o">=</span> <span class="n">mse</span>
+
+<div class="viewcode-block" id="ParafacModel.create_parafac_peaks"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.model.ParafacModel.create_parafac_peaks">[docs]</a>    <span class="k">def</span> <span class="nf">create_parafac_peaks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">absorbance_threshold</span><span class="p">,</span>
+                             <span class="n">spectrum_correl_coef_thresh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If two UV-Vis traces in the PARAFAC components are too similar, no</span>
+<span class="sd">        PARAFAC peaks are created. PARAFAC peaks&#39; dataseta are created synthetically</span>
+<span class="sd">        generated by using the PARAFAC factors of the model and filling the rest</span>
+<span class="sd">        of the array up with zeros. PARAFAC peaks get an index of -impure_peak.idx</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">check_same_uvvis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spectrum_correl_coef_thresh</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="n">check_summed_factor_uvvis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spectrum_correl_coef_thresh</span><span class="p">)):</span>
+            <span class="n">parafac_peaks</span> <span class="o">=</span> <span class="p">[</span><span class="n">create_pure_peak</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impure_peak</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">check_comp_in_impure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">absorbance_threshold</span><span class="p">):</span>
+            <span class="n">parafac_peaks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parafac_peaks</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_comps</span><span class="p">):</span>
+                <span class="c1">#  get factors for one parafac comonent</span>
+                <span class="n">parafac_peak</span> <span class="o">=</span> <span class="n">create_parafac_peak</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                <span class="n">parafac_peaks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parafac_peak</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">peaks</span> <span class="o">=</span> <span class="n">parafac_peaks</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, HaasCP.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+mocca.user\_interaction namespace
+=================================
+
+.. py:module:: mocca.user_interaction
+
+Submodules
+----------
+
+mocca.user\_interaction.campaign module
+---------------------------------------
+
+.. automodule:: mocca.user_interaction.campaign
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.user\_interaction.settings module
+---------------------------------------
+
+.. automodule:: mocca.user_interaction.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.user\_interaction.suggest\_calibration module
+---------------------------------------------------
+
+.. automodule:: mocca.user_interaction.suggest_calibration
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.user\_interaction.user\_objects module
+--------------------------------------------
+
+.. automodule:: mocca.user_interaction.user_objects
+   :members:
+   :undoc-members:
+   :show-inheritance:

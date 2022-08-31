@@ -1,0 +1,53 @@
+mocca.dad\_data package
+=======================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mocca.dad_data.apis
+
+Submodules
+----------
+
+mocca.dad\_data.models module
+-----------------------------
+
+.. automodule:: mocca.dad_data.models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.dad\_data.process\_funcs module
+-------------------------------------
+
+.. automodule:: mocca.dad_data.process_funcs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.dad\_data.process\_gradientdata module
+--------------------------------------------
+
+.. automodule:: mocca.dad_data.process_gradientdata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mocca.dad\_data.utils module
+----------------------------
+
+.. automodule:: mocca.dad_data.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mocca.dad_data
+   :members:
+   :undoc-members:
+   :show-inheritance:

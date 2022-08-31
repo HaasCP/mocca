@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mocca.decomposition.alternative_objective_funcs &mdash; mocca 0.0.post1.dev148+g95c823c.d20220812 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> mocca
+          </a>
+              <div class="version">
+                0.0.post1.dev148+g95c823c.d20220812
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#note">Note</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributions &amp; Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">Module Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mocca</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>mocca.decomposition.alternative_objective_funcs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mocca.decomposition.alternative_objective_funcs</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Wed Feb 23 09:17:34 2022</span>
+
+<span class="sd">@author: haascp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="get_non_comp_sum"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.alternative_objective_funcs.get_non_comp_sum">[docs]</a><span class="k">def</span> <span class="nf">get_non_comp_sum</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">,</span> <span class="n">start_slice</span><span class="p">,</span> <span class="n">end_slice</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get summed integrals from all components except the highest inegral component</span>
+<span class="sd">    in one slice of the PARAFAC factors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_comps</span> <span class="o">=</span> <span class="n">parafac_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">non_comp_sum_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_comps</span><span class="p">):</span>
+        <span class="n">sorted_integrals</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">][:,</span> <span class="n">i</span><span class="p">][</span><span class="n">start_slice</span><span class="p">:</span><span class="n">end_slice</span><span class="p">])</span>
+        <span class="n">non_comp_sum_i</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sorted_integrals</span><span class="p">)</span>
+        <span class="n">non_comp_sum_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">non_comp_sum_i</span><span class="p">)</span>
+    <span class="n">sorted_sums_ex_max</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">non_comp_sum_list</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sorted_sums_ex_max</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_all_non_comp_sum"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.alternative_objective_funcs.get_all_non_comp_sum">[docs]</a><span class="k">def</span> <span class="nf">get_all_non_comp_sum</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">,</span> <span class="n">comp_tensor_shape</span><span class="p">,</span>
+                         <span class="n">show_parafac_analytics</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iterative PARAFAC approach is a minimization problem. Based on the component</span>
+<span class="sd">    tensor data shape, the maximal sum of integrals is found for every component</span>
+<span class="sd">    part in the data tensor. The integrals of all other components in this</span>
+<span class="sd">    component part are summed up and should be ideally zero (only component</span>
+<span class="sd">    spectrum contributes to component part of tensor). This final sum</span>
+<span class="sd">    is the minimization objective for the iterative PARAFAC approach.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_slice</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">end_slice</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">non_comp_sum_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">comp_tensor_shape</span><span class="p">)):</span>
+        <span class="n">end_slice</span> <span class="o">+=</span> <span class="n">comp_tensor_shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">non_comp_sum</span> <span class="o">=</span> <span class="n">get_non_comp_sum</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">,</span> <span class="n">start_slice</span><span class="p">,</span> <span class="n">end_slice</span><span class="p">)</span>
+        <span class="n">non_comp_sum_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">non_comp_sum</span><span class="p">)</span>
+        <span class="n">start_slice</span> <span class="o">+=</span> <span class="n">comp_tensor_shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">show_parafac_analytics</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;objective_val_non_comp = </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">non_comp_sum_list</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">non_comp_sum_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_comp_sum"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.alternative_objective_funcs.get_comp_sum">[docs]</a><span class="k">def</span> <span class="nf">get_comp_sum</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">,</span> <span class="n">start_slice</span><span class="p">,</span> <span class="n">end_slice</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get summed integrals from the highest inegral component in one slice of</span>
+<span class="sd">    PARAFAC factors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_comps</span> <span class="o">=</span> <span class="n">parafac_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">non_comp_sum_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_comps</span><span class="p">):</span>
+        <span class="n">sorted_integrals</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">][:,</span> <span class="n">i</span><span class="p">][</span><span class="n">start_slice</span><span class="p">:</span><span class="n">end_slice</span><span class="p">])</span>
+        <span class="n">non_comp_sum_i</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sorted_integrals</span><span class="p">)</span>
+        <span class="n">non_comp_sum_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">non_comp_sum_i</span><span class="p">)</span>
+    <span class="n">max_sum</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">non_comp_sum_list</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">max_sum</span></div>
+
+
+<div class="viewcode-block" id="get_all_comp_sum"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.alternative_objective_funcs.get_all_comp_sum">[docs]</a><span class="k">def</span> <span class="nf">get_all_comp_sum</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">,</span> <span class="n">comp_tensor_shape</span><span class="p">,</span> <span class="n">show_parafac_analytics</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iterative PARAFAC approach is a maximization problem. Based on the component</span>
+<span class="sd">    tensor data shape, the maximal sum of integrals is found for every component</span>
+<span class="sd">    part in the data tensor. The integrals of these component integrals are</span>
+<span class="sd">    summed up. This sum is the maximization objective for the iterative PARAFAC</span>
+<span class="sd">    approach.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_slice</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">end_slice</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">comp_sum_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">comp_tensor_shape</span><span class="p">)):</span>
+        <span class="n">end_slice</span> <span class="o">+=</span> <span class="n">comp_tensor_shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">comp_sum</span> <span class="o">=</span> <span class="n">get_comp_sum</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">,</span> <span class="n">start_slice</span><span class="p">,</span> <span class="n">end_slice</span><span class="p">)</span>
+        <span class="n">comp_sum_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp_sum</span><span class="p">)</span>
+        <span class="n">start_slice</span> <span class="o">+=</span> <span class="n">comp_tensor_shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">show_parafac_analytics</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;objective_val_comp = </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">comp_sum_list</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">comp_sum_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_total_integral_sum"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.alternative_objective_funcs.get_total_integral_sum">[docs]</a><span class="k">def</span> <span class="nf">get_total_integral_sum</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">,</span> <span class="n">show_parafac_analytics</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iterative PARAFAC approach is a maximization problem. This objective function</span>
+<span class="sd">    assumes that the PARAFAC model is best, when the overall integral over all</span>
+<span class="sd">    slices is maximized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_comps</span> <span class="o">=</span> <span class="n">parafac_factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">sum_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_comps</span><span class="p">):</span>
+        <span class="n">integrals</span> <span class="o">=</span> <span class="n">parafac_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">][:,</span> <span class="n">i</span><span class="p">]</span>
+        <span class="n">sum_i</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">integrals</span><span class="p">)</span>
+        <span class="n">sum_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sum_i</span><span class="p">)</span>
+    <span class="n">total_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sum_list</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_parafac_analytics</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;objective_total_sum = </span><span class="si">{</span><span class="n">total_sum</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">total_sum</span></div>
+
+
+<div class="viewcode-block" id="get_impure_integral_sum"><a class="viewcode-back" href="../../../api/mocca.decomposition.html#mocca.decomposition.alternative_objective_funcs.get_impure_integral_sum">[docs]</a><span class="k">def</span> <span class="nf">get_impure_integral_sum</span><span class="p">(</span><span class="n">parafac_factors</span><span class="p">,</span> <span class="n">show_parafac_analytics</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This objective function assumes that the PARAFAC model is best, when the</span>
+<span class="sd">    summed integral of all components in the impure peak slice is maximized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">integrals</span> <span class="o">=</span> <span class="n">parafac_factors</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">sum_i</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">integrals</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_parafac_analytics</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;impure_peak_sum = </span><span class="si">{</span><span class="n">sum_i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sum_i</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, HaasCP.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
