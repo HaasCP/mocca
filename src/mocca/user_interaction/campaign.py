@@ -89,6 +89,7 @@ class HplcDadCampaign():
                 logging.warning("CampaignWarning: Path {} was already used for "
                                 "different HPLC input. New HPLC input replaces "
                                 "the old one.".format(hplc_input.path))
+        hplc_input.processed = False
         self.hplc_inputs.append(hplc_input)
 
         if self.autosave_path:
