@@ -38,9 +38,11 @@
 
 Automation and digitalization solutions in the field of small molecule synthesis face new challenges for chemical reaction analysis, especially in the field of high-performance liquid chromatography (HPLC). Chromatographic data remains locked in vendors’ hardware and software components limiting their potential in automated workflows and contradicting to FAIR data principles (findability, accessibility, interoperability, reuse), which enable chemometrics and data science applications. In this work, we present an open-source Python project called MOCCA (Multivariate Online Contextual Chromatographic Analysis) for the analysis of open-format HPLC–DAD (photodiode array detector) raw data. MOCCA provides a comprehensive set of data analysis features including a peak deconvolution routine which allows for automated deconvolution of known signals even if overlapped with signals of unexpected impurities or side products. By publishing MOCCA as a Python package, we envision an open-source community project for chromatographic data analysis with the potential of further advancing its scope and capabilities.
 
+Open-source project: https://github.com/HaasCP/mocca
+
 Documentation: https://mocca.readthedocs.io/en/latest/
 
-Check out corresponding scientific publication: !!!
+Corresponding scientific publication: !!!
 
 Installation
 ============
@@ -67,6 +69,18 @@ Installation
 
     pip install jupyterlab
     ipython kernel install --user --name=mocca
+
+
+Getting started
+===============
+MOCCA is currently best used via JupyterLab notebooks. The notebooks folder of the GitHub repository contains a tutorial notebook with corresponding HPLC–DAD test data for the first steps.
+
+Additionally, a full test data set from the scientific publication is added (cyanation of aryl halides via well plate screening). The corresponding notebook contains full data analysis details from the raw data level until the presented visualizations in the manuscript (Fig. 7e) and SI (Fig. S17).
+
+
+How to cite
+===========
+Preprint: !!!
 
 
 .. _pyscaffold-notes:
