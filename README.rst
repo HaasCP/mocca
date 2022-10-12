@@ -58,7 +58,7 @@ Installation
 
 #. If you want to use ``mocca``'s reporting functionality::
 
-    pip3 install -U datapane
+    pip3 install -U datapane==0.14
 
 #. If you want to use Allotrope (adf) file format::
 
