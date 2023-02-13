@@ -42,7 +42,7 @@ Open-source project: https://github.com/HaasCP/mocca
 
 Documentation: https://mocca.readthedocs.io/en/latest/
 
-Corresponding scientific publication (preprint): https://doi.org/10.26434/chemrxiv-2022-0pv2d, this content is a preprint and has not been peer-reviewed.
+Corresponding scientific publication (open access): *ACS Central Science*, **2023**, https://doi.org/10.1021/acscentsci.2c01042.
 
 Installation
 ============
