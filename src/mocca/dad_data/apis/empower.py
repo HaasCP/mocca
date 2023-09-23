@@ -16,33 +16,22 @@ import pandas as pd
 from mocca.dad_data.utils import df_to_array, apply_filter
 
 
-def read_arw_empower(path, wl_high_pass=None, wl_low_pass=None):
-    with open(path) as file:
-        lines = file.readlines()
-        lines = [line.rstrip() for line in lines]
-
-    time_idx = [n for n, l in enumerate(lines) if l.startswith('Time')][0]
-    wl_idx = [n for n, l in enumerate(lines) if l.startswith('Wavelength')][0]
-
-    absorbance_list = []
-    time_vec = []
-    for line in lines[time_idx + 2:]:
-        line_list = line.split("\t")
-        absorbance_list.append(line_list[1:])
-        time_vec.append(line_list[0])
-
-    absorbance = np.array(absorbance_list).astype(float)
-    time = [float(i) for i in time_vec]
-    acq_time = max(time) / len(time)
-    # generates new time column
-    time_series = pd.Series(range(1, (len(time) + 1))).astype(float) * acq_time
-
-    wavelength_vec = lines[wl_idx].split("\t")[1:]
-    wavelength = [float(i) for i in wavelength_vec]
-
-    df = pd.DataFrame(absorbance, columns=wavelength)
-    df = df.assign(time=pd.Series(time_series).values)
-
+def read_arw_empower(path: str, wl_high_pass:float=None, wl_low_pass:float=None) -> pd.DataFrame:
+    '''
+    Read Empower ARW file and return pandas DataFrame.
+    '''
+    wavelength_vec = None
+    # find line number where data starts and read wavelength vector
+    with open(path) as f:
+        for i, line in enumerate(f):
+            if line.startswith('Wavelength'):
+                wavelength_vec = line.split("\t")[1:]
+            elif line.startswith('Time'):
+                n_skip = i+1
+                break
+    # read data
+    df = pd.read_csv(path, sep='\t', names=['time']+wavelength_vec, skiprows=n_skip, dtype=float)
+    # melt data into 3 columns (time, wavelength, absorbance)
     df = pd.melt(df, id_vars='time', value_vars=df.columns,
                  var_name='wavelength', value_name='absorbance')
     return df
