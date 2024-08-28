@@ -27,6 +27,13 @@
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
 
+⛔️ DEPRECATED
+============
+
+For updated version, please see:
+
+https://github.com/Bayer-Group/MOCCA
+
 |
 
 .. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon_w.png?raw=true
