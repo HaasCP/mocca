@@ -34,6 +34,10 @@ For supported and updated version, please see:
 
 https://github.com/Bayer-Group/MOCCA
 
+Example data and notebooks have been removed from this repository and can now be found here:
+
+https://github.com/HaasCP/mocca_tutorial
+
 |
 
 .. image:: https://github.com/haascp/mocca/blob/master/docs/mocca_icon_w.png?raw=true
