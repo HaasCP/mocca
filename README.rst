@@ -28,7 +28,7 @@
     :target: https://pyscaffold.org/
 
 ⛔️ DEPRECATED
-============
+==============
 
 For supported and updated version, please see:
 
