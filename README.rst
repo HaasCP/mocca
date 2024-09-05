@@ -93,11 +93,11 @@ How to cite
 ===========
 **Peer-reviewed, open access:**
 
-Haas, C. P., Lübbesmeyer, M., Jin, E. H., McDonald, M. A., Koscher, B. A., Guimond, N., Di Rocco, L., Kayser, H., Leweke, S., Niedenführ, S., Nicholls, R., Greeves, E., Barber, D. M., Hillenbrand, J., Volpin, G., and Jensen, K. F. Open-Source Chromatographic Data Analysis for Reaction Optimization and Screening. *ACS Cent.Sci.* **2023**. https://doi.org/10.1021/acscentsci.2c01042.
+Haas, C. P., Lübbesmeyer, M., Jin, E. H., McDonald, M. A., Koscher, B. A., Guimond, N., Di Rocco, L., Kayser, H., Leweke, S., Niedenführ, S., Nicholls, R., Greeves, E., Barber, D. M., Hillenbrand, J., Volpin, G., and Jensen, K. F. Open-Source Chromatographic Data Analysis for Reaction Optimization and Screening. *ACS Cent. Sci.* 2023, 9, 2, 307–317. https://doi.org/10.1021/acscentsci.2c01042.
 
 **Preprint:**
 
-Haas, C. P., Lübbesmeyer, M., Jin, E. H., McDonald, M. A., Koscher, B. A., Guimond, N., Di Rocco, L., Kayser, H., Leweke, S., Niedenführ, S., Nicholls, R., Greeves, E., Barber, D. M., Hillenbrand, J., Volpin, G., and Jensen, K. F. Open-Source Chromatographic Data Analysis for Reaction Optimization and Screening. *ChemRxiv* **2022**. https://doi.org/10.26434/chemrxiv-2022-0pv2d.
+Haas, C. P., Lübbesmeyer, M., Jin, E. H., McDonald, M. A., Koscher, B. A., Guimond, N., Di Rocco, L., Kayser, H., Leweke, S., Niedenführ, S., Nicholls, R., Greeves, E., Barber, D. M., Hillenbrand, J., Volpin, G., and Jensen, K. F. Open-Source Chromatographic Data Analysis for Reaction Optimization and Screening. *ChemRxiv* 2022. https://doi.org/10.26434/chemrxiv-2022-0pv2d.
 
 
 .. _pyscaffold-notes:
