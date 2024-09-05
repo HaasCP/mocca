@@ -30,7 +30,7 @@
 ⛔️ DEPRECATED
 ============
 
-For updated version, please see:
+For supported and updated version, please see:
 
 https://github.com/Bayer-Group/MOCCA
 
